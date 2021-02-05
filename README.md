@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# boomer <img src='man/figures/logo.png' align="right" height="139" />
+# boomer <img src='man/figures/logo.PNG' align="right" height="139" />
 
 *{boomer}* lets you look at intermediate results of a call. It
 “explodes” the call into its parts hence the name. It is useful for
@@ -85,9 +85,8 @@ occurrence of the error, it can help with debugging:
 
   - Set the `print` argument to a function such as `str` to change what
     is printed (see `?boom` to see how to print differently depending on
-    class). Useful alternatives would be `glimpse::glimpse` of
-    `invisible` (to print nothing). This is useful when the output is
-    too long.
+    class). Useful alternatives would be `dplyr::glimpse` of `invisible`
+    (to print nothing). This is useful when the output is too long.
 
 <!-- end list -->
 
@@ -97,19 +96,18 @@ boom(head(sapply(seq(10^6), sqrt)), clock = TRUE, print = str)
 #> time: 0 us
 #>  num 1e+06
 #> seq(10^6)
-#> time: 0.996 ms
+#> time: 0 us
 #>  int [1:1000000] 1 2 3 4 5 6 7 8 9 10 ...
 #> sapply(seq(10^6), sqrt)
-#> time: 0.986 s
+#> time: 1.454 s
 #>  num [1:1000000] 1 1.41 1.73 2 2.24 ...
 #> head(sapply(seq(10^6), sqrt))
 #> time: 0 us
 #>  num [1:6] 1 1.41 1.73 2 2.24 ...
 ```
 
-`boom()` also works works on loops and multi-line expression, you might
-want even want to `rig()` a function in order to `boom()` all the calls
-of its body :
+`boom()` also works works on loops and multi-line expression, you can
+also `rig()` a function in order to `boom()` all the calls of its body :
 
 ``` r
 # try it out on you own, a bit too verbose for a README :)
@@ -118,14 +116,14 @@ rig(ave)(warpbreaks$breaks, warpbreaks$wool)
 
 ## Addin
 
-If you don’t want to type `boom()` you can use the provided addin, named
-*“Explode a call”*, just attribute a key combination to it (I use
-ctrl+shift+alt+B on windows), select the call you’d like to explode and
-fire away\!
+To avoid typing `boom()` all the time you can use the provided addin
+named *“Explode a call with `boom()`”*: just attribute a key combination
+to it (I use ctrl+shift+alt+B on windows), select the call you’d like to
+explode and fire away\!
 
 The default values of the `clock` and `print` arguments of `boom()` are
 given by the options `"boomer.clock"` and `"boomer.print"`, so by
-modifying those you will change the behavior of the plugin.
+modifying those you will change the behavior of the addin.
 
 ## Notes
 
@@ -166,6 +164,6 @@ boom(1+2+3+4)
 
 An earlier version of the package was released as *{boom}*, but a
 package *{Boom}* already exists on CRAN so it was renamed. *{boom}*
-won’t be maintained.
+won’t be maintained and will be archived, possibly removed.
 
 Thanks to @data\_question for suggesting the name *{boomer}*.

@@ -141,30 +141,30 @@
 <p><code><a href="reference/boom.html">boom()</a></code> features a couple of optional arguments:</p>
 <ul>
 <li><p>Set <code>clock</code> to <code>TRUE</code> to see how long each step (in isolation!) took to run.</p></li>
-<li><p>Set the <code>print</code> argument to a function such as <code>str</code> to change what is printed (see <code><a href="reference/boom.html">?boom</a></code> to see how to print differently depending on class). Useful alternatives would be <code>glimpse::glimpse</code> of <code>invisible</code> (to print nothing). This is useful when the output is too long.</p></li>
+<li><p>Set the <code>print</code> argument to a function such as <code>str</code> to change what is printed (see <code><a href="reference/boom.html">?boom</a></code> to see how to print differently depending on class). Useful alternatives would be <code><a href="https://dplyr.tidyverse.org/reference/reexports.html">dplyr::glimpse</a></code> of <code>invisible</code> (to print nothing). This is useful when the output is too long.</p></li>
 </ul>
 <!-- end list --><div class="sourceCode" id="cb5"><pre class="r"><span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">10</span>^<span class="fl">6</span>), <span class="no">sqrt</span>)), <span class="kw">clock</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">print</span> <span class="kw">=</span> <span class="no">str</span>)
 <span class="co">#&gt; 10^6</span>
 <span class="co">#&gt; time: 0 us</span>
 <span class="co">#&gt;  num 1e+06</span>
 <span class="co">#&gt; seq(10^6)</span>
-<span class="co">#&gt; time: 0.999 ms</span>
+<span class="co">#&gt; time: 0 us</span>
 <span class="co">#&gt;  int [1:1000000] 1 2 3 4 5 6 7 8 9 10 ...</span>
 <span class="co">#&gt; sapply(seq(10^6), sqrt)</span>
-<span class="co">#&gt; time: 0.951 s</span>
+<span class="co">#&gt; time: 1.454 s</span>
 <span class="co">#&gt;  num [1:1000000] 1 1.41 1.73 2 2.24 ...</span>
 <span class="co">#&gt; head(sapply(seq(10^6), sqrt))</span>
 <span class="co">#&gt; time: 0 us</span>
 <span class="co">#&gt;  num [1:6] 1 1.41 1.73 2 2.24 ...</span></pre></div>
-<p><code><a href="reference/boom.html">boom()</a></code> also works works on loops and multi-line expression, you might want even want to <code><a href="reference/boom.html">rig()</a></code> a function in order to <code><a href="reference/boom.html">boom()</a></code> all the calls of its body :</p>
+<p><code><a href="reference/boom.html">boom()</a></code> also works works on loops and multi-line expression, you can also <code><a href="reference/boom.html">rig()</a></code> a function in order to <code><a href="reference/boom.html">boom()</a></code> all the calls of its body :</p>
 <div class="sourceCode" id="cb6"><pre class="r"><span class="co"># try it out on you own, a bit too verbose for a README :)</span>
 <span class="fu"><a href="reference/boom.html">rig</a></span>(<span class="no">ave</span>)(<span class="no">warpbreaks</span>$<span class="no">breaks</span>, <span class="no">warpbreaks</span>$<span class="no">wool</span>)</pre></div>
 </div>
 <div id="addin" class="section level2">
 <h2 class="hasAnchor">
 <a href="#addin" class="anchor"></a>Addin</h2>
-<p>If you don’t want to type <code><a href="reference/boom.html">boom()</a></code> you can use the provided addin, named <em>“Explode a call”</em>, just attribute a key combination to it (I use ctrl+shift+alt+B on windows), select the call you’d like to explode and fire away!</p>
-<p>The default values of the <code>clock</code> and <code>print</code> arguments of <code><a href="reference/boom.html">boom()</a></code> are given by the options <code>"boomer.clock"</code> and <code>"boomer.print"</code>, so by modifying those you will change the behavior of the plugin.</p>
+<p>To avoid typing <code><a href="reference/boom.html">boom()</a></code> all the time you can use the provided addin named <em>“Explode a call with <code><a href="reference/boom.html">boom()</a></code>”</em>: just attribute a key combination to it (I use ctrl+shift+alt+B on windows), select the call you’d like to explode and fire away!</p>
+<p>The default values of the <code>clock</code> and <code>print</code> arguments of <code><a href="reference/boom.html">boom()</a></code> are given by the options <code>"boomer.clock"</code> and <code>"boomer.print"</code>, so by modifying those you will change the behavior of the addin.</p>
 </div>
 <div id="notes" class="section level2">
 <h2 class="hasAnchor">
@@ -196,7 +196,7 @@
 <span class="co">#&gt; [1] 6</span>
 <span class="co">#&gt; 1 + 2 + 3 + 4</span>
 <span class="co">#&gt; [1] 10</span></pre></div>
-<p>An earlier version of the package was released as <em>{boom}</em>, but a package <em>{Boom}</em> already exists on CRAN so it was renamed. <em>{boom}</em> won’t be maintained.</p>
+<p>An earlier version of the package was released as <em>{boom}</em>, but a package <em>{Boom}</em> already exists on CRAN so it was renamed. <em>{boom}</em> won’t be maintained and will be archived, possibly removed.</p>
 <p>Thanks to @data_question for suggesting the name <em>{boomer}</em>.</p>
 </div>
 </div>
