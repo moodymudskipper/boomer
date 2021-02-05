@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# boomer <img src='man/figures/logo.PNG' align="right" height="139" />
+# boomer <img src='man/figures/logo.png' align="right" height="139" />
 
 *{boomer}* lets you look at intermediate results of a call. It
 “explodes” the call into its parts hence the name. It is useful for
@@ -97,10 +97,10 @@ boom(head(sapply(seq(10^6), sqrt)), clock = TRUE, print = str)
 #> time: 0 us
 #>  num 1e+06
 #> seq(10^6)
-#> time: 0.999 ms
+#> time: 0.996 ms
 #>  int [1:1000000] 1 2 3 4 5 6 7 8 9 10 ...
 #> sapply(seq(10^6), sqrt)
-#> time: 0.951 s
+#> time: 0.986 s
 #>  num [1:1000000] 1 1.41 1.73 2 2.24 ...
 #> head(sapply(seq(10^6), sqrt))
 #> time: 0 us
