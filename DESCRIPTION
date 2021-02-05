@@ -1,0 +1,24 @@
+Package: boomer
+Title: Print the Output of Intermediate Steps of a Call
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Antoine",
+           family = "Fabri",
+           role = c("aut", "cre"),
+           email = "antoine.fabri@gmail.com")
+Description: 'boomer' allows one to print the output of intermediate steps of a call, it is useful for debugging and teaching operation precedence.
+License: GPL-3
+Encoding: UTF-8
+Language: en
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    crayon,
+    rlang,
+    rstudioapi
+Suggests: 
+    magrittr,
+    lobstr
+URL: https://github.com/moodymudskipper/boomer
+BugReports: https://github.com/moodymudskipper/boomer/issues
