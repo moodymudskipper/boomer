@@ -57,16 +57,7 @@ boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.
     eval.parent(call)
   }
   # reset the global times table
-  globals$times <- data.frame(
-    call = character(),
-    total_time_start = Sys.time()[0],
-    evaluation_time_start = Sys.time()[0],
-    evaluation_time_end = Sys.time()[0],
-    evaluation_time = double(),
-    true_time = double(),
-    total_time_end = Sys.time()[0],
-    total_time = double(),
-    counted = logical())
+  reset_globals()
 
   pf   <- parent.frame()
   expr <- substitute(expr)
@@ -101,6 +92,7 @@ boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.
 #' @rdname boom
 rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.print")) {
   expr <- body(fun)
+  reset_globals()
   pf   <- parent.frame()
   funs <- setdiff(all.names(expr), c(
     all.vars(expr), "::", ":::"))
