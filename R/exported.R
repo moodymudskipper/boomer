@@ -75,22 +75,22 @@ boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
   for (fun_chr in funs) {
-    # fun will include namespaces nad functions yet to be defined (in the case of a script)
+    # `funs` will include namespaces and functions yet to be defined (in the case of a script)
     # so we don't want to fail here if the object doesn't exist
     if(!exists(fun_chr, pf)) next
 
     # fetch the env, primitives don't have one, but they're in the base package
-    fun_env <- environment(get(fun_chr, envir = pf))
+    fun_val <- get(fun_chr, envir = pf)
+    fun_env <- environment(fun_val)
     if(is.null(fun_env)) {
-      namespace <- "base"
-    } else {
-      namespace <- getNamespaceName(fun_env)
+      fun_env <- asNamespace("base")
     }
 
-    fun_val <- getExportedValue(namespace, fun_chr)
     f <- wrap(fun_val, clock, print)
-    environment(f) <- asNamespace(namespace)
+    environment(f) <- fun_env
+
     mask[[fun_chr]] <- f
+
   }
   mask$`::` <- double_colon(clock, print)
   mask$`:::` <- triple_colon(clock, print)
