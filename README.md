@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# boomer <img src='man/figures/logo.PNG' align="right" height="139" />
+# boomer <img src='man/figures/logo.png' align="right" height="139" />
 
 *{boomer}* lets you look at intermediate results of a call. It
 “explodes” the call into its parts hence the name. It is useful for
