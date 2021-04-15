@@ -113,16 +113,14 @@ rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.pr
     if(!exists(fun_chr, pf)) next
 
     # fetch the env, primitives don't have one, but they're in the base package
-    fun_env <- environment(get(fun_chr, envir = pf))
+    fun_val <- get(fun_chr, envir = pf)
+    fun_env <- environment(fun_val)
     if(is.null(fun_env)) {
-      namespace <- "base"
-    } else {
-      namespace <- getNamespaceName(fun_env)
+      fun_env <- asNamespace("base")
     }
 
-    fun_val <- getExportedValue(namespace, fun_chr)
     f <- wrap(fun_val, clock, print)
-    environment(f) <- asNamespace(namespace)
+    environment(f) <- fun_env
     mask[[fun_chr]] <- f
   }
   mask$`::` <- double_colon(clock, print)
