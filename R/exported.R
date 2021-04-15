@@ -123,21 +123,36 @@ rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.pr
 
 #' Create rigged function conveniently
 #'
-#' Allows `rigger + function(...) {...}` syntax to create a rigged function
-#' conveniently
+#' Allows `rigger(...) + function(...) {...}` syntax to create a rigged function
+#' conveniently.
+#'
+#' @inheritParams boom
+#'
+#' @return a list containing the arguments, with the class "rigger" to enable
+#' `+.rigger` and `print.rigger`
 #' @export
-rigger <- logical()
-class(rigger) <- "rigger"
+#' @examples
+#' fun1 <- rigger() + function(x) x + 1 + 2
+#' fun1(1)
+#' fun2 <- rigger(TRUE, typeof) + function(x) x + 1 + 2
+#' fun2(1)
+rigger <- function(clock = getOption("boom.clock"), print = getOption("boom.print")) {
+  res <- list(clock = clock, print = print)
+  class(res) <- "rigger"
+  res
+}
+
 
 
 #' @export
 print.rigger <- function(x, ...) {
   writeLines(paste0(
-    "rigger object, use the syntax `rigger + function(...) {...}` to create a ",
-    "rigged function conveniently"))
+    "# rigger object, use the syntax `rigger(...) + function(...) {...}` to create a ",
+    "rigged function conveniently\n"))
+  print(unclass(x))
   invisible(x)
 }
 
 #' @export
-`+.rigger` <- function(e1, e2) rig(e2)
+`+.rigger` <- function(e1, e2) rig(e2, clock = e1$clock, print = e1$print)
 
