@@ -120,3 +120,24 @@ rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.pr
   environment(fun) <- mask
   fun
 }
+
+#' Create rigged function conveniently
+#'
+#' Allows `rigger + function(...) {...}` syntax to create a rigged function
+#' conveniently
+#' @export
+rigger <- logical()
+class(rigger) <- "rigger"
+
+
+#' @export
+print.rigger <- function(x, ...) {
+  writeLines(paste0(
+    "rigger object, use the syntax `rigger + function(...) {...}` to create a ",
+    "rigged function conveniently"))
+  invisible(x)
+}
+
+#' @export
+`+.rigger` <- function(e1, e2) rig(e2)
+
