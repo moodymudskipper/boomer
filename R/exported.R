@@ -125,8 +125,8 @@ rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.pr
     environment(f) <- asNamespace(namespace)
     mask[[fun_chr]] <- f
   }
-  mask$`::` <- double_colon(clock)
-  mask$`:::` <- triple_colon(clock)
+  mask$`::` <- double_colon(clock, print)
+  mask$`:::` <- triple_colon(clock, print)
   environment(fun) <- mask
   fun
 }
