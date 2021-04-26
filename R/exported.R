@@ -9,6 +9,7 @@
 #' @param clock whether to time intermediate steps, `FALSE` by default unless you
 #' set `options(boom.clock = TRUE)`. The execution time of a step doesn't include the
 #' execution time of its previously printed sub-steps.
+#' @param ignore Functions to ignore. `::` and `:::` are always ignored.
 #' @param print A function, a formula or a list of functions or formulas.
 #'
 #' @details
@@ -44,7 +45,7 @@
 #'
 #' # rig a function
 #' rig(ave)(warpbreaks$breaks, warpbreaks$wool)
-boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.print")) {
+boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.print"), ignore = c("~", "{", "(", "<-", "<<-")) {
 
   # if we are in a pipe chain, explode the chain above
   scs <- sys.calls()
@@ -61,7 +62,7 @@ boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.
 
   pf   <- parent.frame()
   expr <- substitute(expr)
-  funs <- setdiff(all.names(expr), c(all.vars(expr), "::", ":::"))
+  funs <- setdiff(all.names(expr), c(all.vars(expr), "::", ":::", ignore))
   mask <- list()
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
@@ -90,12 +91,12 @@ boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.
 
 #' @export
 #' @rdname boom
-rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.print")) {
+rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.print"), ignore = c("~", "{", "(", "<-", "<<-")) {
   expr <- body(fun)
   reset_globals()
   pf   <- parent.frame()
   funs <- setdiff(all.names(expr), c(
-    all.vars(expr), "::", ":::", "~", "{", "<-"))
+    all.vars(expr), "::", ":::", ignore))
   mask <- new.env(parent = environment(fun))
   # go through every existing function detected above and create a wrapper
   # in the mask to override it

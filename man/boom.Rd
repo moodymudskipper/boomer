@@ -5,9 +5,19 @@
 \alias{rig}
 \title{Print the Output of Intermediate Steps of a Call}
 \usage{
-boom(expr, clock = getOption("boom.clock"), print = getOption("boom.print"))
+boom(
+  expr,
+  clock = getOption("boom.clock"),
+  print = getOption("boom.print"),
+  ignore = c("~", "{", "(", "<-", "<<-")
+)
 
-rig(fun, clock = getOption("boom.clock"), print = getOption("boom.print"))
+rig(
+  fun,
+  clock = getOption("boom.clock"),
+  print = getOption("boom.print"),
+  ignore = c("~", "{", "(", "<-", "<<-")
+)
 }
 \arguments{
 \item{expr}{call to explode}
@@ -17,6 +27,8 @@ set \code{options(boom.clock = TRUE)}. The execution time of a step doesn't incl
 execution time of its previously printed sub-steps.}
 
 \item{print}{A function, a formula or a list of functions or formulas.}
+
+\item{ignore}{Functions to ignore. \code{::} and \code{:::} are always ignored.}
 
 \item{fun}{function ro \code{rig()}}
 }
