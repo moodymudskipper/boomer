@@ -104,19 +104,19 @@ rig <- function(
 
   expr <- body(fun)
   reset_globals()
-  pf   <- parent.frame()
+  rigged_fun_env   <- environment(fun)
   funs <- setdiff(all.names(expr), c(
     all.vars(expr), "::", ":::", ignore))
-  mask <- new.env(parent = environment(fun))
+  mask <- new.env(parent = rigged_fun_env)
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
   for (fun_chr in funs) {
     # fun will include namespaces nad functions yet to be defined (in the case of a script)
     # so we don't want to fail here if the object doesn't exist
-    if(!exists(fun_chr, pf)) next
+    if(!exists(fun_chr, rigged_fun_env)) next
 
     # fetch the env, primitives don't have one, but they're in the base package
-    fun_val <- get(fun_chr, envir = pf)
+    fun_val <- get(fun_chr, envir = rigged_fun_env)
     fun_env <- environment(fun_val)
     if(is.null(fun_env)) {
       fun_env <- asNamespace("base")
