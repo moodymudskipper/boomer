@@ -9,15 +9,16 @@
 #' @param clock whether to time intermediate steps, `FALSE` by default unless you
 #' set `options(boom.clock = TRUE)`. The execution time of a step doesn't include the
 #' execution time of its previously printed sub-steps.
-#' @param ignore Functions to ignore. `::` and `:::` are always ignored.
+#' @param ignore functions to ignore, defaults to `c("~", "{", "(", "<-", "<<-", "=")`
+#'   unless the option `"boom.ignore"`. `::` and `:::` are always ignored.
 #' @param print A function, a formula or a list of functions or formulas.
 #'
 #' @details
-#' By default, unless `options(boom.clock = print)` is set to a custom value, the
+#' By default, unless the "boom.print" option  is set to a custom value, the
 #' output of every step is printed in a standard way.
 #'
-#' If you provide another function such as
-#' `str`, the console output of `str` will be printed. Use `invisible` to display
+#' If you provide another function such, for instance `options(boom.print = str)`
+#' the console output of `str` will be printed. Use `invisible` to display
 #' nothing, another useful alternative would be `dplyr::glimpse`.
 #'
 #' *{rlang}*'s formula notation is supported, so for instance you can type:
@@ -45,7 +46,11 @@
 #'
 #' # rig a function
 #' rig(ave)(warpbreaks$breaks, warpbreaks$wool)
-boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.print"), ignore = c("~", "{", "(", "<-", "<<-")) {
+boom <- function(
+  expr,
+  clock = getOption("boom.clock"),
+  print = getOption("boom.print"),
+  ignore = getOption("boom.ignore")) {
 
   # if we are in a pipe chain, explode the chain above
   scs <- sys.calls()
@@ -91,7 +96,12 @@ boom <- function(expr, clock = getOption("boom.clock"), print = getOption("boom.
 
 #' @export
 #' @rdname boom
-rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.print"), ignore = c("~", "{", "(", "<-", "<<-")) {
+rig <- function(
+  fun,
+  clock = getOption("boom.clock"),
+  print = getOption("boom.print"),
+  ignore = getOption("boom.ignore")) {
+
   expr <- body(fun)
   reset_globals()
   pf   <- parent.frame()

@@ -14,8 +14,6 @@
       [1] 6
       1 + 2 * 3
       [1] 7
-      n <- 1 + 2 * 3
-      [1] 7
       -n
       [1] -7
       utils:::head(x, -n)
@@ -23,11 +21,6 @@
       base::nchar(utils:::head(x, -n))
        [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
       sum(base::nchar(utils:::head(x, -n)))
-      [1] 19
-      {
-          n <- 1 + 2 * 3
-          sum(base::nchar(utils:::head(x, -n)))
-      }
       [1] 19
     Output
       [1] 19

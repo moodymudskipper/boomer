@@ -9,14 +9,14 @@ boom(
   expr,
   clock = getOption("boom.clock"),
   print = getOption("boom.print"),
-  ignore = c("~", "{", "(", "<-", "<<-")
+  ignore = getOption("boom.ignore")
 )
 
 rig(
   fun,
   clock = getOption("boom.clock"),
   print = getOption("boom.print"),
-  ignore = c("~", "{", "(", "<-", "<<-")
+  ignore = getOption("boom.ignore")
 )
 }
 \arguments{
@@ -28,8 +28,6 @@ execution time of its previously printed sub-steps.}
 
 \item{print}{A function, a formula or a list of functions or formulas.}
 
-\item{ignore}{Functions to ignore. \code{::} and \code{:::} are always ignored.}
-
 \item{fun}{function ro \code{rig()}}
 }
 \description{
@@ -37,11 +35,11 @@ execution time of its previously printed sub-steps.}
 \code{rig()} a function to make all the calls of its body \code{boom()}.
 }
 \details{
-By default, unless \code{options(boom.clock = print)} is set to a custom value, the
+By default, unless the "boom.print" option  is set to a custom value, the
 output of every step is printed in a standard way.
 
-If you provide another function such as
-\code{str}, the console output of \code{str} will be printed. Use \code{invisible} to display
+If you provide another function such, for instance \code{options(boom.print = str)}
+the console output of \code{str} will be printed. Use \code{invisible} to display
 nothing, another useful alternative would be \code{dplyr::glimpse}.
 
 \emph{{rlang}}'s formula notation is supported, so for instance you can type:
