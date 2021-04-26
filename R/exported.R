@@ -95,7 +95,7 @@ rig <- function(fun, clock = getOption("boom.clock"), print = getOption("boom.pr
   reset_globals()
   pf   <- parent.frame()
   funs <- setdiff(all.names(expr), c(
-    all.vars(expr), "::", ":::"))
+    all.vars(expr), "::", ":::", "~", "{", "<-"))
   mask <- new.env(parent = environment(fun))
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
