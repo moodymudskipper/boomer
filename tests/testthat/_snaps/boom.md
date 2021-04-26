@@ -95,3 +95,21 @@
       head(sapply(seq(10^6), sqrt))
        num [1:6] 1 1.41 1.73 2 2.24 ...
 
+# visible_only arg works
+
+    Code
+      boom(1 + invisible(1))
+    Output
+      invisible(1)
+      [1] 1
+      1 + invisible(1)
+      [1] 2
+
+---
+
+    Code
+      boom(1 + invisible(1), visible_only = TRUE)
+    Output
+      1 + invisible(1)
+      [1] 2
+

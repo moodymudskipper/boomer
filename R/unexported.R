@@ -11,7 +11,7 @@ allNames <- function (x)
 }
 
 
-wrap <- function(fun_val, clock, print_fun) {
+wrap <- function(fun_val, clock, print_fun, visible_only) {
   if(clock) {
     f <- as.function(c(alist(...=), bquote({
       # start the clock
@@ -25,8 +25,10 @@ wrap <- function(fun_val, clock, print_fun) {
       # evaluate call with original function and clock it
       pf <- parent.frame()
       evaluation_time_start <- Sys.time()
-      res <- rlang::eval_bare(sc, pf)
+      res <- withVisible(rlang::eval_bare(sc, pf))
       evaluation_time_end <- Sys.time()
+      if(!res$visible && .(visible_only)) return(invisible(res$value))
+      res <- res$value
 
       # update the global `times` data frame and compute the true time
       true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
@@ -52,7 +54,9 @@ wrap <- function(fun_val, clock, print_fun) {
       sc_bkp <- sc
       sc[[1]] <- .(fun_val)
       # evaluate call with original function
-      res <- rlang::eval_bare(sc, parent.frame())
+      res <- withVisible(rlang::eval_bare(sc, parent.frame()))
+      if(!res$visible && .(visible_only)) return(invisible(res$value))
+      res <- res$value
       # display side effects
       writeLines(crayon::cyan(deparse(sc_bkp)))
       print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
@@ -137,7 +141,7 @@ fetch_print_fun <- function(print_fun, res) {
 }
 
 
-double_colon <- function(clock, print_fun) {
+double_colon <- function(clock, print_fun, visible_only) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`::`
@@ -157,8 +161,10 @@ double_colon <- function(clock, print_fun) {
         # evaluate call with original function and clock it
         pf <- parent.frame()
         evaluation_time_start <- Sys.time()
-        res <- rlang::eval_bare(sc, pf)
+        res <- withVisible(rlang::eval_bare(sc, pf))
         evaluation_time_end <- Sys.time()
+        if(!res$visible && .(visible_only)) return(invisible(res$value))
+        res <- res$value
 
         # update the global `times` data frame and compute the true time
         true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
@@ -191,7 +197,9 @@ double_colon <- function(clock, print_fun) {
         sc_bkp <- sc
         sc[[1]] <- .(fun_val)
         # evaluate call with original function
-        res <- rlang::eval_bare(sc, parent.frame())
+        res <- withVisible(rlang::eval_bare(sc, parent.frame()))
+        if(!res$visible && .(visible_only)) return(invisible(res$value))
+        res <- res$value
         writeLines(crayon::cyan(deparse(sc_bkp)))
         print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
         writeLines(capture.output(print_fun(res)))
@@ -201,7 +209,7 @@ double_colon <- function(clock, print_fun) {
   }
 }
 
-triple_colon <- function(clock, print_fun) {
+triple_colon <- function(clock, print_fun, visible_only) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`:::`
@@ -220,8 +228,10 @@ triple_colon <- function(clock, print_fun) {
         # evaluate call with original function and clock it
         pf <- parent.frame()
         evaluation_time_start <- Sys.time()
-        res <- rlang::eval_bare(sc, pf)
+        res <- withVisible(rlang::eval_bare(sc, pf))
         evaluation_time_end <- Sys.time()
+        if(!res$visible && .(visible_only)) return(invisible(res$value))
+        res <- res$value
 
         # update the global `times` data frame and compute the true time
         true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
@@ -253,7 +263,9 @@ triple_colon <- function(clock, print_fun) {
         sc_bkp <- sc
         sc[[1]] <- .(fun_val)
         # evaluate call with original function
-        res <- rlang::eval_bare(sc, parent.frame())
+        res <- withVisible(rlang::eval_bare(sc, parent.frame()))
+        if(!res$visible && .(visible_only)) return(invisible(res$value))
+        res <- res$value
         writeLines(crayon::cyan(deparse(sc_bkp)))
         print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
         writeLines(capture.output(print_fun(res)))

@@ -4,7 +4,12 @@
 \alias{rigger}
 \title{Create rigged function conveniently}
 \usage{
-rigger(clock = getOption("boom.clock"), print = getOption("boom.print"))
+rigger(
+  clock = getOption("boom.clock"),
+  print = getOption("boom.print"),
+  ignore = getOption("boom.ignore"),
+  visible_only = getOption("boom.visible_only")
+)
 }
 \arguments{
 \item{clock}{whether to time intermediate steps, \code{FALSE} by default unless you
@@ -12,6 +17,9 @@ set \code{options(boom.clock = TRUE)}. The execution time of a step doesn't incl
 execution time of its previously printed sub-steps.}
 
 \item{print}{A function, a formula or a list of functions or formulas.}
+
+\item{visible_only}{whether functions returning invisibly should be considered,
+by default they are unless the option \code{"boom.visible_only"} is set to \code{TRUE}.}
 }
 \value{
 a list containing the arguments, with the class "rigger" to enable

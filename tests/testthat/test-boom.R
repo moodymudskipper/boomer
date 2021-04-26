@@ -26,3 +26,12 @@ test_that("boom() works with README examples", {
     boom(head(sapply(seq(10^6), sqrt)), print = str)
   })
 })
+
+test_that("visible_only arg works", {
+  expect_snapshot({
+    boom(1 + invisible(1))
+  })
+  expect_snapshot({
+    boom(1 + invisible(1), visible_only = TRUE)
+  })
+})

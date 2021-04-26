@@ -9,9 +9,11 @@
 #' @param clock whether to time intermediate steps, `FALSE` by default unless you
 #' set `options(boom.clock = TRUE)`. The execution time of a step doesn't include the
 #' execution time of its previously printed sub-steps.
+#' @param print A function, a formula or a list of functions or formulas.
 #' @param ignore functions to ignore, defaults to `c("~", "{", "(", "<-", "<<-", "=")`
 #'   unless the option `"boom.ignore"`. `::` and `:::` are always ignored.
-#' @param print A function, a formula or a list of functions or formulas.
+#' @param visible_only whether functions returning invisibly should be considered,
+#'   by default they are unless the option `"boom.visible_only"` is set to `TRUE`.
 #'
 #' @details
 #' By default, unless the "boom.print" option  is set to a custom value, the
@@ -50,7 +52,8 @@ boom <- function(
   expr,
   clock = getOption("boom.clock"),
   print = getOption("boom.print"),
-  ignore = getOption("boom.ignore")) {
+  ignore = getOption("boom.ignore"),
+  visible_only = getOption("boom.visible_only")) {
 
   # if we are in a pipe chain, explode the chain above
   scs <- sys.calls()
@@ -83,14 +86,14 @@ boom <- function(
       fun_env <- asNamespace("base")
     }
 
-    f <- wrap(fun_val, clock, print)
+    f <- wrap(fun_val, clock, print, visible_only)
     environment(f) <- fun_env
 
     mask[[fun_chr]] <- f
 
   }
-  mask$`::` <- double_colon(clock, print)
-  mask$`:::` <- triple_colon(clock, print)
+  mask$`::` <- double_colon(clock, print, visible_only)
+  mask$`:::` <- triple_colon(clock, print, visible_only)
   invisible(eval(expr, envir = mask, enclos = parent.frame()))
 }
 
@@ -100,7 +103,8 @@ rig <- function(
   fun,
   clock = getOption("boom.clock"),
   print = getOption("boom.print"),
-  ignore = getOption("boom.ignore")) {
+  ignore = getOption("boom.ignore"),
+  visible_only = getOption("boom.visible_only")) {
 
   expr <- body(fun)
   reset_globals()
@@ -122,12 +126,12 @@ rig <- function(
       fun_env <- asNamespace("base")
     }
 
-    f <- wrap(fun_val, clock, print)
+    f <- wrap(fun_val, clock, print, visible_only)
     environment(f) <- fun_env
     mask[[fun_chr]] <- f
   }
-  mask$`::` <- double_colon(clock, print)
-  mask$`:::` <- triple_colon(clock, print)
+  mask$`::` <- double_colon(clock, print, visible_only)
+  mask$`:::` <- triple_colon(clock, print, visible_only)
   environment(fun) <- mask
   fun
 }
@@ -150,8 +154,10 @@ rig <- function(
 rigger <- function(
   clock = getOption("boom.clock"),
   print = getOption("boom.print"),
-  ignore = getOption("boom.ignore")) {
-  res <- list(clock = clock, print = print, ignore = ignore)
+  ignore = getOption("boom.ignore"),
+  visible_only = getOption("boom.visible_only")) {
+  res <- list(
+    clock = clock, print = print, ignore = ignore, visible_only = visible_only)
   class(res) <- "rigger"
   res
 }
@@ -168,5 +174,10 @@ print.rigger <- function(x, ...) {
 }
 
 #' @export
-`+.rigger` <- function(e1, e2) rig(e2, clock = e1$clock, print = e1$print)
-
+`+.rigger` <- function(e1, e2) {
+  rig(e2,
+      clock = e1$clock,
+      print = e1$print,
+      ignore = e1$ignore,
+      visible_only = e1$visible_only)
+}

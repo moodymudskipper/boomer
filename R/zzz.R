@@ -4,7 +4,8 @@
   op.boom <- list(
     boom.clock = FALSE,
     boom.print = print,
-    boom.ignore = c("~", "{", "(", "<-", "<<-", "=")
+    boom.ignore = c("~", "{", "(", "<-", "<<-", "="),
+    boom.visible_only = FALSE
   )
   toset <- !(names(op.boom) %in% names(op))
   if(any(toset)) options(op.boom[toset])
