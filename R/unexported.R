@@ -11,60 +11,67 @@ allNames <- function (x)
 }
 
 
+wrap_clocked <- function(fun_val, print_fun, visible_only) {
+  as.function(c(alist(...=), bquote({
+    # start the clock
+    total_time_start <- Sys.time()
+
+    # manipulate call to use original function
+    sc  <- sys.call()
+    sc_bkp <- sc
+    sc[[1]] <- .(fun_val)
+
+    # evaluate call with original function and clock it
+    pf <- parent.frame()
+    evaluation_time_start <- Sys.time()
+    res <- withVisible(rlang::eval_bare(sc, pf))
+    evaluation_time_end <- Sys.time()
+    if(!res$visible && .(visible_only)) return(invisible(res$value))
+    res <- res$value
+
+    # update the global `times` data frame and compute the true time
+    true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
+      call, total_time_start, evaluation_time_start, evaluation_time_end)
+
+    # update last_total_time_end on exit, we do it this way so our total
+    # time doesn't leave out the updating of the times df with this value
+    globals <- getFromNamespace("globals", "boomer")
+    on.exit(globals$last_total_time_end <- Sys.time())
+
+    # display side effects
+    writeLines(crayon::cyan(deparse(sc_bkp)))
+    writeLines(crayon::blue(true_time_msg))
+    print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
+    writeLines(capture.output(print_fun(res)))
+
+    res
+  })))
+}
+
+wrap_unclocked <- function(fun_val, print_fun, visible_only) {
+  as.function(c(alist(...=), bquote({
+    # manipulate call to use original function
+    sc  <- sys.call()
+    sc_bkp <- sc
+    sc[[1]] <- .(fun_val)
+    # evaluate call with original function
+    res <- withVisible(rlang::eval_bare(sc, parent.frame()))
+    if(!res$visible && .(visible_only)) return(invisible(res$value))
+    res <- res$value
+    # display side effects
+    writeLines(crayon::cyan(deparse(sc_bkp)))
+    print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
+    writeLines(capture.output(print_fun(res)))
+    res
+  })))
+}
+
 wrap <- function(fun_val, clock, print_fun, visible_only) {
   if(clock) {
-    f <- as.function(c(alist(...=), bquote({
-      # start the clock
-      total_time_start <- Sys.time()
-
-      # manipulate call to use original function
-      sc  <- sys.call()
-      sc_bkp <- sc
-      sc[[1]] <- .(fun_val)
-
-      # evaluate call with original function and clock it
-      pf <- parent.frame()
-      evaluation_time_start <- Sys.time()
-      res <- withVisible(rlang::eval_bare(sc, pf))
-      evaluation_time_end <- Sys.time()
-      if(!res$visible && .(visible_only)) return(invisible(res$value))
-      res <- res$value
-
-      # update the global `times` data frame and compute the true time
-      true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
-        call, total_time_start, evaluation_time_start, evaluation_time_end)
-
-      # update last_total_time_end on exit, we do it this way so our total
-      # time doesn't leave out the updating of the times df with this value
-      globals <- getFromNamespace("globals", "boomer")
-      on.exit(globals$last_total_time_end <- Sys.time())
-
-      # display side effects
-      writeLines(crayon::cyan(deparse(sc_bkp)))
-      writeLines(crayon::blue(true_time_msg))
-      print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-      writeLines(capture.output(print_fun(res)))
-
-      res
-    })))
+    wrap_clocked(fun_val, print_fun, visible_only)
   } else {
-    f <- as.function(c(alist(...=), bquote({
-      # manipulate call to use original function
-      sc  <- sys.call()
-      sc_bkp <- sc
-      sc[[1]] <- .(fun_val)
-      # evaluate call with original function
-      res <- withVisible(rlang::eval_bare(sc, parent.frame()))
-      if(!res$visible && .(visible_only)) return(invisible(res$value))
-      res <- res$value
-      # display side effects
-      writeLines(crayon::cyan(deparse(sc_bkp)))
-      print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-      writeLines(capture.output(print_fun(res)))
-      res
-    })))
+    wrap_unclocked(fun_val, print_fun, visible_only)
   }
-  f
 }
 
 update_times_df_and_get_true_time <- function(
@@ -149,40 +156,7 @@ double_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- getExportedValue(pkg, name)
 
-      as.function(c(alist(...=), bquote({
-        # start the clock
-        total_time_start <- Sys.time()
-
-        # manipulate call to use original function
-        sc  <- sys.call()
-        sc_bkp <- sc
-        sc[[1]] <- .(fun_val)
-
-        # evaluate call with original function and clock it
-        pf <- parent.frame()
-        evaluation_time_start <- Sys.time()
-        res <- withVisible(rlang::eval_bare(sc, pf))
-        evaluation_time_end <- Sys.time()
-        if(!res$visible && .(visible_only)) return(invisible(res$value))
-        res <- res$value
-
-        # update the global `times` data frame and compute the true time
-        true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
-          call, total_time_start, evaluation_time_start, evaluation_time_end)
-
-        # update last_total_time_end on exit, we do it this way so our total
-        # time doesn't leave out the updating of the times df with this value
-        globals <- getFromNamespace("globals", "boomer")
-        on.exit(globals$last_total_time_end <- Sys.time())
-
-        # display side effects
-        writeLines(crayon::cyan(deparse(sc_bkp)))
-        writeLines(crayon::blue(true_time_msg))
-        print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-        writeLines(capture.output(print_fun(res)))
-
-        res
-      })))
+      wrap_clocked(fun_val, print_fun, visible_only)
     }
   } else {
     function(pkg, name) {
@@ -191,20 +165,7 @@ double_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- getExportedValue(pkg, name)
 
-      as.function(c(alist(...=), bquote({
-        # manipulate call to use original function
-        sc  <- sys.call()
-        sc_bkp <- sc
-        sc[[1]] <- .(fun_val)
-        # evaluate call with original function
-        res <- withVisible(rlang::eval_bare(sc, parent.frame()))
-        if(!res$visible && .(visible_only)) return(invisible(res$value))
-        res <- res$value
-        writeLines(crayon::cyan(deparse(sc_bkp)))
-        print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-        writeLines(capture.output(print_fun(res)))
-        res
-      })))
+      wrap_unclocked(fun_val, print_fun, visible_only)
     }
   }
 }
@@ -216,40 +177,8 @@ triple_colon <- function(clock, print_fun, visible_only) {
       pkg <- as.character(substitute(pkg))
       name <- as.character(substitute(name))
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
-      as.function(c(alist(...=), bquote({
-        # start the clock
-        total_time_start <- Sys.time()
 
-        # manipulate call to use original function
-        sc  <- sys.call()
-        sc_bkp <- sc
-        sc[[1]] <- .(fun_val)
-
-        # evaluate call with original function and clock it
-        pf <- parent.frame()
-        evaluation_time_start <- Sys.time()
-        res <- withVisible(rlang::eval_bare(sc, pf))
-        evaluation_time_end <- Sys.time()
-        if(!res$visible && .(visible_only)) return(invisible(res$value))
-        res <- res$value
-
-        # update the global `times` data frame and compute the true time
-        true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
-          call, total_time_start, evaluation_time_start, evaluation_time_end)
-
-        # update last_total_time_end on exit, we do it this way so our total
-        # time doesn't leave out the updating of the times df with this value
-        globals <- getFromNamespace("globals", "boomer")
-        on.exit(globals$last_total_time_end <- Sys.time())
-
-        # display side effects
-        writeLines(crayon::cyan(deparse(sc_bkp)))
-        writeLines(crayon::blue(true_time_msg))
-        print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-        writeLines(capture.output(print_fun(res)))
-
-        res
-      })))
+      wrap_clocked(fun_val, print_fun, visible_only)
     }
   } else {
     function(pkg, name) {
@@ -257,20 +186,8 @@ triple_colon <- function(clock, print_fun, visible_only) {
       pkg <- as.character(substitute(pkg))
       name <- as.character(substitute(name))
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
-      as.function(c(alist(...=), bquote({
-        # manipulate call to use original function
-        sc  <- sys.call()
-        sc_bkp <- sc
-        sc[[1]] <- .(fun_val)
-        # evaluate call with original function
-        res <- withVisible(rlang::eval_bare(sc, parent.frame()))
-        if(!res$visible && .(visible_only)) return(invisible(res$value))
-        res <- res$value
-        writeLines(crayon::cyan(deparse(sc_bkp)))
-        print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-        writeLines(capture.output(print_fun(res)))
-        res
-      })))
+
+      wrap_unclocked(fun_val, print_fun, visible_only)
     }
   }
 }
