@@ -147,8 +147,11 @@ rig <- function(
 #' fun1(1)
 #' fun2 <- rigger(TRUE, typeof) + function(x) x + 1 + 2
 #' fun2(1)
-rigger <- function(clock = getOption("boom.clock"), print = getOption("boom.print")) {
-  res <- list(clock = clock, print = print)
+rigger <- function(
+  clock = getOption("boom.clock"),
+  print = getOption("boom.print"),
+  ignore = getOption("boom.ignore")) {
+  res <- list(clock = clock, print = print, ignore = ignore)
   class(res) <- "rigger"
   res
 }
