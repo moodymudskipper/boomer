@@ -116,7 +116,9 @@
       1 %>% identity() %>% missing_function() %>% I() %>% boomer::boom()
     Output
       I(.)
+      Error: simpleError/error/condition
       1 %>% identity() %>% missing_function() %>% I()
+      Error: simpleError/error/condition
     Error <simpleError>
       could not find function "missing_function"
     Code
@@ -126,8 +128,11 @@
       1 %>% identity() %>% eagerly_failing_function() %>% I() %>% boomer::boom()
     Output
       eagerly_failing_function(.)
+      Error: simpleError/error/condition
       I(.)
+      Error: simpleError/error/condition
       1 %>% identity() %>% eagerly_failing_function() %>% I()
+      Error: simpleError/error/condition
     Error <simpleError>
       oops
     Code
@@ -140,8 +145,11 @@
       identity(.)
       [1] 1
       failing_function(.)
+      Error: simpleError/error/condition
       I(.)
+      Error: simpleError/error/condition
       1 %>% identity() %>% failing_function() %>% I()
+      Error: simpleError/error/condition
     Error <simpleError>
       oops
 

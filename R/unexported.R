@@ -46,6 +46,7 @@ wrap_clocked <- function(fun_val, print_fun, visible_only) {
 
     # rethrow on failure
     if (!success) {
+      writeLines(crayon::magenta("Error:", paste0(class(error), collapse = "/")))
       stop(error)
     }
 
@@ -87,6 +88,7 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only) {
 
     # rethrow on failure
     if (!success) {
+      writeLines(crayon::magenta("Error:", paste0(class(error), collapse = "/")))
       stop(error)
     }
 
