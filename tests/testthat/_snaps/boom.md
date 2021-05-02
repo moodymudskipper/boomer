@@ -101,3 +101,37 @@
       1 + invisible(1)
       [1] 2
 
+# can debug failing pipes (#17)
+
+    Code
+      1 %>% identity() %>% I() %>% boomer::boom()
+    Output
+      identity(.)
+      [1] 1
+      I(.)
+      [1] 1
+      1 %>% identity() %>% I()
+      [1] 1
+    Code
+      1 %>% identity() %>% missing_function() %>% I() %>% boomer::boom()
+    Error <simpleError>
+      could not find function "missing_function"
+    Code
+      eagerly_failing_function <- (function(x) {
+        stop("oops")
+      })
+      1 %>% identity() %>% eagerly_failing_function() %>% I() %>% boomer::boom()
+    Error <simpleError>
+      oops
+    Code
+      failing_function <- (function(x) {
+        force(x)
+        stop("oops")
+      })
+      1 %>% identity() %>% failing_function() %>% I() %>% boomer::boom()
+    Output
+      identity(.)
+      [1] 1
+    Error <simpleError>
+      oops
+

@@ -37,3 +37,39 @@ test_that("visible_only arg works", {
     boom(1 + invisible(1), visible_only = TRUE)
   })
 })
+
+test_that("can debug failing pipes (#17)", {
+  expect_snapshot(error = TRUE, {
+    1 %>%
+      identity() %>%
+      I() %>%
+      boomer::boom()
+
+    1 %>%
+      identity() %>%
+      missing_function() %>%
+      I() %>%
+      boomer::boom()
+
+    eagerly_failing_function <- function(x) {
+      stop("oops")
+    }
+
+    1 %>%
+      identity() %>%
+      eagerly_failing_function() %>%
+      I() %>%
+      boomer::boom()
+
+    failing_function <- function(x) {
+      force(x)
+      stop("oops")
+    }
+
+    1 %>%
+      identity() %>%
+      failing_function() %>%
+      I() %>%
+      boomer::boom()
+  })
+})
