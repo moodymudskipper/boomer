@@ -15,10 +15,12 @@ test_that("boom() works with a global function", {
 })
 
 test_that("boom() works with README examples", {
+  library(magrittr, quietly = TRUE, verbose = FALSE)
+
   expect_snapshot({
     boom(1 + !1 * 2)
     boom(subset(head(mtcars, 2), qsec > 17))
-    library(magrittr, quietly = TRUE, verbose = FALSE)
+
     mtcars %>%
       head(2) %>%
       subset(qsec > 17) %>%

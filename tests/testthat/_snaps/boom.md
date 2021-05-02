@@ -26,7 +26,6 @@
       fun <- (function(x) {
         x
       })
-    Code
       boomer::boom(fun(1:3))
     Output
       1:3
@@ -57,17 +56,6 @@
       subset(head(mtcars, 2), qsec > 17)
                     mpg cyl disp  hp drat    wt  qsec vs am gear carb
       Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
-    Code
-      library(magrittr, quietly = TRUE, verbose = FALSE)
-    Warning <simpleWarning>
-      package 'magrittr' was built under R version 4.0.4
-    Message <packageStartupMessage>
-      
-      Attaching package: 'magrittr'
-    Message <packageStartupMessage>
-      The following objects are masked from 'package:testthat':
-      
-          equals, is_less_than, not
     Code
       mtcars %>% head(2) %>% subset(qsec > 17) %>% boom()
     Output
