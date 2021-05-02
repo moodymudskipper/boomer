@@ -77,7 +77,10 @@ boom <- function(
   for (fun_chr in funs) {
     # `funs` will include namespaces and functions yet to be defined (in the case of a script)
     # so we don't want to fail here if the object doesn't exist
-    if(!exists(fun_chr, pf)) next
+    if(!exists(fun_chr, pf)) {
+      message("Not booming undefined `", fun_chr, "()`.")
+      next
+    }
 
     # fetch the env, primitives don't have one, but they're in the base package
     fun_val <- get(fun_chr, envir = pf)
@@ -117,7 +120,10 @@ rig <- function(
   for (fun_chr in funs) {
     # fun will include namespaces nad functions yet to be defined (in the case of a script)
     # so we don't want to fail here if the object doesn't exist
-    if(!exists(fun_chr, rigged_fun_env)) next
+    if(!exists(fun_chr, rigged_fun_env)) {
+      message("Not rigging undefined `", fun_chr, "()`.")
+      next
+    }
 
     # fetch the env, primitives don't have one, but they're in the base package
     fun_val <- get(fun_chr, envir = rigged_fun_env)
