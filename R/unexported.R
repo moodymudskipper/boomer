@@ -16,30 +16,45 @@ wrap_clocked <- function(fun_val, print_fun, visible_only) {
     # start the clock
     total_time_start <- Sys.time()
 
-    # manipulate call to use original function
-    sc  <- sys.call()
-    sc_bkp <- sc
-    sc[[1]] <- .(fun_val)
-
-    # evaluate call with original function and clock it
-    pf <- parent.frame()
-    evaluation_time_start <- Sys.time()
-    res <- withVisible(rlang::eval_bare(sc, pf))
-    evaluation_time_end <- Sys.time()
-    if(!res$visible && .(visible_only)) return(invisible(res$value))
-    res <- res$value
-
-    # update the global `times` data frame and compute the true time
-    true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
-      call, total_time_start, evaluation_time_start, evaluation_time_end)
-
     # update last_total_time_end on exit, we do it this way so our total
     # time doesn't leave out the updating of the times df with this value
     globals <- getFromNamespace("globals", "boomer")
     on.exit(globals$last_total_time_end <- Sys.time())
 
-    # display side effects
+    # manipulate call to use original function
+    sc  <- sys.call()
+    sc_bkp <- sc
+    sc[[1]] <- .(fun_val)
+
+    # evaluate call with original function
+    pf <- parent.frame()
+    evaluation_time_start <- Sys.time()
+    success <- FALSE
+    error <- tryCatch(
+      {
+        res <- withVisible(rlang::eval_bare(sc, parent.frame()))
+        success <- TRUE
+      },
+      error = identity
+    )
+    evaluation_time_end <- Sys.time()
+    if(success && !res$visible && .(visible_only)) return(invisible(res$value))
+
+    # always display function call
+    # (must happen after evaluation so that calls are shown in order)
     writeLines(crayon::cyan(deparse(sc_bkp)))
+
+    # rethrow on failure
+    if (!success) {
+      stop(error)
+    }
+
+    # update the global `times` data frame and compute the true time
+    true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
+      call, total_time_start, evaluation_time_start, evaluation_time_end)
+
+    # otherwise print result
+    res <- res$value
     writeLines(crayon::blue(true_time_msg))
     print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
     writeLines(capture.output(print_fun(res)))
@@ -54,12 +69,29 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only) {
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
+
     # evaluate call with original function
-    res <- withVisible(rlang::eval_bare(sc, parent.frame()))
-    if(!res$visible && .(visible_only)) return(invisible(res$value))
-    res <- res$value
-    # display side effects
+    success <- FALSE
+    error <- tryCatch(
+      {
+        res <- withVisible(rlang::eval_bare(sc, parent.frame()))
+        success <- TRUE
+      },
+      error = identity
+    )
+    if(success && !res$visible && .(visible_only)) return(invisible(res$value))
+
+    # always display function call
+    # (must happen after evaluation so that calls are shown in order)
     writeLines(crayon::cyan(deparse(sc_bkp)))
+
+    # rethrow on failure
+    if (!success) {
+      stop(error)
+    }
+
+    # otherwise print result
+    res <- res$value
     print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
     writeLines(capture.output(print_fun(res)))
     res
