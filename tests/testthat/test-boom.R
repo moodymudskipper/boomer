@@ -15,10 +15,12 @@ test_that("boom() works with a global function", {
 })
 
 test_that("boom() works with README examples", {
+  library(magrittr, quietly = TRUE, verbose = FALSE)
+
   expect_snapshot({
     boom(1 + !1 * 2)
     boom(subset(head(mtcars, 2), qsec > 17))
-    library(magrittr, quietly = TRUE, verbose = FALSE)
+
     mtcars %>%
       head(2) %>%
       subset(qsec > 17) %>%
@@ -33,5 +35,41 @@ test_that("visible_only arg works", {
   })
   expect_snapshot({
     boom(1 + invisible(1), visible_only = TRUE)
+  })
+})
+
+test_that("can debug failing pipes (#17)", {
+  expect_snapshot(error = TRUE, {
+    1 %>%
+      identity() %>%
+      I() %>%
+      boomer::boom()
+
+    1 %>%
+      identity() %>%
+      missing_function() %>%
+      I() %>%
+      boomer::boom()
+
+    eagerly_failing_function <- function(x) {
+      stop("oops")
+    }
+
+    1 %>%
+      identity() %>%
+      eagerly_failing_function() %>%
+      I() %>%
+      boomer::boom()
+
+    failing_function <- function(x) {
+      force(x)
+      stop("oops")
+    }
+
+    1 %>%
+      identity() %>%
+      failing_function() %>%
+      I() %>%
+      boomer::boom()
   })
 })

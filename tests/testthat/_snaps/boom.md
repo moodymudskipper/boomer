@@ -26,7 +26,6 @@
       fun <- (function(x) {
         x
       })
-    Code
       boomer::boom(fun(1:3))
     Output
       1:3
@@ -57,17 +56,6 @@
       subset(head(mtcars, 2), qsec > 17)
                     mpg cyl disp  hp drat    wt  qsec vs am gear carb
       Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
-    Code
-      library(magrittr, quietly = TRUE, verbose = FALSE)
-    Warning <simpleWarning>
-      package 'magrittr' was built under R version 4.0.4
-    Message <packageStartupMessage>
-      
-      Attaching package: 'magrittr'
-    Message <packageStartupMessage>
-      The following objects are masked from 'package:testthat':
-      
-          equals, is_less_than, not
     Code
       mtcars %>% head(2) %>% subset(qsec > 17) %>% boom()
     Output
@@ -112,4 +100,56 @@
     Output
       1 + invisible(1)
       [1] 2
+
+# can debug failing pipes (#17)
+
+    Code
+      1 %>% identity() %>% I() %>% boomer::boom()
+    Output
+      identity(.)
+      [1] 1
+      I(.)
+      [1] 1
+      1 %>% identity() %>% I()
+      [1] 1
+    Code
+      1 %>% identity() %>% missing_function() %>% I() %>% boomer::boom()
+    Output
+      I(.)
+      Error: simpleError/error/condition
+      1 %>% identity() %>% missing_function() %>% I()
+      Error: simpleError/error/condition
+    Error <simpleError>
+      could not find function "missing_function"
+    Code
+      eagerly_failing_function <- (function(x) {
+        stop("oops")
+      })
+      1 %>% identity() %>% eagerly_failing_function() %>% I() %>% boomer::boom()
+    Output
+      eagerly_failing_function(.)
+      Error: simpleError/error/condition
+      I(.)
+      Error: simpleError/error/condition
+      1 %>% identity() %>% eagerly_failing_function() %>% I()
+      Error: simpleError/error/condition
+    Error <simpleError>
+      oops
+    Code
+      failing_function <- (function(x) {
+        force(x)
+        stop("oops")
+      })
+      1 %>% identity() %>% failing_function() %>% I() %>% boomer::boom()
+    Output
+      identity(.)
+      [1] 1
+      failing_function(.)
+      Error: simpleError/error/condition
+      I(.)
+      Error: simpleError/error/condition
+      1 %>% identity() %>% failing_function() %>% I()
+      Error: simpleError/error/condition
+    Error <simpleError>
+      oops
 
