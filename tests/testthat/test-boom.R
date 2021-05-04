@@ -15,7 +15,7 @@ test_that("boom() works with a global function", {
 })
 
 test_that("boom() works with README examples", {
-  library(magrittr, quietly = TRUE, verbose = FALSE)
+  `%>%` <- magrittr::`%>%`
 
   expect_snapshot({
     boom(1 + !1 * 2)
