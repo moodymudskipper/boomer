@@ -10,8 +10,8 @@
 #' set `options(boom.clock = TRUE)`. The execution time of a step doesn't include the
 #' execution time of its previously printed sub-steps.
 #' @param print A function, a formula or a list of functions or formulas.
-#' @param ignore functions to ignore, defaults to `c("~", "{", "(", "<-", "<<-", "=")`
-#'   unless the option `"boom.ignore"`. `::` and `:::` are always ignored.
+#' @param ignore functions to ignore, defaults to `c("~", "\{", "(", "<-", "<<-", "=")`
+#'   unless the option `"boom.ignore"` is modified. `::` and `:::` are always ignored.
 #' @param visible_only whether functions returning invisibly should be considered,
 #'   by default they are unless the option `"boom.visible_only"` is set to `TRUE`.
 #'
@@ -180,4 +180,52 @@ print.rigger <- function(x, ...) {
       print = e1$print,
       ignore = e1$ignore,
       visible_only = e1$visible_only)
+}
+
+
+#' rig functions directly in their namespace
+#'
+#'
+#' @param ... functions to rig
+#' @inheritParams boom
+#'
+#' @export
+#'
+rig_in_namespace <- function(
+  ...,
+  clock = getOption("boom.clock"),
+  print = getOption("boom.print"),
+  ignore = getOption("boom.ignore"),
+  visible_only = getOption("boom.visible_only")) {
+
+  nms <- as.character(substitute(alist(...))[-1])
+  vals <- list(...)
+
+  ## rig all functions in their own namespace
+  for (i in seq_along(vals)) {
+
+    fun_chr <- nms[[i]]
+    ns <- environment(vals[[i]])
+    # update value
+    vals[[i]] <- rig(vals[[i]])
+    val <- vals[[i]]
+    nm <- nms[[i]]
+
+    unlockBinding(nm, ns)
+    assign(nm, val, ns)
+    pkg <- paste0("package:", base::getNamespaceName(ns))
+    #unlockBinding(fun_chr, pkg)
+    assign(nm, val, pkg)
+  }
+
+  # list of modified functions
+  rigged_funs <- setNames(vals, nms)
+  wrapped_funs <- lapply(rigged_funs, wrap, clock, print, visible_only)
+
+  # add all modified functions to each function's environment
+  for(fun in vals) {
+    list2env(wrapped_funs, environment(fun))
+  }
+
+  invisible(NULL)
 }
