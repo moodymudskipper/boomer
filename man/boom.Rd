@@ -30,6 +30,9 @@ execution time of its previously printed sub-steps.}
 
 \item{print}{A function, a formula or a list of functions or formulas.}
 
+\item{ignore}{functions to ignore, defaults to \code{c("~", "\\{", "(", "<-", "<<-", "=")}
+unless the option \code{"boom.ignore"} is modified. \code{::} and \code{:::} are always ignored.}
+
 \item{visible_only}{whether functions returning invisibly should be considered,
 by default they are unless the option \code{"boom.visible_only"} is set to \code{TRUE}.}
 

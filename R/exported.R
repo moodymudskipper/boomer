@@ -185,12 +185,13 @@ print.rigger <- function(x, ...) {
 
 #' rig functions directly in their namespace
 #'
+#' To recover original functions, restart the R session
 #'
-#' @param ... functions to rig
+#'
 #' @inheritParams boom
+#' @param ... functions to rig
 #'
 #' @export
-#'
 rig_in_namespace <- function(
   ...,
   clock = getOption("boom.clock"),
@@ -204,17 +205,15 @@ rig_in_namespace <- function(
   ## rig all functions in their own namespace
   for (i in seq_along(vals)) {
 
-    fun_chr <- nms[[i]]
+    nm <- nms[[i]]
     ns <- environment(vals[[i]])
-    # update value
     vals[[i]] <- rig(vals[[i]])
     val <- vals[[i]]
-    nm <- nms[[i]]
 
     unlockBinding(nm, ns)
     assign(nm, val, ns)
     pkg <- paste0("package:", base::getNamespaceName(ns))
-    #unlockBinding(fun_chr, pkg)
+    unlockBinding(nm, as.environment(pkg))
     assign(nm, val, pkg)
   }
 
