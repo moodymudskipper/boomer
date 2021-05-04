@@ -5,7 +5,9 @@
         n <- 1 + 2 * 3
         sum(base::nchar(utils:::head(x, -n)))
       })
+    Code
       rigged <- rig(fun)
+    Code
       rigged(letters)
     Output
       2 * 3
@@ -20,5 +22,20 @@
        [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
       sum(base::nchar(utils:::head(x, -n)))
       [1] 19
+    Output
       [1] 19
+
+# functions created at runtime are boomed
+
+    Code
+      rig(foo2)(2)
+    Message <simpleMessage>
+      Not rigging undefined `SQRT()`.
+    Output
+      x * 2
+      [1] 4
+      SQRT(x)
+      [1] 2
+    Output
+      [1] 2
 

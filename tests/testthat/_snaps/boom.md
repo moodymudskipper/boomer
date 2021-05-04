@@ -115,6 +115,8 @@
       [1] 1
     Code
       1 %>% identity() %>% missing_function() %>% I() %>% boomer::boom()
+    Message <simpleMessage>
+      Not booming undefined `missing_function()`.
     Output
       I(.)
       Error: simpleError/error/condition
@@ -155,4 +157,21 @@
       Error: simpleError/error/condition
     Error <simpleError>
       oops
+
+# functions created at runtime are boomed
+
+    Code
+      boom({
+        x <- 2
+        x <- x * 2
+        SQRT <- sqrt
+        SQRT(x)
+      })
+    Message <simpleMessage>
+      Not booming undefined `SQRT()`.
+    Output
+      x * 2
+      [1] 4
+      SQRT(x)
+      [1] 2
 

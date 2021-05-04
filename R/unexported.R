@@ -248,12 +248,14 @@ reset_globals <- function() {
 
 fetch_functions <- function(expr, ignore) {
   dismissed_token_types <-
-    c("expr",
-      "SYMBOL",     # regular symbols not used before `(`
-      "SYMBOL_SUB", # argument names
-      "NUM_CONST",  # numbers
-      "STR_CONST",  # strings
-      "EQ_SUB",     # `=` in argument definition
+    c("EQ_ASSIGN",      # dealt with through shim_assign() so ignored here
+      "LEFT_ASSIGN",    # dealt with through shim_assign() so ignored here
+      "expr",           #
+      "SYMBOL",         # regular symbols not used before `(`
+      "SYMBOL_SUB",     # argument names
+      "NUM_CONST",      # numbers
+      "STR_CONST",      # strings
+      "EQ_SUB",         # `=` in argument definition
       "SYMBOL_PACKAGE", # rhs of `::` or `:::`
       "NS_GET_INT",     # `:::`
       "NS_GET")         # `::`
@@ -266,4 +268,32 @@ fetch_functions <- function(expr, ignore) {
   # remove tokens that are not functions
   funs <- setdiff(unique(funs), c(ignore, ")", "}", ",", "[", "]"))
   funs
+}
+
+
+
+build_shimmed_assign <- function(symbol, ignore, clock, print_fun, visible_only) {
+  # return a function that shims an assignment operator
+  if(symbol == "<-") {
+    f <- eval(bquote(function(e1, e2) {
+      E2 <- if(!is.function(e2)) e2 else {
+        wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only))
+      }
+      invisible(eval.parent(substitute(.Primitive("<-")(e1, E2))))
+    }))
+  } else if(symbol == "=") {
+    f <- eval(bquote(function(e1, e2) {
+      E2 <- if(!is.function(e2)) e2 else {
+        wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only))
+      }
+      invisible(eval.parent(substitute(.Primitive("=")(e1, E2))))
+    }))
+  }
+
+  if(!symbol %in% ignore)
+    f <- wrap(f, clock = clock, print_fun = print_fun, visible_only = visible_only)
+
+  # need to put `f` in namespace so `wrap` is accessible (CRAN doesn't like `:::`)
+  environment(f) <- asNamespace("boomer")
+  f
 }

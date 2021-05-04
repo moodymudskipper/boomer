@@ -72,6 +72,8 @@ boom <- function(
   expr <- substitute(expr)
   funs <- fetch_functions(expr, ignore)
   mask <- list()
+  mask$"<-" <- build_shimmed_assign("<-", ignore, clock, print, visible_only)
+  mask$"=" <- build_shimmed_assign("=", ignore, clock, print, visible_only)
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
   for (fun_chr in funs) {
@@ -114,6 +116,8 @@ rig <- function(
   rigged_fun_env   <- environment(fun)
   funs <- fetch_functions(expr, ignore)
   mask <- new.env(parent = rigged_fun_env)
+  mask$"<-" <- build_shimmed_assign("<-", ignore, clock, print, visible_only)
+  mask$"=" <- build_shimmed_assign("=", ignore, clock, print, visible_only)
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
   for (fun_chr in funs) {

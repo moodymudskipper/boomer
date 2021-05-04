@@ -8,3 +8,13 @@ test_that("boom()", {
     rigged(letters)
   })
 })
+
+
+test_that("functions created at runtime are boomed", {
+  foo2 <- function(x) {
+    x <- x * 2
+    SQRT <- sqrt
+    SQRT(x)
+  }
+  expect_snapshot(rig(foo2)(2))
+})

@@ -73,3 +73,12 @@ test_that("can debug failing pipes (#17)", {
       boomer::boom()
   })
 })
+
+test_that("functions created at runtime are boomed", {
+  expect_snapshot(boom({
+    x <- 2
+    x <- x * 2
+    SQRT <- sqrt
+    SQRT(x)
+  }))
+})
