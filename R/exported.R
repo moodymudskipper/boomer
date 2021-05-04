@@ -70,12 +70,12 @@ boom <- function(
 
   pf   <- parent.frame()
   expr <- substitute(expr)
-  funs <- setdiff(all.names(expr), c(all.vars(expr), "::", ":::", ignore))
+  funs <- fetch_functions(expr, ignore)
   mask <- list()
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
   for (fun_chr in funs) {
-    # `funs` will include namespaces and functions yet to be defined (in the case of a script)
+    # `funs` will include functions yet to be defined when calling `rig()`
     # so we don't want to fail here if the object doesn't exist
     if(!exists(fun_chr, pf)) next
 
@@ -109,13 +109,12 @@ rig <- function(
   expr <- body(fun)
   reset_globals()
   rigged_fun_env   <- environment(fun)
-  funs <- setdiff(all.names(expr), c(
-    all.vars(expr), "::", ":::", ignore))
+  funs <- fetch_functions(expr, ignore)
   mask <- new.env(parent = rigged_fun_env)
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
   for (fun_chr in funs) {
-    # fun will include namespaces nad functions yet to be defined (in the case of a script)
+    # `funs` will include functions yet to be defined when calling `rig()`
     # so we don't want to fail here if the object doesn't exist
     if(!exists(fun_chr, rigged_fun_env)) next
 
