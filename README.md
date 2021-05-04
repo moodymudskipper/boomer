@@ -1,5 +1,8 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- badges: start -->
+
+[![R-CMD-check](https://github.com/moodymudskipper/boomer/workflows/R-CMD-check/badge.svg)](https://github.com/moodymudskipper/boomer/actions)
+<!-- badges: end -->
 
 # boomer <img src='man/figures/logo.png' align="right" height="139" />
 
@@ -44,6 +47,7 @@ the end of a pipe chain.
 
 ``` r
 library(magrittr)
+#> Warning: package 'magrittr' was built under R version 4.0.4
 mtcars %>%
   head(2) %>%
   subset(qsec > 17) %>%
@@ -96,10 +100,10 @@ boom(head(sapply(seq(10^6), sqrt)), clock = TRUE, print = str)
 #> time: 0 us
 #>  num 1e+06
 #> seq(10^6)
-#> time: 0 us
+#> time: 0.001 s
 #>  int [1:1000000] 1 2 3 4 5 6 7 8 9 10 ...
 #> sapply(seq(10^6), sqrt)
-#> time: 1.454 s
+#> time: 1.262 s
 #>  num [1:1000000] 1 1.41 1.73 2 2.24 ...
 #> head(sapply(seq(10^6), sqrt))
 #> time: 0 us
