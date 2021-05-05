@@ -16,15 +16,24 @@ wrap_clocked <- function(fun_val, print_fun, visible_only) {
     # start the clock
     total_time_start <- Sys.time()
 
-    # update last_total_time_end on exit, we do it this way so our total
-    # time doesn't leave out the updating of the times df with this value
-    globals <- getFromNamespace("globals", "boomer")
-    on.exit(globals$last_total_time_end <- Sys.time())
-
     # manipulate call to use original function
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
+
+
+    if(ctxt == "rig") {
+      if(!identical(parent.env(parent.env(parent.frame())), ref_env))
+        return(rlang::eval_bare(sc, parent.frame()))
+    } else {
+      if(!identical(parent.env(parent.frame()), ref_env))
+        return(rlang::eval_bare(sc, parent.frame()))
+    }
+
+    # update last_total_time_end on exit, we do it this way so our total
+    # time doesn't leave out the updating of the times df with this value
+    globals <- getFromNamespace("globals", "boomer")
+    on.exit(globals$last_total_time_end <- Sys.time())
 
     # evaluate call with original function
     pf <- parent.frame()
@@ -64,12 +73,27 @@ wrap_clocked <- function(fun_val, print_fun, visible_only) {
   })))
 }
 
+foo5 <- function() {
+  sqrt(4)
+  lapply(c(4,9), "sqrt")
+}
+
 wrap_unclocked <- function(fun_val, print_fun, visible_only) {
   as.function(c(alist(...=), bquote({
+
+    browser()
     # manipulate call to use original function
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
+
+    if(ctxt == "rig") {
+      if(!identical(parent.env(parent.env(parent.frame())), ref_env))
+        return(rlang::eval_bare(sc, parent.frame()))
+    } else {
+      if(!identical(parent.env(parent.frame()), ref_env))
+        return(rlang::eval_bare(sc, parent.frame()))
+    }
 
     # evaluate call with original function
     success <- FALSE
@@ -100,12 +124,17 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only) {
   })))
 }
 
-wrap <- function(fun_val, clock, print_fun, visible_only) {
+wrap <- function(fun_val, clock, print_fun, visible_only, ref_env, ctxt) {
+  force(ref_env)
+  force(ctxt)
   if(clock) {
-    wrap_clocked(fun_val, print_fun, visible_only)
+    f <- wrap_clocked(fun_val, print_fun, visible_only)
   } else {
-    wrap_unclocked(fun_val, print_fun, visible_only)
+    f <- wrap_unclocked(fun_val, print_fun, visible_only)
   }
+  # set envir so `f` can access ref_env and ctxt
+  environment(f) <- environment()
+  f
 }
 
 update_times_df_and_get_true_time <- function(
@@ -182,7 +211,8 @@ fetch_print_fun <- function(print_fun, res) {
 }
 
 
-double_colon <- function(clock, print_fun, visible_only) {
+double_colon <- function(clock, print_fun, visible_only, ref_env, ctxt) {
+  env <- environment()
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`::`
@@ -190,7 +220,10 @@ double_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- getExportedValue(pkg, name)
 
-      wrap_clocked(fun_val, print_fun, visible_only)
+      f <- wrap_clocked(fun_val, print_fun, visible_only)
+      # set envir so `f` can access ref_env and ctxt
+      environment(f) <- env
+      f
     }
   } else {
     function(pkg, name) {
@@ -199,12 +232,16 @@ double_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- getExportedValue(pkg, name)
 
-      wrap_unclocked(fun_val, print_fun, visible_only)
+      f <- wrap_unclocked(fun_val, print_fun, visible_only)
+      # set envir so `f` can access ref_env and ctxt
+      environment(f) <- env
+      f
     }
   }
 }
 
-triple_colon <- function(clock, print_fun, visible_only) {
+triple_colon <- function(clock, print_fun, visible_only, ref_env, ctxt) {
+  env <- environment()
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`:::`
@@ -212,7 +249,10 @@ triple_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
 
-      wrap_clocked(fun_val, print_fun, visible_only)
+      f <- wrap_clocked(fun_val, print_fun, visible_only)
+      # set envir so `f` can access ref_env and ctxt
+      environment(f) <- env
+      f
     }
   } else {
     function(pkg, name) {
@@ -221,7 +261,10 @@ triple_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
 
-      wrap_unclocked(fun_val, print_fun, visible_only)
+      f <- wrap_unclocked(fun_val, print_fun, visible_only)
+      # set envir so `f` can access ref_env and ctxt
+      environment(f) <- env
+      f
     }
   }
 }
@@ -272,19 +315,22 @@ fetch_functions <- function(expr, ignore) {
 
 
 
-build_shimmed_assign <- function(symbol, ignore, clock, print_fun, visible_only) {
+build_shimmed_assign <- function(symbol, ignore, clock, print_fun, visible_only,
+                                 ref_env, ctxt) {
   # return a function that shims an assignment operator
   if(symbol == "<-") {
     f <- eval(bquote(function(e1, e2) {
       E2 <- if(!is.function(e2)) e2 else {
-        wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only))
+        wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only),
+             ref_env = .(ref_env), ctxt = .(ctxt))
       }
       invisible(eval.parent(substitute(.Primitive("<-")(e1, E2))))
     }))
   } else if(symbol == "=") {
     f <- eval(bquote(function(e1, e2) {
       E2 <- if(!is.function(e2)) e2 else {
-        wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only))
+        wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only),
+             ref_env = .(ref_env), ctxt = .(ctxt))
       }
       invisible(eval.parent(substitute(.Primitive("=")(e1, E2))))
     }))

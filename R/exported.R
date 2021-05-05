@@ -72,8 +72,8 @@ boom <- function(
   expr <- substitute(expr)
   funs <- fetch_functions(expr, ignore)
   mask <- list()
-  mask$"<-" <- build_shimmed_assign("<-", ignore, clock, print, visible_only)
-  mask$"=" <- build_shimmed_assign("=", ignore, clock, print, visible_only)
+  mask$"<-" <- build_shimmed_assign("<-", ignore, clock, print, visible_only, pf, "boom")
+  mask$"=" <- build_shimmed_assign("=", ignore, clock, print, visible_only, pf, "boom")
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
   for (fun_chr in funs) {
@@ -91,14 +91,14 @@ boom <- function(
       fun_env <- asNamespace("base")
     }
 
-    f <- wrap(fun_val, clock, print, visible_only)
-    environment(f) <- fun_env
+    f <- wrap(fun_val, clock, print, visible_only, ref_env = pf, ctxt = "boom")
+    #environment(f) <- fun_env
 
     mask[[fun_chr]] <- f
 
   }
-  mask$`::` <- double_colon(clock, print, visible_only)
-  mask$`:::` <- triple_colon(clock, print, visible_only)
+  mask$`::` <- double_colon(clock, print, visible_only, pf, "boom")
+  mask$`:::` <- triple_colon(clock, print, visible_only, pf, "boom")
   invisible(eval(expr, envir = mask, enclos = parent.frame()))
 }
 
@@ -116,8 +116,10 @@ rig <- function(
   rigged_fun_env   <- environment(fun)
   funs <- fetch_functions(expr, ignore)
   mask <- new.env(parent = rigged_fun_env)
-  mask$"<-" <- build_shimmed_assign("<-", ignore, clock, print, visible_only)
-  mask$"=" <- build_shimmed_assign("=", ignore, clock, print, visible_only)
+  mask$"<-" <- build_shimmed_assign("<-", ignore, clock, print, visible_only,
+                                    ref_env = rigged_fun_env, ctxt = "rig")
+  mask$"=" <- build_shimmed_assign("=", ignore, clock, print, visible_only,
+                                   ref_env = rigged_fun_env, ctxt = "rig")
   # go through every existing function detected above and create a wrapper
   # in the mask to override it
   for (fun_chr in funs) {
@@ -135,12 +137,12 @@ rig <- function(
       fun_env <- asNamespace("base")
     }
 
-    f <- wrap(fun_val, clock, print, visible_only)
-    environment(f) <- fun_env
+    f <- wrap(fun_val, clock, print, visible_only, ref_env = rigged_fun_env, ctxt = "rig")
+    #environment(f) <- fun_env
     mask[[fun_chr]] <- f
   }
-  mask$`::` <- double_colon(clock, print, visible_only)
-  mask$`:::` <- triple_colon(clock, print, visible_only)
+  mask$`::` <- double_colon(clock, print, visible_only, rigged_fun_env,"rig")
+  mask$`:::` <- triple_colon(clock, print, visible_only, rigged_fun_env,"rig")
   environment(fun) <- mask
   fun
 }
