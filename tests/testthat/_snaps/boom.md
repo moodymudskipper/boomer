@@ -26,7 +26,6 @@
       fun <- (function(x) {
         x
       })
-    Code
       boomer::boom(fun(1:3))
     Output
       1:3
@@ -128,7 +127,6 @@
       eagerly_failing_function <- (function(x) {
         stop("oops")
       })
-    Code
       1 %>% identity() %>% eagerly_failing_function() %>% I() %>% boomer::boom()
     Output
       eagerly_failing_function(.)
@@ -144,7 +142,6 @@
         force(x)
         stop("oops")
       })
-    Code
       1 %>% identity() %>% failing_function() %>% I() %>% boomer::boom()
     Output
       identity(.)
