@@ -260,8 +260,11 @@ fetch_functions <- function(expr, ignore) {
       "SYMBOL_PACKAGE", # rhs of `::` or `:::`
       "NS_GET_INT",     # `:::`
       "NS_GET",         # `::`
-      "ELSE",
-      "IN")
+      "ELSE",           # not a function
+      "IN",             # not a function
+      "WHILE",          # always returns NULL
+      "REPEAT",         # always returns NULL
+      "FOR")            # always returns NULL
   parse_data <- getParseData(parse(text = deparse(expr), keep.source = TRUE))
   # remove rows which follow `:::` or `::`
   to_remove <- which(parse_data$token %in% c("NS_GET", "NS_GET_INT")) + 1
