@@ -21,13 +21,9 @@
       [1] 23
     Code
       boom(for (i in 1:10) i)
-    Message <simpleMessage>
-      Not booming undefined `in()`.
     Output
       1:10
        [1]  1  2  3  4  5  6  7  8  9 10
-      for (i in 1:10) i
-      NULL
 
 # boom() works with a global function
 
