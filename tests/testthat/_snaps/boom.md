@@ -19,6 +19,15 @@
        [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
       sum(base::nchar(utils:::head(letters, -3)))
       [1] 23
+    Code
+      boom(for (i in 1:10) i)
+    Message <simpleMessage>
+      Not booming undefined `in()`.
+    Output
+      1:10
+       [1]  1  2  3  4  5  6  7  8  9 10
+      for (i in 1:10) i
+      NULL
 
 # boom() works with a global function
 
@@ -26,7 +35,6 @@
       fun <- (function(x) {
         x
       })
-    Code
       boomer::boom(fun(1:3))
     Output
       1:3
@@ -128,7 +136,6 @@
       eagerly_failing_function <- (function(x) {
         stop("oops")
       })
-    Code
       1 %>% identity() %>% eagerly_failing_function() %>% I() %>% boomer::boom()
     Output
       eagerly_failing_function(.)
@@ -144,7 +151,6 @@
         force(x)
         stop("oops")
       })
-    Code
       1 %>% identity() %>% failing_function() %>% I() %>% boomer::boom()
     Output
       identity(.)

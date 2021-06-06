@@ -2,6 +2,7 @@ test_that("boom()", {
   expect_snapshot({
     boom(1 + 2 * 3)
     boom(sum(base::nchar(utils:::head(letters, -3))))
+    boom(for(i in 1:10) i)
   })
 })
 
