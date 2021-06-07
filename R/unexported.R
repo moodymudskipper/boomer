@@ -1,5 +1,6 @@
 # will contain `times` data frame and `last_total_time_end` POSIXct
 globals <- new.env()
+globals$n_indent <- -1
 
 # copied from method::allNames
 allNames <- function (x)
@@ -13,13 +14,19 @@ allNames <- function (x)
 
 wrap_clocked <- function(fun_val, print_fun, visible_only) {
   as.function(c(alist(...=), bquote({
+
     # start the clock
     total_time_start <- Sys.time()
 
-    # update last_total_time_end on exit, we do it this way so our total
-    # time doesn't leave out the updating of the times df with this value
     globals <- getFromNamespace("globals", "boomer")
-    on.exit(globals$last_total_time_end <- Sys.time())
+    # set indentation
+    globals$n_indent <- globals$n_indent + 1
+    on.exit({
+      globals$n_indent <- globals$n_indent - 1
+      # update last_total_time_end on exit, we do it this way so our total
+      # time doesn't leave out the updating of the times df with this value
+      globals$last_total_time_end <- Sys.time()
+      })
 
     # manipulate call to use original function
     sc  <- sys.call()
@@ -42,7 +49,10 @@ wrap_clocked <- function(fun_val, print_fun, visible_only) {
 
     # always display function call
     # (must happen after evaluation so that calls are shown in order)
-    writeLines(crayon::cyan(deparse(sc_bkp)))
+    call_chr <- deparse(sc_bkp)
+    call_chr <- paste0(strrep("\ub7 ", globals$n_indent), call_chr)
+    call_chr <- crayon::cyan(call_chr)
+    writeLines(call_chr)
 
     # rethrow on failure
     if (!success) {
@@ -66,6 +76,12 @@ wrap_clocked <- function(fun_val, print_fun, visible_only) {
 
 wrap_unclocked <- function(fun_val, print_fun, visible_only) {
   as.function(c(alist(...=), bquote({
+    globals <- getFromNamespace("globals", "boomer")
+
+    # set indentation
+    globals$n_indent <- globals$n_indent + 1
+    on.exit(globals$n_indent <- globals$n_indent - 1)
+
     # manipulate call to use original function
     sc  <- sys.call()
     sc_bkp <- sc
@@ -84,7 +100,10 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only) {
 
     # always display function call
     # (must happen after evaluation so that calls are shown in order)
-    writeLines(crayon::cyan(deparse(sc_bkp)))
+    call_chr <- deparse(sc_bkp)
+    call_chr <- paste0(strrep("\ub7 ", globals$n_indent), call_chr)
+    call_chr <- crayon::cyan(call_chr)
+    writeLines(call_chr)
 
     # rethrow on failure
     if (!success) {
