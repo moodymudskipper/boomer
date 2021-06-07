@@ -216,7 +216,8 @@ rig_in_namespace <- function(
 
     nm <- nms[[i]]
     ns <- environment(vals[[i]])
-    vals[[i]] <- rig(vals[[i]])
+    vals[[i]] <- rig(vals[[i]], clock = clock, print = print, ignore = ignore,
+                     visible_only = visible_only)
     val <- vals[[i]]
 
     unlockBinding(nm, ns)
@@ -237,3 +238,4 @@ rig_in_namespace <- function(
 
   invisible(NULL)
 }
+
