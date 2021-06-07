@@ -97,8 +97,8 @@ boom <- function(
     mask[[fun_chr]] <- f
 
   }
-  mask$`::` <- double_colon(clock, print, visible_only)
-  mask$`:::` <- triple_colon(clock, print, visible_only)
+  mask$`::` <- double_colon(clock, print, visible_only, nm = NULL)
+  mask$`:::` <- triple_colon(clock, print, visible_only, nm = NULL)
   invisible(eval(expr, envir = mask, enclos = parent.frame()))
 }
 
@@ -110,6 +110,16 @@ rig <- function(
   print = getOption("boom.print"),
   ignore = getOption("boom.ignore"),
   visible_only = getOption("boom.visible_only")) {
+  rig_impl(fun, clock, print, ignore, visible_only, NULL)
+}
+
+rig_impl <- function(
+  fun,
+  clock = getOption("boom.clock"),
+  print = getOption("boom.print"),
+  ignore = getOption("boom.ignore"),
+  visible_only = getOption("boom.visible_only"),
+  nm = NULL) {
 
   expr <- body(fun)
   reset_globals()
@@ -135,12 +145,12 @@ rig <- function(
       fun_env <- asNamespace("base")
     }
 
-    f <- wrap(fun_val, clock, print, visible_only)
+    f <- wrap(fun_val, clock, print, visible_only, nm = nm)
     environment(f) <- fun_env
     mask[[fun_chr]] <- f
   }
-  mask$`::` <- double_colon(clock, print, visible_only)
-  mask$`:::` <- triple_colon(clock, print, visible_only)
+  mask$`::` <- double_colon(clock, print, visible_only, nm)
+  mask$`:::` <- triple_colon(clock, print, visible_only, nm)
   environment(fun) <- mask
   fun
 }
@@ -216,8 +226,8 @@ rig_in_namespace <- function(
 
     nm <- nms[[i]]
     ns <- environment(vals[[i]])
-    vals[[i]] <- rig(vals[[i]], clock = clock, print = print, ignore = ignore,
-                     visible_only = visible_only)
+    vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, ignore = ignore,
+                     visible_only = visible_only, nm = nm)
     val <- vals[[i]]
 
     unlockBinding(nm, ns)
@@ -229,7 +239,11 @@ rig_in_namespace <- function(
 
   # list of modified functions
   rigged_funs <- setNames(vals, nms)
-  wrapped_funs <- lapply(rigged_funs, wrap, clock, print, visible_only)
+  wrapped_funs <- mapply(
+    wrap,
+    rigged_funs,
+    nm = nms,
+    MoreArgs = list(clock = clock, print_fun = print, visible_only = visible_only))
 
   # add all modified functions to each function's environment
   for(fun in vals) {
@@ -238,4 +252,5 @@ rig_in_namespace <- function(
 
   invisible(NULL)
 }
+
 

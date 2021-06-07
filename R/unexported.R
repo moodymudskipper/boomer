@@ -12,7 +12,7 @@ allNames <- function (x)
 }
 
 
-wrap_clocked <- function(fun_val, print_fun, visible_only) {
+wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
   as.function(c(alist(...=), bquote({
 
     # start the clock
@@ -74,7 +74,8 @@ wrap_clocked <- function(fun_val, print_fun, visible_only) {
   })))
 }
 
-wrap_unclocked <- function(fun_val, print_fun, visible_only) {
+wrap_unclocked <- function(fun_val, print_fun, visible_only, nm) {
+  prefix <- if(is.null(nm)) "" else paste0(nm, "> ")
   as.function(c(alist(...=), bquote({
     globals <- getFromNamespace("globals", "boomer")
 
@@ -101,7 +102,7 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only) {
     # always display function call
     # (must happen after evaluation so that calls are shown in order)
     call_chr <- deparse(sc_bkp)
-    call_chr <- paste0(strrep("\ub7 ", globals$n_indent), call_chr)
+    call_chr <- paste0(.(prefix), strrep("\ub7 ", globals$n_indent), call_chr)
     call_chr <- crayon::cyan(call_chr)
     writeLines(call_chr)
 
@@ -119,11 +120,11 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only) {
   })))
 }
 
-wrap <- function(fun_val, clock, print_fun, visible_only) {
+wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
   if(clock) {
-    wrap_clocked(fun_val, print_fun, visible_only)
+    wrap_clocked(fun_val, print_fun, visible_only, nm)
   } else {
-    wrap_unclocked(fun_val, print_fun, visible_only)
+    wrap_unclocked(fun_val, print_fun, visible_only, nm)
   }
 }
 
@@ -201,7 +202,7 @@ fetch_print_fun <- function(print_fun, res) {
 }
 
 
-double_colon <- function(clock, print_fun, visible_only) {
+double_colon <- function(clock, print_fun, visible_only, nm) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`::`
@@ -209,7 +210,7 @@ double_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- getExportedValue(pkg, name)
 
-      wrap_clocked(fun_val, print_fun, visible_only)
+      wrap_clocked(fun_val, print_fun, visible_only, nm)
     }
   } else {
     function(pkg, name) {
@@ -218,12 +219,12 @@ double_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- getExportedValue(pkg, name)
 
-      wrap_unclocked(fun_val, print_fun, visible_only)
+      wrap_unclocked(fun_val, print_fun, visible_only, nm)
     }
   }
 }
 
-triple_colon <- function(clock, print_fun, visible_only) {
+triple_colon <- function(clock, print_fun, visible_only, nm) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`:::`
@@ -231,7 +232,7 @@ triple_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
 
-      wrap_clocked(fun_val, print_fun, visible_only)
+      wrap_clocked(fun_val, print_fun, visible_only, nm)
     }
   } else {
     function(pkg, name) {
@@ -240,7 +241,7 @@ triple_colon <- function(clock, print_fun, visible_only) {
       name <- as.character(substitute(name))
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
 
-      wrap_unclocked(fun_val, print_fun, visible_only)
+      wrap_unclocked(fun_val, print_fun, visible_only, nm)
     }
   }
 }
