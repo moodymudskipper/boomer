@@ -32,6 +32,15 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
+    fun_nm   <- deparse(sc_bkp[[1]])
+    fun_nm <- gsub("<", "LT", fun_nm)
+    fun_nm <- gsub(">", "GT", fun_nm)
+    call_chr <- deparse(sc_bkp)
+    call_chr <- gsub("<", "LT", call_chr)
+    call_chr <- gsub("<", "GT", call_chr)
+    open  <- sprintf("<%s CALL=%s>", fun_nm, call_chr)
+    close <- sprintf("</%s>", fun_nm)
+    writeLines(open)
 
     # evaluate call with original function
     pf <- parent.frame()
@@ -49,10 +58,10 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
 
     # always display function call
     # (must happen after evaluation so that calls are shown in order)
-    call_chr <- deparse(sc_bkp)
-    call_chr <- paste0(strrep("\ub7 ", globals$n_indent), call_chr)
-    call_chr <- crayon::cyan(call_chr)
-    writeLines(call_chr)
+    #
+    # call_chr <- paste0(strrep("\ub7 ", globals$n_indent), call_chr)
+    # call_chr <- crayon::cyan(call_chr)
+    # writeLines(call_chr)
 
     # rethrow on failure
     if (!success) {
@@ -69,6 +78,7 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
     writeLines(crayon::blue(true_time_msg))
     print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
     writeLines(capture.output(print_fun(res)))
+    writeLines(close)
 
     res
   })))
@@ -87,6 +97,15 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only, nm) {
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
+    fun_nm   <- deparse(sc_bkp[[1]])
+    fun_nm <- gsub("<", "LT", fun_nm)
+    fun_nm <- gsub(">", "GT", fun_nm)
+    call_chr <- deparse(sc_bkp)
+    call_chr <- gsub("<", "LT", call_chr)
+    call_chr <- gsub(">", "GT", call_chr)
+    open  <- sprintf("<%s CALL=%s>", fun_nm, call_chr)
+    close <- sprintf("</%s>", fun_nm)
+    writeLines(open)
 
     # evaluate call with original function
     success <- FALSE
@@ -99,12 +118,12 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only, nm) {
     )
     if(success && !res$visible && .(visible_only)) return(invisible(res$value))
 
-    # always display function call
-    # (must happen after evaluation so that calls are shown in order)
-    call_chr <- deparse(sc_bkp)
-    call_chr <- paste0(.(prefix), strrep("\ub7 ", globals$n_indent), call_chr)
-    call_chr <- crayon::cyan(call_chr)
-    writeLines(call_chr)
+    # # always display function call
+    # # (must happen after evaluation so that calls are shown in order)
+    # call_chr <- deparse(sc_bkp)
+    # call_chr <- paste0(.(prefix), strrep("\ub7 ", globals$n_indent), call_chr)
+    # call_chr <- crayon::cyan(call_chr)
+    # writeLines(call_chr)
 
     # rethrow on failure
     if (!success) {
@@ -116,6 +135,7 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only, nm) {
     res <- res$value
     print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
     writeLines(capture.output(print_fun(res)))
+    writeLines(close)
     res
   })))
 }
