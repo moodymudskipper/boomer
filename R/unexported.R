@@ -209,6 +209,7 @@ double_colon <- function(clock, print_fun, visible_only, nm) {
       pkg <- as.character(substitute(pkg))
       name <- as.character(substitute(name))
       fun_val <- getExportedValue(pkg, name)
+      if(!is.function(fun_val)) return(fun_val)
 
       wrap_clocked(fun_val, print_fun, visible_only, nm)
     }
@@ -218,6 +219,7 @@ double_colon <- function(clock, print_fun, visible_only, nm) {
       pkg <- as.character(substitute(pkg))
       name <- as.character(substitute(name))
       fun_val <- getExportedValue(pkg, name)
+      if(!is.function(fun_val)) return(fun_val)
 
       wrap_unclocked(fun_val, print_fun, visible_only, nm)
     }
@@ -231,6 +233,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm) {
       pkg <- as.character(substitute(pkg))
       name <- as.character(substitute(name))
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
+      if(!is.function(fun_val)) return(fun_val)
 
       wrap_clocked(fun_val, print_fun, visible_only, nm)
     }
@@ -240,6 +243,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm) {
       pkg <- as.character(substitute(pkg))
       name <- as.character(substitute(name))
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
+      if(!is.function(fun_val)) return(fun_val)
 
       wrap_unclocked(fun_val, print_fun, visible_only, nm)
     }
