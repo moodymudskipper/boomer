@@ -314,7 +314,7 @@ fetch_functions <- function(expr, ignore) {
   # keep only eligible token types
   funs <- parse_data$text[! parse_data$token %in% dismissed_token_types]
   # remove tokens that are not functions
-  funs <- setdiff(unique(funs), c(ignore, ")", "}", ","))
+  funs <- setdiff(unique(funs), c(ignore, ")", "}", ",", "]"))
   funs
 }
 
