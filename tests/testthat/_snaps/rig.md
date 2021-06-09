@@ -8,17 +8,23 @@
       rigged <- rig(fun)
       rigged(letters)
     Output
-      · 2 * 3
+      <U+0001F4A3> +
+      · <U+0001F4A3> *
+      · <U+0001F4A5> 2 * 3
       [1] 6
-      1 + 2 * 3
+      <U+0001F4A5> 1 + 2 * 3
       [1] 7
-      · · · -n
+      <U+0001F4A3> sum
+      · <U+0001F4A3> base::nchar
+      · · <U+0001F4A3> utils:::head
+      · · · <U+0001F4A3> -
+      · · · <U+0001F4A5> -n
       [1] -7
-      · · utils:::head(x, -n)
+      · · <U+0001F4A5> utils:::head(x, -n)
        [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
-      · base::nchar(utils:::head(x, -n))
+      · <U+0001F4A5> base::nchar(utils:::head(x, -n))
        [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
-      sum(base::nchar(utils:::head(x, -n)))
+      <U+0001F4A5> sum(base::nchar(utils:::head(x, -n)))
       [1] 19
       [1] 19
 
@@ -29,9 +35,11 @@
     Message <simpleMessage>
       Not rigging undefined `SQRT()`.
     Output
-      x * 2
+      <U+0001F4A3> *
+      <U+0001F4A5> x * 2
       [1] 4
-      SQRT(x)
+      <U+0001F4A3> SQRT
+      <U+0001F4A5> SQRT(x)
       [1] 2
       [1] 2
 

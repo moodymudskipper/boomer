@@ -12,15 +12,15 @@ allNames <- function (x)
 }
 
 
-wrap_clocked <- function(fun_val, print_fun, visible_only, prefix) {
+wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
   as.function(c(alist(...=), bquote({
-
     # start the clock
     total_time_start <- Sys.time()
 
     globals <- getFromNamespace("globals", "boomer")
     # set indentation
     globals$n_indent <- globals$n_indent + 1
+    dots <- crayon::yellow(strrep("\ub7 ", globals$n_indent))
     on.exit({
       globals$n_indent <- globals$n_indent - 1
       # update last_total_time_end on exit, we do it this way so our total
@@ -28,10 +28,23 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, prefix) {
       globals$last_total_time_end <- Sys.time()
       })
 
+    if(!is.null(.(nm))) {
+      mask <- parent.env(parent.frame())
+      if(isTRUE(mask$..FIRST_CURLY..)) {
+        cat(dots, "\U0001f447 ", crayon::yellow(.(nm)),"\n", sep = "")
+        withr::defer_parent({
+          cat(dots, "\U0001f446 ", crayon::yellow(.(nm)),"\n", sep = "")
+          mask$..FIRST_CURLY.. <- TRUE
+        })
+        mask$..FIRST_CURLY.. <- FALSE
+      }
+    }
+
     # manipulate call to use original function
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
+    cat(dots, "\U0001f4a3 ", crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
 
     # evaluate call with original function
     pf <- parent.frame()
@@ -48,13 +61,7 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, prefix) {
     if(success && !res$visible && .(visible_only)) return(invisible(res$value))
 
     # always display function call
-    # (must happen after evaluation so that calls are shown in order)
-    call_chr <- deparse(sc_bkp)
-    call_chr <- paste0(
-      crayon::yellow(.(prefix)),
-      crayon::yellow(strrep("\ub7 ", globals$n_indent)),
-      crayon::cyan(call_chr))
-    writeLines(call_chr)
+    cat(dots, "\U0001f4a5 ", crayon::cyan(deparse(sc_bkp)), "\n", sep ="")
 
     # rethrow on failure
     if (!success) {
@@ -76,18 +83,32 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, prefix) {
   })))
 }
 
-wrap_unclocked <- function(fun_val, print_fun, visible_only, prefix) {
+wrap_unclocked <- function(fun_val, print_fun, visible_only, nm) {
   as.function(c(alist(...=), bquote({
     globals <- getFromNamespace("globals", "boomer")
 
     # set indentation
     globals$n_indent <- globals$n_indent + 1
+    dots <- crayon::yellow(strrep("\ub7 ", globals$n_indent))
     on.exit(globals$n_indent <- globals$n_indent - 1)
+
+    if(!is.null(.(nm))) {
+      mask <- parent.env(parent.frame())
+      if(isTRUE(mask$..FIRST_CURLY..)) {
+        cat(dots, "\U0001f447 ", crayon::yellow(.(nm)),"\n", sep = "")
+        withr::defer_parent({
+          cat(dots, "\U0001f446 ", crayon::yellow(.(nm)),"\n", sep = "")
+          mask$..FIRST_CURLY.. <- TRUE
+        })
+        mask$..FIRST_CURLY.. <- FALSE
+      }
+    }
 
     # manipulate call to use original function
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
+    cat(dots, "\U0001f4a3 ", crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
 
     # evaluate call with original function
     success <- FALSE
@@ -101,13 +122,7 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only, prefix) {
     if(success && !res$visible && .(visible_only)) return(invisible(res$value))
 
     # always display function call
-    # (must happen after evaluation so that calls are shown in order)
-    call_chr <- deparse(sc_bkp)
-    call_chr <- paste0(
-      crayon::yellow(.(prefix)),
-      crayon::yellow(strrep("\ub7 ", globals$n_indent)),
-      crayon::cyan(call_chr))
-    writeLines(call_chr)
+    cat(dots, "\U0001f4a5 ", crayon::cyan(deparse(sc_bkp)), "\n", sep ="")
 
     # rethrow on failure
     if (!success) {
@@ -123,11 +138,11 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only, prefix) {
   })))
 }
 
-wrap <- function(fun_val, clock, print_fun, visible_only, prefix = "") {
+wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
   if(clock) {
-    wrap_clocked(fun_val, print_fun, visible_only, prefix)
+    wrap_clocked(fun_val, print_fun, visible_only, nm)
   } else {
-    wrap_unclocked(fun_val, print_fun, visible_only, prefix)
+    wrap_unclocked(fun_val, print_fun, visible_only, nm)
   }
 }
 
@@ -205,7 +220,7 @@ fetch_print_fun <- function(print_fun, res) {
 }
 
 
-double_colon <- function(clock, print_fun, visible_only, prefix) {
+double_colon <- function(clock, print_fun, visible_only, nm) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`::`
@@ -214,7 +229,7 @@ double_colon <- function(clock, print_fun, visible_only, prefix) {
       fun_val <- getExportedValue(pkg, name)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap_clocked(fun_val, print_fun, visible_only, prefix)
+      wrap_clocked(fun_val, print_fun, visible_only, nm)
     }
   } else {
     function(pkg, name) {
@@ -224,12 +239,12 @@ double_colon <- function(clock, print_fun, visible_only, prefix) {
       fun_val <- getExportedValue(pkg, name)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap_unclocked(fun_val, print_fun, visible_only, prefix)
+      wrap_unclocked(fun_val, print_fun, visible_only, nm)
     }
   }
 }
 
-triple_colon <- function(clock, print_fun, visible_only, prefix) {
+triple_colon <- function(clock, print_fun, visible_only, nm) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`:::`
@@ -238,7 +253,7 @@ triple_colon <- function(clock, print_fun, visible_only, prefix) {
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap_clocked(fun_val, print_fun, visible_only, prefix)
+      wrap_clocked(fun_val, print_fun, visible_only, nm)
     }
   } else {
     function(pkg, name) {
@@ -248,7 +263,7 @@ triple_colon <- function(clock, print_fun, visible_only, prefix) {
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap_unclocked(fun_val, print_fun, visible_only, prefix)
+      wrap_unclocked(fun_val, print_fun, visible_only, nm)
     }
   }
 }
@@ -347,7 +362,7 @@ rig_impl <- function(
   print = getOption("boom.print"),
   ignore = getOption("boom.ignore"),
   visible_only = getOption("boom.visible_only"),
-  prefix = "") {
+  nm = NULL) {
 
   expr <- body(fun)
   reset_globals()
@@ -373,23 +388,24 @@ rig_impl <- function(
       fun_env <- asNamespace("base")
     }
 
-    f <- wrap(fun_val, clock, print, visible_only, prefix = prefix)
+    f <- wrap(fun_val, clock, print, visible_only, nm = nm)
     environment(f) <- fun_env
     mask[[fun_chr]] <- f
   }
-  mask$`::` <- double_colon(clock, print, visible_only, prefix)
-  mask$`:::` <- triple_colon(clock, print, visible_only, prefix)
+  mask$`::` <- double_colon(clock, print, visible_only, nm)
+  mask$`:::` <- triple_colon(clock, print, visible_only, nm)
+  mask$..FIRST_CURLY.. <- TRUE
   environment(fun) <- mask
   fun
 }
 
 
-short_f <- function(x) {
-  z <- subset(head(mtcars, 2), qsec > long_function(x))
+foo <- function(x) {
+  z <- subset(head(mtcars, 2), qsec > bar(x))
   rbind(z, z)
 }
 
-long_function <- function(x) 2 * x - 1
+bar <- function(x) {2 * x - 1}
 
 # rig_in_namespace(short_f, long_function)
 # short_f(8)
