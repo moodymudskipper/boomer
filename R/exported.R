@@ -113,48 +113,6 @@ rig <- function(
   rig_impl(fun, clock, print, ignore, visible_only, NULL)
 }
 
-rig_impl <- function(
-  fun,
-  clock = getOption("boom.clock"),
-  print = getOption("boom.print"),
-  ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only"),
-  nm = NULL) {
-
-  expr <- body(fun)
-  reset_globals()
-  rigged_fun_env   <- environment(fun)
-  funs <- fetch_functions(expr, ignore)
-  mask <- new.env(parent = rigged_fun_env)
-  mask$"<-" <- build_shimmed_assign("<-", ignore, clock, print, visible_only)
-  mask$"=" <- build_shimmed_assign("=", ignore, clock, print, visible_only)
-  # go through every existing function detected above and create a wrapper
-  # in the mask to override it
-  for (fun_chr in funs) {
-    # `funs` will include functions yet to be defined when calling `rig()`
-    # so we don't want to fail here if the object doesn't exist
-    if(!exists(fun_chr, rigged_fun_env)) {
-      message("Not rigging undefined `", fun_chr, "()`.")
-      next
-    }
-
-    # fetch the env, primitives don't have one, but they're in the base package
-    fun_val <- get(fun_chr, envir = rigged_fun_env)
-    fun_env <- environment(fun_val)
-    if(is.null(fun_env)) {
-      fun_env <- asNamespace("base")
-    }
-
-    f <- wrap(fun_val, clock, print, visible_only, nm = nm)
-    environment(f) <- fun_env
-    mask[[fun_chr]] <- f
-  }
-  mask$`::` <- double_colon(clock, print, visible_only, nm)
-  mask$`:::` <- triple_colon(clock, print, visible_only, nm)
-  environment(fun) <- mask
-  fun
-}
-
 #' Create rigged function conveniently
 #'
 #' Allows `rigger(...) + function(...) {...}` syntax to create a rigged function
