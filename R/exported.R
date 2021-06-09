@@ -97,8 +97,8 @@ boom <- function(
     mask[[fun_chr]] <- f
 
   }
-  mask$`::` <- double_colon(clock, print, visible_only, nm = NULL)
-  mask$`:::` <- triple_colon(clock, print, visible_only, nm = NULL)
+  mask$`::` <- double_colon(clock, print, visible_only, prefix = "")
+  mask$`:::` <- triple_colon(clock, print, visible_only, prefix = "")
   invisible(eval(expr, envir = mask, enclos = parent.frame()))
 }
 
@@ -177,6 +177,8 @@ rig_in_namespace <- function(
   visible_only = getOption("boom.visible_only")) {
 
   nms <- as.character(substitute(alist(...))[-1])
+  prefixes <- format(nms, width = max(nchar(nms)))
+  prefixes <- paste0(prefixes, "> ")
   vals <- list(...)
 
   ## rig all functions in their own namespace
@@ -185,7 +187,7 @@ rig_in_namespace <- function(
     nm <- nms[[i]]
     ns <- environment(vals[[i]])
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, ignore = ignore,
-                     visible_only = visible_only, nm = nm)
+                     visible_only = visible_only, prefix = prefixes[[i]])
     val <- vals[[i]]
 
     unlockBinding(nm, ns)
@@ -200,7 +202,7 @@ rig_in_namespace <- function(
   wrapped_funs <- mapply(
     wrap,
     rigged_funs,
-    nm = nms,
+    prefix = prefixes,
     MoreArgs = list(clock = clock, print_fun = print, visible_only = visible_only))
 
   # add all modified functions to each function's environment
