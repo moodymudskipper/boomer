@@ -2,15 +2,6 @@
 globals <- new.env()
 globals$n_indent <- -1
 
-# copied from method::allNames
-allNames <- function (x)
-{
-  value <- names(x)
-  if (is.null(value))
-    character(length(x))
-  else value
-}
-
 
 wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
   as.function(c(alist(...=), bquote({
@@ -398,14 +389,3 @@ rig_impl <- function(
   environment(fun) <- mask
   fun
 }
-
-
-foo <- function(x) {
-  z <- subset(head(mtcars, 2), qsec > bar(x))
-  rbind(z, z)
-}
-
-bar <- function(x) {2 * x - 1}
-
-# rig_in_namespace(short_f, long_function)
-# short_f(8)

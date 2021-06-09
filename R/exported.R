@@ -188,11 +188,11 @@ rig_in_namespace <- function(
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, ignore = ignore,
                      visible_only = visible_only, nm = nms[[i]])
     val <- vals[[i]]
-
-    unlockBinding(nm, ns)
+    ub <- unlockBinding
+    ub(nm, ns)
     assign(nm, val, ns)
     pkg <- paste0("package:", base::getNamespaceName(ns))
-    unlockBinding(nm, as.environment(pkg))
+    ub(nm, as.environment(pkg))
     assign(nm, val, pkg)
   }
 

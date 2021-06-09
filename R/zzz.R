@@ -1,3 +1,8 @@
+#' @importFrom stats setNames
+#' @importFrom utils getParseData head
+#' @importFrom methods allNames
+NULL
+
 .onLoad <- function(libname, pkgname) {
   #nocov start
   op <- options()

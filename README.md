@@ -23,24 +23,24 @@ remotes::install_github("moodymudskipper/boomer")
 ``` r
 library(boomer)
 boom(1 + !1 * 2)
-#> · · 1 * 2
-#> [1] 2
-#> · !1 * 2
-#> [1] FALSE
-#> 1 + !1 * 2
-#> [1] 1
+```
+
+\<U+0001F4A3\> + · \<U+0001F4A3\> \! · · \<U+0001F4A3\> * · ·
+\<U+0001F4A5\> 1 * 2 \[1\] 2 · \<U+0001F4A5\> \!1 \* 2 \[1\] FALSE
+\<U+0001F4A5\> 1 + \!1 \* 2 \[1\] 1
+
+``` r
 
 boom(subset(head(mtcars, 2), qsec > 17))
-#> · head(mtcars, 2)
-#>               mpg cyl disp  hp drat    wt  qsec vs am gear carb
-#> Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4
-#> Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
-#> · qsec > 17
-#> [1] FALSE  TRUE
-#> subset(head(mtcars, 2), qsec > 17)
-#>               mpg cyl disp  hp drat    wt  qsec vs am gear carb
-#> Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
 ```
+
+\<U+0001F4A3\> subset · \<U+0001F4A3\> head · \<U+0001F4A5\>
+head(mtcars, 2) mpg cyl disp hp drat wt qsec vs am gear carb Mazda RX4
+21 6 160 110 3.9 2.620 16.46 0 1 4 4 Mazda RX4 Wag 21 6 160 110 3.9
+2.875 17.02 0 1 4 4 · \<U+0001F4A3\> \> · \<U+0001F4A5\> qsec \> 17
+\[1\] FALSE TRUE \<U+0001F4A5\> subset(head(mtcars, 2), qsec \> 17) mpg
+cyl disp hp drat wt qsec vs am gear carb Mazda RX4 Wag 21 6 160 110 3.9
+2.875 17.02 0 1 4 4
 
 You can use `boom()` with *{magrittr}* pipes, just pipe to `boom()` at
 the end of a pipe chain.
@@ -52,16 +52,20 @@ mtcars %>%
   head(2) %>%
   subset(qsec > 17) %>%
   boom()
-#> · · head(., 2)
+#> <U+0001F4A3> %>%
+#> · <U+0001F4A3> subset
+#> · · <U+0001F4A3> head
+#> · · <U+0001F4A5> head(., 2)
 #>               mpg cyl disp  hp drat    wt  qsec vs am gear carb
 #> Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4
 #> Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
-#> · · qsec > 17
+#> · · <U+0001F4A3> >
+#> · · <U+0001F4A5> qsec > 17
 #> [1] FALSE  TRUE
-#> · subset(., qsec > 17)
+#> · <U+0001F4A5> subset(., qsec > 17)
 #>               mpg cyl disp  hp drat    wt  qsec vs am gear carb
 #> Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
-#> mtcars %>% head(2) %>% subset(qsec > 17)
+#> <U+0001F4A5> mtcars %>% head(2) %>% subset(qsec > 17)
 #>               mpg cyl disp  hp drat    wt  qsec vs am gear carb
 #> Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
 ```
@@ -75,13 +79,17 @@ occurrence of the error, it can help with debugging:
   toupper() %>%
   sqrt() %>%
   boom()
-#> · · · substr(., 1, 3)
+#> <U+0001F4A3> %>%
+#> · <U+0001F4A3> sqrt
+#> · · <U+0001F4A3> toupper
+#> · · · <U+0001F4A3> substr
+#> · · · <U+0001F4A5> substr(., 1, 3)
 #> [1] "tom"
-#> · · toupper(.)
+#> · · <U+0001F4A5> toupper(.)
 #> [1] "TOM"
-#> · sqrt(.)
+#> · <U+0001F4A5> sqrt(.)
 #> Error: simpleError/error/condition
-#> "tomato" %>% substr(1, 3) %>% toupper() %>% sqrt()
+#> <U+0001F4A5> "tomato" %>% substr(1, 3) %>% toupper() %>% sqrt()
 #> Error: simpleError/error/condition
 #> Error in .Primitive("sqrt")(.): non-numeric argument to mathematical function
 ```
@@ -100,16 +108,20 @@ occurrence of the error, it can help with debugging:
 
 ``` r
 boom(head(sapply(seq(10^6), sqrt)), clock = TRUE, print = str)
-#> · · · 10^6
+#> <U+0001F4A3> head
+#> · <U+0001F4A3> sapply
+#> · · <U+0001F4A3> seq
+#> · · · <U+0001F4A3> ^
+#> · · · <U+0001F4A5> 10^6
 #> time: 0 us
 #>  num 1e+06
-#> · · seq(10^6)
+#> · · <U+0001F4A5> seq(10^6)
 #> time: 0 us
 #>  int [1:1000000] 1 2 3 4 5 6 7 8 9 10 ...
-#> · sapply(seq(10^6), sqrt)
-#> time: 1 s
+#> · <U+0001F4A5> sapply(seq(10^6), sqrt)
+#> time: 1.041 s
 #>  num [1:1000000] 1 1.41 1.73 2 2.24 ...
-#> head(sapply(seq(10^6), sqrt))
+#> <U+0001F4A5> head(sapply(seq(10^6), sqrt))
 #> time: 0 us
 #>  num [1:6] 1 1.41 1.73 2 2.24 ...
 ```
@@ -155,18 +167,23 @@ lobstr::ast(deparse(quote(1+2+3+4)))
 #>     \-4
 
 boom(deparse(quote(1+2+3+4)))
-#> · quote(1 + 2 + 3 + 4)
+#> <U+0001F4A3> deparse
+#> · <U+0001F4A3> quote
+#> · <U+0001F4A5> quote(1 + 2 + 3 + 4)
 #> 1 + 2 + 3 + 4
-#> deparse(quote(1 + 2 + 3 + 4))
+#> <U+0001F4A5> deparse(quote(1 + 2 + 3 + 4))
 #> [1] "1 + 2 + 3 + 4"
 
 # standard evaluation
 boom(1+2+3+4)
-#> · · 1 + 2
+#> <U+0001F4A3> +
+#> · <U+0001F4A3> +
+#> · · <U+0001F4A3> +
+#> · · <U+0001F4A5> 1 + 2
 #> [1] 3
-#> · 1 + 2 + 3
+#> · <U+0001F4A5> 1 + 2 + 3
 #> [1] 6
-#> 1 + 2 + 3 + 4
+#> <U+0001F4A5> 1 + 2 + 3 + 4
 #> [1] 10
 ```
 
