@@ -48,6 +48,8 @@
 #'
 #' # rig a function
 #' rig(ave)(warpbreaks$breaks, warpbreaks$wool)
+#'
+
 boom <- function(
   expr,
   clock = getOption("boom.clock"),
@@ -62,45 +64,15 @@ boom <- function(
     identical(scs[[l]][[2]], quote(.)) &&
     identical(scs[[l-1]][[1]], quote(`%>%`))
   if(call_is_piped) {
+    # change `code %>% boom(., ...)` into `boom(code, ...)`
     call <- do.call(substitute, list(scs[[l]], list(. = scs[[l-1]][[2]])))
+    # call modified expression
     eval.parent(call)
   }
-  # reset the global times table
-  reset_globals()
 
-  pf   <- parent.frame()
-  expr <- substitute(expr)
-  funs <- fetch_functions(expr, ignore)
-  mask <- list()
-  mask$"<-" <- build_shimmed_assign("<-", ignore, clock, print, visible_only)
-  mask$"=" <- build_shimmed_assign("=", ignore, clock, print, visible_only)
-  # go through every existing function detected above and create a wrapper
-  # in the mask to override it
-  for (fun_chr in funs) {
-    # `funs` will include functions yet to be defined when calling `rig()`
-    # so we don't want to fail here if the object doesn't exist
-    if(!exists(fun_chr, pf)) {
-      message("Not booming undefined `", fun_chr, "()`.")
-      next
-    }
-
-    # fetch the env, primitives don't have one, but they're in the base package
-    fun_val <- get(fun_chr, envir = pf)
-    fun_env <- environment(fun_val)
-    if(is.null(fun_env)) {
-      fun_env <- asNamespace("base")
-    }
-
-    f <- wrap(fun_val, clock, print, visible_only)
-    environment(f) <- fun_env
-
-    mask[[fun_chr]] <- f
-
-  }
-  mask$`::` <- double_colon(clock, print, visible_only, nm = NULL)
-  mask$`:::` <- triple_colon(clock, print, visible_only, nm = NULL)
-  mask$..FIRST_CURLY.. <- TRUE
-  invisible(eval(expr, envir = mask, enclos = parent.frame()))
+  fun <- as.function(list(substitute(expr)), envir = parent.frame())
+  fun <- rig_impl(fun, clock, print, ignore, visible_only, nm = NULL)
+  fun()
 }
 
 #' @export
