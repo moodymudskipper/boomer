@@ -103,6 +103,35 @@ rig(hello)("world")
 
 ![](man/figures/README-7.png)
 
+## `rig_in_namespace()`
+
+`rig_in_namespace()` was designed to assist package development.
+Functions are rigged in place and we can explode the calls of the bodies
+of several functions at a time.
+
+For instance you might have these functions in a package :
+
+``` r
+cylinder_vol <- function(r, h) {
+  h * disk_area(r)
+}
+
+disk_area <- function(r) {
+  pi * r^2
+}
+```
+
+`cylinder_vol` depends on `disk_area`, call `devtools::load_all()` then
+`rig_in_namespace()` on both and enjoy the detailed output:
+
+``` r
+devtools::load_all()
+rig_in_namespace(cylinder_vol, disk_area)
+cylinder_vol(3,10)
+```
+
+![](man/figures/README-9.png)
+
 ## Addin
 
 To avoid typing `boom()` all the time you can use the provided addin
