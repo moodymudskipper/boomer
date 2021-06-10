@@ -302,7 +302,8 @@ rig_impl <- function(
   # in the mask to override it
   for (fun_chr in funs) {
     # `funs` will include functions yet to be defined when calling `rig()`
-    # so we don't want to fail here if the object doesn't exist
+    # these might or might nor be sorted out by shim_assign, but we can't know
+    # yet so we don't want to fail here if the object doesn't exist
     if(!exists(fun_chr, rigged_fun_env)) {
       if(!is.null(nm))
         message("`", fun_chr, "()` is undefined outside of `", nm, "()` and its output might not be shown.")
