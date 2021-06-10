@@ -2,11 +2,10 @@
 globals <- new.env()
 globals$n_indent <- -1
 
-
-wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
-  as.function(c(alist(...=), bquote({
+wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
+  as.function(c(alist(...=), bquote2({
     # start the clock
-    total_time_start <- Sys.time()
+    .IF(clock, total_time_start <- Sys.time())
 
     globals <- getFromNamespace("globals", "boomer")
     # set indentation
@@ -16,10 +15,10 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
       globals$n_indent <- globals$n_indent - 1
       # update last_total_time_end on exit, we do it this way so our total
       # time doesn't leave out the updating of the times df with this value
-      globals$last_total_time_end <- Sys.time()
-      })
+      .IF(clock, globals$last_total_time_end <- Sys.time())
+    })
 
-    if(!is.null(.(nm))) {
+    .IF(!is.null(nm), {
       mask <- parent.env(parent.frame())
       if(isTRUE(mask$..FIRST_CURLY..)) {
         cat(dots, "\U0001f447 ", crayon::yellow(.(nm)),"\n", sep = "")
@@ -29,7 +28,7 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
         })
         mask$..FIRST_CURLY.. <- FALSE
       }
-    }
+    })
 
     # manipulate call to use original function
     sc  <- sys.call()
@@ -38,8 +37,7 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
     cat(dots, "\U0001f4a3 ", crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
 
     # evaluate call with original function
-    pf <- parent.frame()
-    evaluation_time_start <- Sys.time()
+    .IF(clock, evaluation_time_start <- Sys.time())
     success <- FALSE
     error <- tryCatch(
       {
@@ -48,7 +46,7 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
       },
       error = identity
     )
-    evaluation_time_end <- Sys.time()
+    .IF(clock, evaluation_time_end <- Sys.time())
     if(success && !res$visible && .(visible_only)) return(invisible(res$value))
 
     # always display function call
@@ -61,81 +59,18 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
     }
 
     # update the global `times` data frame and compute the true time
-    true_time_msg <- getFromNamespace("update_times_df_and_get_true_time", "boomer")(
-      call, total_time_start, evaluation_time_start, evaluation_time_end)
+    .IF(clock, true_time_msg <-
+          getFromNamespace("update_times_df_and_get_true_time", "boomer")(
+      call, total_time_start, evaluation_time_start, evaluation_time_end))
 
     # otherwise print result
     res <- res$value
-    writeLines(crayon::blue(true_time_msg))
+    .IF(clock, writeLines(crayon::blue(true_time_msg)))
     print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-    writeLines(c(paste0(dots, capture.output(print_fun(res))), ""))
+    writeLines(c(paste0(dots, capture.output(print_fun(res))), dots))
 
     res
   })))
-}
-
-wrap_unclocked <- function(fun_val, print_fun, visible_only, nm) {
-  as.function(c(alist(...=), bquote({
-    globals <- getFromNamespace("globals", "boomer")
-
-    # set indentation
-    globals$n_indent <- globals$n_indent + 1
-    dots <- crayon::yellow(strrep("\ub7 ", globals$n_indent))
-    on.exit(globals$n_indent <- globals$n_indent - 1)
-
-    if(!is.null(.(nm))) {
-      mask <- parent.env(parent.frame())
-      if(isTRUE(mask$..FIRST_CURLY..)) {
-        cat(dots, "\U0001f447 ", crayon::yellow(.(nm)),"\n", sep = "")
-        withr::defer_parent({
-          cat(dots, "\U0001f446 ", crayon::yellow(.(nm)),"\n", sep = "")
-          mask$..FIRST_CURLY.. <- TRUE
-        })
-        mask$..FIRST_CURLY.. <- FALSE
-      }
-    }
-
-    # manipulate call to use original function
-    sc  <- sys.call()
-    sc_bkp <- sc
-    sc[[1]] <- .(fun_val)
-    cat(dots, "\U0001f4a3 ", crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
-
-    # evaluate call with original function
-    success <- FALSE
-    error <- tryCatch(
-      {
-        res <- withVisible(rlang::eval_bare(sc, parent.frame()))
-        success <- TRUE
-      },
-      error = identity
-    )
-    if(success && !res$visible && .(visible_only)) return(invisible(res$value))
-
-    # always display function call
-    cat(dots, "\U0001f4a5 ", crayon::cyan(deparse(sc_bkp)), "\n", sep ="")
-
-    # rethrow on failure
-    if (!success) {
-      writeLines(crayon::magenta("Error:", paste0(class(error), collapse = "/")))
-      stop(error)
-    }
-
-    # otherwise print result
-    res <- res$value
-    print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-    writeLines(c(paste0(dots, capture.output(print_fun(res))), ""))
-
-    res
-  })))
-}
-
-wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
-  if(clock) {
-    wrap_clocked(fun_val, print_fun, visible_only, nm)
-  } else {
-    wrap_unclocked(fun_val, print_fun, visible_only, nm)
-  }
 }
 
 update_times_df_and_get_true_time <- function(
@@ -221,7 +156,7 @@ double_colon <- function(clock, print_fun, visible_only, nm) {
       fun_val <- getExportedValue(pkg, name)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap_clocked(fun_val, print_fun, visible_only, nm)
+      wrap(fun_val, TRUE, print_fun, visible_only, nm)
     }
   } else {
     function(pkg, name) {
@@ -231,7 +166,7 @@ double_colon <- function(clock, print_fun, visible_only, nm) {
       fun_val <- getExportedValue(pkg, name)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap_unclocked(fun_val, print_fun, visible_only, nm)
+      wrap(fun_val, FALSE, print_fun, visible_only, nm)
     }
   }
 }
@@ -245,7 +180,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm) {
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap_clocked(fun_val, print_fun, visible_only, nm)
+      wrap(fun_val, TRUE, print_fun, visible_only, nm)
     }
   } else {
     function(pkg, name) {
@@ -255,7 +190,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm) {
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap_unclocked(fun_val, print_fun, visible_only, nm)
+      wrap(fun_val, FALSE, print_fun, visible_only, nm)
     }
   }
 }
