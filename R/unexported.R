@@ -68,7 +68,7 @@ wrap_clocked <- function(fun_val, print_fun, visible_only, nm) {
     res <- res$value
     writeLines(crayon::blue(true_time_msg))
     print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-    writeLines(capture.output(print_fun(res)))
+    writeLines(c(capture.output(print_fun(res)), ""))
 
     res
   })))
@@ -124,7 +124,7 @@ wrap_unclocked <- function(fun_val, print_fun, visible_only, nm) {
     # otherwise print result
     res <- res$value
     print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-    writeLines(capture.output(print_fun(res)))
+    writeLines(c(capture.output(print_fun(res)), ""))
     res
   })))
 }
