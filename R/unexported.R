@@ -304,7 +304,8 @@ rig_impl <- function(
     # `funs` will include functions yet to be defined when calling `rig()`
     # so we don't want to fail here if the object doesn't exist
     if(!exists(fun_chr, rigged_fun_env)) {
-      message("Not rigging undefined `", fun_chr, "()`.")
+      if(!is.null(nm))
+        message("`", fun_chr, "()` is undefined outside of `", nm, "()` and its output might not be shown.")
       next
     }
 
