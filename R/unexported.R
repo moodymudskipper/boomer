@@ -225,6 +225,7 @@ fetch_functions <- function(expr, ignore) {
     c("EQ_ASSIGN",      # dealt with through shim_assign() so ignored here
       "LEFT_ASSIGN",    # dealt with through shim_assign() so ignored here
       "expr",           #
+      "expr_or_assign_or_help",
       "forcond",        # ignore token after `for`
       "SYMBOL",         # regular symbols not used before `(`
       "SYMBOL_SUB",     # argument names
