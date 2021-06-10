@@ -255,29 +255,16 @@ fetch_functions <- function(expr, ignore) {
 
 build_shimmed_assign <- function(symbol, ignore, clock, print_fun, visible_only) {
   # return a function that shims an assignment operator
-  if (symbol == "<-") {
-    f <- eval(bquote(function(e1, e2) {
-      E2 <- if (is.language(e2)) {
-        substitute(quote(e2), list(e2 = e2))
-      } else if (!is.function(e2)) {
-        e2
-      } else {
-        wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only))
-      }
-      invisible(eval.parent(substitute(.Primitive("<-")(e1, E2))))
-    }))
-  } else if (symbol == "=") {
-    f <- eval(bquote(function(e1, e2) {
-      E2 <- if (is.language(e2)) {
-        substitute(quote(e2), list(e2 = e2))
-      } else if (!is.function(e2)) {
-        e2
-      } else {
-        wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only))
-      }
-      invisible(eval.parent(substitute(.Primitive("=")(e1, E2))))
-    }))
-  }
+  f <- eval(bquote(function(e1, e2) {
+    E2 <- if (is.language(e2)) {
+      substitute(quote(e2), list(e2 = e2))
+    } else if (!is.function(e2)) {
+      e2
+    } else {
+      wrap(e2, clock = .(clock), print_fun = .(print_fun), visible_only = .(visible_only))
+    }
+    invisible(eval.parent(substitute(.Primitive(.(symbol))(e1, E2))))
+  }))
 
   if (!symbol %in% ignore) {
     f <- wrap(f, clock = clock, print_fun = print_fun, visible_only = visible_only)
