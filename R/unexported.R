@@ -50,7 +50,12 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
     if(success && !res$visible && .(visible_only)) return(invisible(res$value))
 
     # always display function call
-    cat(dots, "\U0001f4a5 ", crayon::cyan(deparse(sc_bkp)), "\n", sep ="")
+    cat(
+      dots,
+      "\U0001f4a5 ",
+      crayon::cyan(deparse1(sc_bkp, collapse = paste0("\n", strrep(" ", globals$n_indent + 3)))),
+      "\n",
+      sep ="")
 
     # rethrow on failure
     if (!success) {
