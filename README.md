@@ -6,9 +6,11 @@
 
 # boomer <img src='man/figures/logo.png' align="right" height="139" />
 
-*{boomer}* lets you look at intermediate results of a call. It
-“explodes” the call into its parts hence the name. It is useful for
-debugging and teaching operation precedence.
+*{boomer}* is a debugging tool that lets you look at intermediate
+results of a call. It “explodes” the call into its parts hence the name.
+
+A function can be “rigged”, so it will print the result of all the
+function calls of their body.
 
 ## Installation
 
@@ -18,57 +20,33 @@ Install with:
 remotes::install_github("moodymudskipper/boomer")
 ```
 
-## Examples
+## `boom()`
 
 ``` r
 library(boomer)
 boom(1 + !1 * 2)
 ```
 
-\<U+0001F4A3\> + · \<U+0001F4A3\> \! · · \<U+0001F4A3\> * · ·
-\<U+0001F4A5\> 1 * 2 \[1\] 2 · \<U+0001F4A5\> \!1 \* 2 \[1\] FALSE
-\<U+0001F4A5\> 1 + \!1 \* 2 \[1\] 1
+![](man/figures/README-1.png)
 
 ``` r
-
 boom(subset(head(mtcars, 2), qsec > 17))
 ```
 
-\<U+0001F4A3\> subset · \<U+0001F4A3\> head · \<U+0001F4A5\>
-head(mtcars, 2) mpg cyl disp hp drat wt qsec vs am gear carb Mazda RX4
-21 6 160 110 3.9 2.620 16.46 0 1 4 4 Mazda RX4 Wag 21 6 160 110 3.9
-2.875 17.02 0 1 4 4 · \<U+0001F4A3\> \> · \<U+0001F4A5\> qsec \> 17
-\[1\] FALSE TRUE \<U+0001F4A5\> subset(head(mtcars, 2), qsec \> 17) mpg
-cyl disp hp drat wt qsec vs am gear carb Mazda RX4 Wag 21 6 160 110 3.9
-2.875 17.02 0 1 4 4
+![](man/figures/README-2.png)
 
 You can use `boom()` with *{magrittr}* pipes, just pipe to `boom()` at
 the end of a pipe chain.
 
 ``` r
 library(magrittr)
-#> Warning: package 'magrittr' was built under R version 4.0.4
 mtcars %>%
   head(2) %>%
   subset(qsec > 17) %>%
   boom()
-#> <U+0001F4A3> %>%
-#> · <U+0001F4A3> subset
-#> · · <U+0001F4A3> head
-#> · · <U+0001F4A5> head(., 2)
-#>               mpg cyl disp  hp drat    wt  qsec vs am gear carb
-#> Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4
-#> Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
-#> · · <U+0001F4A3> >
-#> · · <U+0001F4A5> qsec > 17
-#> [1] FALSE  TRUE
-#> · <U+0001F4A5> subset(., qsec > 17)
-#>               mpg cyl disp  hp drat    wt  qsec vs am gear carb
-#> Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
-#> <U+0001F4A5> mtcars %>% head(2) %>% subset(qsec > 17)
-#>               mpg cyl disp  hp drat    wt  qsec vs am gear carb
-#> Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
 ```
+
+![](man/figures/README-3.png)
 
 If a call fails, *{boomer}* will print intermediate outputs up to the
 occurrence of the error, it can help with debugging:
@@ -79,60 +57,51 @@ occurrence of the error, it can help with debugging:
   toupper() %>%
   sqrt() %>%
   boom()
-#> <U+0001F4A3> %>%
-#> · <U+0001F4A3> sqrt
-#> · · <U+0001F4A3> toupper
-#> · · · <U+0001F4A3> substr
-#> · · · <U+0001F4A5> substr(., 1, 3)
-#> [1] "tom"
-#> · · <U+0001F4A5> toupper(.)
-#> [1] "TOM"
-#> · <U+0001F4A5> sqrt(.)
-#> Error: simpleError/error/condition
-#> <U+0001F4A5> "tomato" %>% substr(1, 3) %>% toupper() %>% sqrt()
-#> Error: simpleError/error/condition
-#> Error in .Primitive("sqrt")(.): non-numeric argument to mathematical function
 ```
 
-`boom()` features a couple of optional arguments:
+![](man/figures/README-4.png)
 
-  - Set `clock` to `TRUE` to see how long each step (in isolation\!)
+`boom()` features optional arguments, the main ones are :
+
+  - `clock`: set to `TRUE` to see how long each step (in isolation\!)
     took to run.
 
-  - Set the `print` argument to a function such as `str` to change what
-    is printed (see `?boom` to see how to print differently depending on
-    class). Useful alternatives would be `dplyr::glimpse` of `invisible`
-    (to print nothing). This is useful when the output is too long.
+  - `print`: set to a function such as `str` to change what is printed
+    (see `?boom` to see how to print differently depending on class).
+    Useful alternatives would be `dplyr::glimpse` of `invisible` (to
+    print nothing).
 
-<!-- end list -->
-
-``` r
-boom(head(sapply(seq(10^6), sqrt)), clock = TRUE, print = str)
-#> <U+0001F4A3> head
-#> · <U+0001F4A3> sapply
-#> · · <U+0001F4A3> seq
-#> · · · <U+0001F4A3> ^
-#> · · · <U+0001F4A5> 10^6
-#> time: 0 us
-#>  num 1e+06
-#> · · <U+0001F4A5> seq(10^6)
-#> time: 0 us
-#>  int [1:1000000] 1 2 3 4 5 6 7 8 9 10 ...
-#> · <U+0001F4A5> sapply(seq(10^6), sqrt)
-#> time: 1.041 s
-#>  num [1:1000000] 1 1.41 1.73 2 2.24 ...
-#> <U+0001F4A5> head(sapply(seq(10^6), sqrt))
-#> time: 0 us
-#>  num [1:6] 1 1.41 1.73 2 2.24 ...
-```
-
-`boom()` also works works on loops and multi-line expression, you can
-also `rig()` a function in order to `boom()` all the calls of its body :
+This is useful when the output is too long.
 
 ``` r
-# try it out on you own, a bit too verbose for a README :)
-rig(ave)(warpbreaks$breaks, warpbreaks$wool)
+boom(lapply(head(cars), sqrt), clock = TRUE, print = str)
 ```
+
+![](man/figures/README-5.png)
+
+`boom()` also works works on loops and multi-line expression.
+
+``` r
+ boom(for(i in 1:3) paste0(i, "!"))
+```
+
+![](man/figures/README-6.png)
+
+## `rig()`
+
+`rig()` a function in order to `boom()` its body :
+
+``` r
+hello <- function(x) {
+  if(!is.character(x) | length(x) != 1) {
+    stop("`x` should be a string")
+  }
+  paste0("Hello ", x, "!")
+}
+rig(hello)("world")
+```
+
+![](man/figures/README-7.png)
 
 ## Addin
 
@@ -141,11 +110,14 @@ named *“Explode a call with `boom()`”*: just attribute a key combination
 to it (I use ctrl+shift+alt+B on windows), select the call you’d like to
 explode and fire away\!
 
-The default values of the `clock` and `print` arguments of `boom()` are
-given by the options `"boomer.clock"` and `"boomer.print"`, so by
-modifying those you will change the behavior of the addin.
+The default values of the optional arguments of `boom()` are given by
+the options `"boomer.clock"`, `"boomer.print"` etc, so by modifying
+those you will change the behavior of the addin.
 
 ## Notes
+
+For windows users *{boom}* doesn’t look good in markdown report or
+reprexes at the moment.
 
 *{boomer}* prints the output of intermediate steps as they are executed,
 and thus doesn’t say anything about what isn’t executed, it is in
@@ -165,27 +137,13 @@ lobstr::ast(deparse(quote(1+2+3+4)))
 #>     | | \-2 
 #>     | \-3 
 #>     \-4
-
-boom(deparse(quote(1+2+3+4)))
-#> <U+0001F4A3> deparse
-#> · <U+0001F4A3> quote
-#> · <U+0001F4A5> quote(1 + 2 + 3 + 4)
-#> 1 + 2 + 3 + 4
-#> <U+0001F4A5> deparse(quote(1 + 2 + 3 + 4))
-#> [1] "1 + 2 + 3 + 4"
-
-# standard evaluation
-boom(1+2+3+4)
-#> <U+0001F4A3> +
-#> · <U+0001F4A3> +
-#> · · <U+0001F4A3> +
-#> · · <U+0001F4A5> 1 + 2
-#> [1] 3
-#> · <U+0001F4A5> 1 + 2 + 3
-#> [1] 6
-#> <U+0001F4A5> 1 + 2 + 3 + 4
-#> [1] 10
 ```
+
+``` r
+boom(deparse(quote(1+2+3+4)))
+```
+
+![](man/figures/README-8.png)
 
 An earlier version of the package was released as *{boom}*, but a
 package *{Boom}* already exists on CRAN so it was renamed. *{boom}*
