@@ -83,7 +83,7 @@ rig <- function(
   print = getOption("boom.print"),
   ignore = getOption("boom.ignore"),
   visible_only = getOption("boom.visible_only")) {
-  rig_impl(fun, clock, print, ignore, visible_only, NULL)
+  rig_impl(fun, clock, print, ignore, visible_only, as.character(substitute(fun)))
 }
 
 #' Create rigged function conveniently
