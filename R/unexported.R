@@ -3,7 +3,7 @@ globals <- new.env()
 globals$n_indent <- -1
 
 wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
-  as.function(c(alist(...=), bquote2({
+  as.function(envir = asNamespace("boomer"), c(alist(...=), bquote2({
     # start the clock
     .IF(clock, total_time_start <- Sys.time())
 
@@ -66,7 +66,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
     # update the global `times` data frame and compute the true time
     .IF(clock, true_time_msg <-
           getFromNamespace("update_times_df_and_get_true_time", "boomer")(
-      call, total_time_start, evaluation_time_start, evaluation_time_end))
+            call, total_time_start, evaluation_time_start, evaluation_time_end))
 
     # otherwise print result
     res <- res$value
@@ -202,7 +202,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm) {
 
 
 reset_globals <- function() {
-    # reset the global times table
+  # reset the global times table
   globals$times <- data.frame(
     call = character(),
     total_time_start = Sys.time()[0],
@@ -269,9 +269,6 @@ build_shimmed_assign <- function(symbol, ignore, clock, print_fun, visible_only)
   if (!symbol %in% ignore) {
     f <- wrap(f, clock = clock, print_fun = print_fun, visible_only = visible_only)
   }
-
-  # need to put `f` in namespace so `wrap` is accessible (CRAN doesn't like `:::`)
-  environment(f) <- asNamespace("boomer")
   f
 }
 
@@ -311,7 +308,6 @@ rig_impl <- function(
     }
 
     f <- wrap(fun_val, clock, print, visible_only, nm = nm)
-    environment(f) <- fun_env
     mask[[fun_chr]] <- f
   }
   mask$`::` <- double_colon(clock, print, visible_only, nm)
