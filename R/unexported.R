@@ -20,13 +20,13 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
 
     .IF(!is.null(nm), {
       mask <- parent.env(parent.frame())
-      if(isTRUE(mask$..FIRST_CURLY..)) {
+      if(isTRUE(mask$..FIRST_CALL..)) {
         cat(dots, "\U0001f447 ", crayon::yellow(.(nm)),"\n", sep = "")
         withr::defer_parent({
           cat(dots, "\U0001f446 ", crayon::yellow(.(nm)),"\n", sep = "")
-          mask$..FIRST_CURLY.. <- TRUE
+          mask$..FIRST_CALL.. <- TRUE
         })
-        mask$..FIRST_CURLY.. <- FALSE
+        mask$..FIRST_CALL.. <- FALSE
       }
     })
 
@@ -312,7 +312,7 @@ rig_impl <- function(
   }
   mask$`::` <- double_colon(clock, print, visible_only, nm)
   mask$`:::` <- triple_colon(clock, print, visible_only, nm)
-  mask$..FIRST_CURLY.. <- TRUE
+  mask$..FIRST_CALL.. <- TRUE
   environment(fun) <- mask
   fun
 }
