@@ -72,10 +72,12 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     if(success && !res$visible && .(visible_only)) return(invisible(res$value))
 
     # always display function call
+    call_txt <- deparse1(sc_bkp, collapse = paste0("\n", strrep(" ", globals$n_indent + 3)))
+    call_txt <- styler::style_text(call_txt)
     cat(
       dots,
       "\U0001f4a5 ",
-      crayon::cyan(deparse1(sc_bkp, collapse = paste0("\n", strrep(" ", globals$n_indent + 3)))),
+      crayon::cyan(call_txt),
       "\n",
       sep ="")
 

@@ -18,6 +18,7 @@ Imports:
     methods,
     rlang,
     rstudioapi,
+    styler,
     withr
 Suggests: 
     lobstr,
