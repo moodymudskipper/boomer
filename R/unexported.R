@@ -29,13 +29,16 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
           args <- names(eval.parent(quote(match.call())))[-1]
           for (arg in args) {
             tryCatch(
-              error = function(e) invisible(NULL), {
+              error = function(e) {
+                writeLines(paste0(
+                  dots, c(crayon::green(arg, ": Couldn't evaluate"))))
+              }, {
                 # to do : make it CRAN compatible
                 capture.output(arg_val <- suppressMessages(suppressWarnings(
                   eval(pryr:::promise_code(arg, pf), pryr:::promise_env(arg, pf)))))
                 output <- capture.output(print_fun(arg_val))
                 writeLines(paste0(
-                  dots, c(crayon::green(paste0(arg), ":"), output)))
+                  dots, c(crayon::green(arg, ":"), output)))
               })
           }
         })
