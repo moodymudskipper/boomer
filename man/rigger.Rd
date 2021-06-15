@@ -8,7 +8,8 @@ rigger(
   clock = getOption("boom.clock"),
   print = getOption("boom.print"),
   ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only")
+  visible_only = getOption("boom.visible_only"),
+  print_args = getOption("boom.print_args")
 )
 }
 \arguments{
@@ -23,6 +24,9 @@ unless the option \code{"boom.ignore"} is modified. \code{::} and \code{:::} are
 
 \item{visible_only}{whether functions returning invisibly should be considered,
 by default they are unless the option \code{"boom.visible_only"} is set to \code{TRUE}.}
+
+\item{print_args}{whether to print the values of the arguments provided to a rigged
+function. Use with caution, see details.}
 }
 \value{
 a list containing the arguments, with the class "rigger" to enable

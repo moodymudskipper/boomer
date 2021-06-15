@@ -18,7 +18,8 @@ rig(
   clock = getOption("boom.clock"),
   print = getOption("boom.print"),
   ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only")
+  visible_only = getOption("boom.visible_only"),
+  print_args = getOption("boom.print_args")
 )
 }
 \arguments{
@@ -37,6 +38,9 @@ unless the option \code{"boom.ignore"} is modified. \code{::} and \code{:::} are
 by default they are unless the option \code{"boom.visible_only"} is set to \code{TRUE}.}
 
 \item{fun}{function ro \code{rig()}}
+
+\item{print_args}{whether to print the values of the arguments provided to a rigged
+function. Use with caution, see details.}
 }
 \description{
 \code{boom()} will explode a call into the output of its parts.
@@ -61,6 +65,20 @@ of the given S3 class are printed. For instance \code{print = list(str, data.fra
 Modifying the options is especially useful if you want to use the addin
 with custom behavior.
 }
+\section{print_args}{
+
+
+Arguments are not always meant to be evaluated if non standard
+evaluation is used, if \code{print_args} is \code{TRUE} we always try to evaluate them.
+Promises are not affected so calls to \code{substitute()} or \code{rlang::enquo()} for instance
+will work fine.
+However pure NSE arguments will be evaluated once instead of not evaluated at all,
+and SE arguments will be evaluated twice instead of once. So in the rare case where a function
+has an argument whose evaluation has side effects the behavior might be unexpected.
+Exceptions among those side effects are printing, messaging, warning or failing, which we
+could disable.
+}
+
 \examples{
 # explode a simple call
 boom(subset(head(mtcars, 2), qsec > 17))
@@ -73,4 +91,5 @@ boom(subset(head(mtcars, 2), qsec > 17), print = list(data.frame = str))
 
 # rig a function
 rig(ave)(warpbreaks$breaks, warpbreaks$wool)
+
 }

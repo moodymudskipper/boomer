@@ -2,7 +2,7 @@
 globals <- new.env()
 globals$n_indent <- -1
 
-wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
+wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args = FALSE) {
   as.function(envir = asNamespace("boomer"), c(alist(...=), bquote2({
     # start the clock
     .IF(clock, total_time_start <- Sys.time())
@@ -10,6 +10,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
     globals <- getFromNamespace("globals", "boomer")
     # set indentation
     globals$n_indent <- globals$n_indent + 1
+    print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
     dots <- crayon::yellow(strrep("\ub7 ", globals$n_indent))
     on.exit({
       globals$n_indent <- globals$n_indent - 1
@@ -22,9 +23,27 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
       mask <- parent.env(parent.frame())
       if(isTRUE(mask$..FIRST_CALL..)) {
         cat(dots, "\U0001f447 ", crayon::yellow(.(nm)),"\n", sep = "")
+
+        .IF(print_args, {
+          pf <- parent.frame()
+          args <- names(eval.parent(quote(match.call())))[-1]
+          for (arg in args) {
+            tryCatch(
+              error = function(e) invisible(NULL), {
+                # to do : make it CRAN compatible
+                capture.output(arg_val <- suppressMessages(suppressWarnings(
+                  eval(pryr:::promise_code(arg, pf), pryr:::promise_env(arg, pf)))))
+                output <- capture.output(print_fun(arg_val))
+                writeLines(paste0(
+                  dots, c(crayon::green(paste0(arg), ":"), output)))
+              })
+          }
+        })
+
         withr::defer_parent({
           cat(dots, "\U0001f446 ", crayon::yellow(.(nm)),"\n", sep = "")
           mask$..FIRST_CALL.. <- TRUE
+
         })
         mask$..FIRST_CALL.. <- FALSE
       }
@@ -71,7 +90,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL) {
     # otherwise print result
     res <- res$value
     .IF(clock, writeLines(crayon::blue(true_time_msg)))
-    print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
+
     writeLines(c(paste0(dots, capture.output(print_fun(res))), dots))
 
     res
@@ -152,7 +171,7 @@ fetch_print_fun <- function(print_fun, res) {
 }
 
 
-double_colon <- function(clock, print_fun, visible_only, nm) {
+double_colon <- function(clock, print_fun, visible_only, nm, print_args) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`::`
@@ -161,7 +180,7 @@ double_colon <- function(clock, print_fun, visible_only, nm) {
       fun_val <- getExportedValue(pkg, name)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap(fun_val, TRUE, print_fun, visible_only, nm)
+      wrap(fun_val, TRUE, print_fun, visible_only, nm, print_args)
     }
   } else {
     function(pkg, name) {
@@ -171,12 +190,12 @@ double_colon <- function(clock, print_fun, visible_only, nm) {
       fun_val <- getExportedValue(pkg, name)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap(fun_val, FALSE, print_fun, visible_only, nm)
+      wrap(fun_val, FALSE, print_fun, visible_only, nm, print_args)
     }
   }
 }
 
-triple_colon <- function(clock, print_fun, visible_only, nm) {
+triple_colon <- function(clock, print_fun, visible_only, nm, print_args) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`:::`
@@ -185,7 +204,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm) {
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap(fun_val, TRUE, print_fun, visible_only, nm)
+      wrap(fun_val, TRUE, print_fun, visible_only, nm, print_args)
     }
   } else {
     function(pkg, name) {
@@ -195,7 +214,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm) {
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap(fun_val, FALSE, print_fun, visible_only, nm)
+      wrap(fun_val, FALSE, print_fun, visible_only, nm, print_args)
     }
   }
 }
@@ -279,7 +298,8 @@ rig_impl <- function(
   print = getOption("boom.print"),
   ignore = getOption("boom.ignore"),
   visible_only = getOption("boom.visible_only"),
-  nm = NULL) {
+  nm = NULL,
+  print_args = FALSE) {
 
   expr <- body(fun)
   reset_globals()
@@ -307,7 +327,7 @@ rig_impl <- function(
       fun_env <- asNamespace("base")
     }
 
-    f <- wrap(fun_val, clock, print, visible_only, nm = nm)
+    f <- wrap(fun_val, clock, print, visible_only, nm = nm, print_args = print_args)
     mask[[fun_chr]] <- f
   }
   mask$`::` <- double_colon(clock, print, visible_only, nm)
