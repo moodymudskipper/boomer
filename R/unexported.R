@@ -330,8 +330,8 @@ rig_impl <- function(
     f <- wrap(fun_val, clock, print, visible_only, nm = nm, print_args = print_args)
     mask[[fun_chr]] <- f
   }
-  mask$`::` <- double_colon(clock, print, visible_only, nm)
-  mask$`:::` <- triple_colon(clock, print, visible_only, nm)
+  mask$`::` <- double_colon(clock, print, visible_only, nm, print_args)
+  mask$`:::` <- triple_colon(clock, print, visible_only, nm, print_args)
   mask$..FIRST_CALL.. <- TRUE
   environment(fun) <- mask
   fun
