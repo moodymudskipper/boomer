@@ -56,7 +56,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
-    cat(dots, "\U0001f4a3 ", crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
+    cat(dots, "\U0001f4a3 ", crayon::green(file_line(sc)), " ", crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
 
     # evaluate call with original function
     .IF(clock, evaluation_time_start <- Sys.time())
@@ -340,4 +340,10 @@ rig_impl <- function(
   mask$..FIRST_CALL.. <- TRUE
   environment(fun) <- mask
   fun
+}
+
+file_line <- function(call) {
+  file <- getSrcFilename(call)
+  line <- unclass(getSrcref(call))[[1]]
+  paste0(file, ":", line)
 }
