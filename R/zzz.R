@@ -11,7 +11,8 @@ NULL
     boom.print = print,
     boom.ignore = c("~", "{", "(", "<-", "<<-", "="),
     boom.visible_only = FALSE,
-    boom.print_args = FALSE
+    boom.print_args = FALSE,
+    boom.safe_print = FALSE
   )
   toset <- !(names(op.boom) %in% names(op))
   if(any(toset)) options(op.boom[toset])

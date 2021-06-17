@@ -4,6 +4,22 @@ globals$n_indent <- -1
 
 wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args = FALSE) {
   as.function(envir = asNamespace("boomer"), c(alist(...=), bquote2({
+    # set icons, this is slightly inefficient but easier and more readable than
+    .IF(getOption("boom.safe_print"), {
+      rig_open   <- crayon::bold(crayon::yellow("{ "))
+      rig_close  <- crayon::bold(crayon::yellow("} "))
+      wrap_open  <- crayon::bold(crayon::yellow("< "))
+      wrap_close <- crayon::bold(crayon::yellow("> "))
+      dot        <- crayon::yellow(". ")
+    }, {
+      rig_open  <- "\U0001f447 "
+      rig_close <- "\U0001f446 "
+      wrap_open <- "\U0001f4a3 "
+      wrap_close <- "\U0001f4a5 "
+      dot        <- crayon::yellow("\ub7 ")
+    }
+    )
+
     # start the clock
     .IF(clock, total_time_start <- Sys.time())
 
@@ -11,7 +27,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     # set indentation
     globals$n_indent <- globals$n_indent + 1
     print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
-    dots <- crayon::yellow(strrep("\ub7 ", globals$n_indent))
+    dots <- strrep(dot, globals$n_indent)
     on.exit({
       globals$n_indent <- globals$n_indent - 1
       # update last_total_time_end on exit, we do it this way so our total
@@ -22,7 +38,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     .IF(!is.null(nm), {
       mask <- parent.env(parent.frame())
       if(isTRUE(mask$..FIRST_CALL..)) {
-        cat(dots, "\U0001f447 ", crayon::yellow(.(nm)),"\n", sep = "")
+        cat(dots, rig_open, crayon::yellow(.(nm)),"\n", sep = "")
 
         .IF(print_args, {
           pf <- parent.frame()
@@ -44,7 +60,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
         })
 
         withr::defer_parent({
-          cat(dots, "\U0001f446 ", crayon::yellow(.(nm)),"\n", sep = "")
+          cat(dots, rig_close, crayon::yellow(.(nm)),"\n", sep = "")
           mask$..FIRST_CALL.. <- TRUE
 
         })
@@ -56,7 +72,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
-    cat(dots, "\U0001f4a3 ", crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
+    cat(dots, wrap_open, crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
 
     # evaluate call with original function
     .IF(clock, evaluation_time_start <- Sys.time())
@@ -76,7 +92,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     call_txt <- styler::style_text(call_txt)
     cat(
       dots,
-      "\U0001f4a5 ",
+      wrap_close,
       crayon::cyan(call_txt),
       "\n",
       sep ="")
