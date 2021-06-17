@@ -1,3 +1,5 @@
+options(boom.safe_print = TRUE)
+
 test_that("boom()", {
   expect_snapshot({
     boom(1 + 2 * 3)
