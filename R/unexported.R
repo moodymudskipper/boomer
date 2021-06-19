@@ -36,8 +36,10 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
       .IF(clock, globals$last_total_time_end <- Sys.time())
     })
 
+    # is the wrapped function called by a rigged function?
     .IF(!is.null(nm), {
       mask <- parent.env(parent.frame())
+      # is this wrapped function call the first of the body?
       if(isTRUE(mask$..FIRST_CALL..)) {
         cat(dots, rig_open, crayon::yellow(.(nm)),"\n", sep = "")
 
@@ -61,11 +63,12 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
           }
         })
 
+        # when exiting rigged function, inform and reset ..FIRST_CALL..
         withr::defer_parent({
           cat(dots, rig_close, crayon::yellow(.(nm)),"\n", sep = "")
           mask$..FIRST_CALL.. <- TRUE
-
         })
+
         mask$..FIRST_CALL.. <- FALSE
       }
     })
