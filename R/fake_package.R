@@ -11,6 +11,8 @@
 #'
 #' @noRd
 fake_package <- function(name, exported = NULL, unexported = NULL, attach = TRUE) {
+  # for CRAN notes
+  makeNamespace <- NULL
   # fetch and eval call to create `makeNamespace`
   eval(body(loadNamespace)[[c(8, 4, 4)]])
   # create an empty namespace
@@ -25,7 +27,7 @@ fake_package <- function(name, exported = NULL, unexported = NULL, attach = TRUE
   namespaceExport(ns, names(exported))
   if(attach) {
     # copy exported funs to "package:pkg" envir of the search path
-    attach(exported, name = paste0("package:", name))
+    match.fun("attach")(exported, name = paste0("package:", name))
   }
   invisible()
 }

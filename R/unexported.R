@@ -3,6 +3,8 @@ globals <- new.env()
 globals$n_indent <- -1
 
 wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args = FALSE) {
+  # for CRAN notes
+  .IF <- . <- NULL
   as.function(envir = asNamespace("boomer"), c(alist(...=), bquote2({
     # set icons, this is slightly inefficient but easier and more readable than
     .IF(getOption("boom.safe_print"), {
