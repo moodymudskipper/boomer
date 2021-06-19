@@ -1,6 +1,6 @@
 options(boom.safe_print = TRUE)
 
-test_that("boom()", {
+test_that("rig() works", {
   expect_snapshot({
     fun <- function(x) {
       n <- 1 + 2 * 3
@@ -12,6 +12,17 @@ test_that("boom()", {
 })
 
 
+test_that("rigger() works", {
+  expect_snapshot({
+    fun <- function(x) {
+      n <- 1 + 2 * 3
+      sum(base::nchar(utils:::head(x, -n)))
+    }
+    rigged <- rigger() + fun
+    rigged(letters)
+  })
+})
+
 test_that("functions created at runtime are boomed", {
   foo2 <- function(x) {
     x <- x * 2
@@ -20,3 +31,4 @@ test_that("functions created at runtime are boomed", {
   }
   expect_snapshot(rig(foo2)(2))
 })
+

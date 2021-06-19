@@ -1,4 +1,4 @@
-# boom()
+# rig() works
 
     Code
       fun <- (function(x) {
@@ -34,6 +34,44 @@
       [1] 19
       
       } fun
+      [1] 19
+
+# rigger() works
+
+    Code
+      fun <- (function(x) {
+        n <- 1 + 2 * 3
+        sum(base::nchar(utils:::head(x, -n)))
+      })
+      rigged <- rigger() + fun
+      rigged(letters)
+    Output
+      { e2
+      < +
+      . < *
+      . > 2 * 3
+      . [1] 6
+      . 
+      > 1 + 2 * 3
+      [1] 7
+      
+      < sum
+      . < base::nchar
+      . . < utils:::head
+      . . . < -
+      . . . > -n
+      . . . [1] -7
+      . . . 
+      . . > utils:::head(x, -n)
+      . .  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+      . . 
+      . > base::nchar(utils:::head(x, -n))
+      .  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+      . 
+      > sum(base::nchar(utils:::head(x, -n)))
+      [1] 19
+      
+      } e2
       [1] 19
 
 # functions created at runtime are boomed
