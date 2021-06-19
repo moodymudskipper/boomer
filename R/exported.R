@@ -153,7 +153,8 @@ rig_in_namespace <- function(
   clock = getOption("boom.clock"),
   print = getOption("boom.print"),
   ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only")) {
+  visible_only = getOption("boom.visible_only"),
+  print_args = getOption("boom.print_args")) {
 
   nms <- as.character(substitute(alist(...))[-1])
   vals <- list(...)
@@ -164,7 +165,7 @@ rig_in_namespace <- function(
     nm <- nms[[i]]
     ns <- environment(vals[[i]])
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, ignore = ignore,
-                     visible_only = visible_only, nm = nms[[i]])
+                     visible_only = visible_only, nm = nms[[i]], print_args = print_args)
     val <- vals[[i]]
     ub <- unlockBinding
     ub(nm, ns)
@@ -180,7 +181,8 @@ rig_in_namespace <- function(
     wrap,
     rigged_funs,
     nm = nms,
-    MoreArgs = list(clock = clock, print_fun = print, visible_only = visible_only))
+    MoreArgs = list(clock = clock, print_fun = print, visible_only = visible_only,
+                    print_args = print_args))
 
   # add all modified functions to each function's environment
   for(fun in vals) {
