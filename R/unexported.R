@@ -23,10 +23,9 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     # start the clock
     .IF(clock, total_time_start <- Sys.time())
 
-    globals <- getFromNamespace("globals", "boomer")
     # set indentation
     globals$n_indent <- globals$n_indent + 1
-    print_fun <- getFromNamespace("fetch_print_fun", "boomer")(.(print_fun), res)
+    print_fun <- fetch_print_fun(.(print_fun), res)
     dots <- strrep(dot, globals$n_indent)
     on.exit({
       globals$n_indent <- globals$n_indent - 1
@@ -104,9 +103,8 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     }
 
     # update the global `times` data frame and compute the true time
-    .IF(clock, true_time_msg <-
-          getFromNamespace("update_times_df_and_get_true_time", "boomer")(
-            call, total_time_start, evaluation_time_start, evaluation_time_end))
+    .IF(clock, true_time_msg <- update_times_df_and_get_true_time(
+      call, total_time_start, evaluation_time_start, evaluation_time_end))
 
     # otherwise print result
     res <- res$value
