@@ -25,7 +25,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
 
     # set indentation
     globals$n_indent <- globals$n_indent + 1
-    print_fun <- fetch_print_fun(.(print_fun), res)
+
     dots <- strrep(dot, globals$n_indent)
     on.exit({
       globals$n_indent <- globals$n_indent - 1
@@ -51,6 +51,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
                 # to do : make it CRAN compatible
                 capture.output(arg_val <- suppressMessages(suppressWarnings(
                   eval(pryr:::promise_code(arg, pf), pryr:::promise_env(arg, pf)))))
+                print_fun <- fetch_print_fun(.(print_fun), arg_val)
                 output <- capture.output(print_fun(arg_val))
                 writeLines(paste0(
                   dots, c(crayon::green(arg, ":"), output)))
@@ -110,6 +111,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     res <- res$value
     .IF(clock, writeLines(crayon::blue(true_time_msg)))
 
+    print_fun <- fetch_print_fun(.(print_fun), res)
     writeLines(c(paste0(dots, capture.output(print_fun(res))), dots))
 
     res
