@@ -1,5 +1,5 @@
 #' @importFrom stats setNames
-#' @importFrom utils getParseData head
+#' @importFrom utils getParseData head capture.output
 #' @importFrom methods allNames
 NULL
 
