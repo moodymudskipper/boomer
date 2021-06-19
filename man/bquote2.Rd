@@ -20,7 +20,7 @@ and \code{yes} and \code{no} will be quoted. \code{no} is optional.
 }
 \examples{
 fun <- function(x, y, cond) {
-  bquote2({
+  boomer:::bquote2({
     some_long_code_chunk_1(.(x))
     .IF(cond, do_something())
     some_long_code_chunk_2(.(y))
