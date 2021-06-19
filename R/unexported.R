@@ -43,30 +43,11 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
       if(isTRUE(mask$..FIRST_CALL..)) {
         cat(dots, rig_open, crayon::yellow(.(nm)),"\n", sep = "")
 
-        .IF(print_args, {
-          pf <- parent.frame()
-          args <- names(eval.parent(quote(match.call())))[-1]
-          for (arg in args) {
-            tryCatch(
-              error = function(e) {
-                writeLines(paste0(
-                  dots, c(crayon::green(arg, ": Couldn't evaluate"))))
-              }, {
-                # to do : make it CRAN compatible
-                capture.output(arg_val <- suppressMessages(suppressWarnings(
-                  eval(pryr:::promise_code(arg, pf), pryr:::promise_env(arg, pf)))))
-                print_fun <- fetch_print_fun(.(print_fun), arg_val)
-                output <- capture.output(print_fun(arg_val))
-                writeLines(paste0(
-                  dots, c(crayon::green(arg, ":"), output)))
-              })
-          }
-        })
-
         # when exiting rigged function, inform and reset ..FIRST_CALL..
         withr::defer_parent({
           cat(dots, rig_close, crayon::yellow(.(nm)),"\n", sep = "")
           mask$..FIRST_CALL.. <- TRUE
+          mask$..EVALED_ARGS..[] <- FALSE
         })
 
         mask$..FIRST_CALL.. <- FALSE
@@ -90,6 +71,24 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
       error = identity
     )
     .IF(clock, evaluation_time_end <- Sys.time())
+
+    # if arguments have been evaled, print them
+    .IF(print_args && !is.null(nm), {
+      for (arg in names(mask$..EVALED_ARGS..)) {
+        if(!mask$..EVALED_ARGS..[[arg]]) {
+          evaled <- promise_evaled(arg, parent.frame())
+          if(evaled) {
+            mask$..EVALED_ARGS..[[arg]] <- TRUE
+            arg_val <- get(arg, envir = parent.frame())
+            print_fun <- fetch_print_fun(.(print_fun), arg_val)
+            output <- capture.output(print_fun(arg_val))
+            writeLines(paste0(
+              dots, c(crayon::green(arg, ":"), output)))
+          }
+        }
+      }
+    })
+
     if(success && !res$visible && .(visible_only)) return(invisible(res$value))
 
     # always display function call
@@ -359,6 +358,8 @@ rig_impl <- function(
   mask$`::` <- double_colon(clock, print, visible_only, nm, print_args)
   mask$`:::` <- triple_colon(clock, print, visible_only, nm, print_args)
   mask$..FIRST_CALL.. <- TRUE
+  arg_nms <- formalArgs(fun)
+  mask$..EVALED_ARGS.. <- setNames(rep(FALSE, length(arg_nms)), arg_nms)
   environment(fun) <- mask
   fun
 }

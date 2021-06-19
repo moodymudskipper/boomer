@@ -15,7 +15,7 @@
 #' @param visible_only whether functions returning invisibly should be considered,
 #'   by default they are unless the option `"boom.visible_only"` is set to `TRUE`.
 #' @param print_args whether to print the values of the arguments provided to a rigged
-#'   function. Use with caution, see details.
+#'   function. They are printed when they are evaluated, if they are evaluated.
 #'
 #' @details
 #' By default, unless the "boom.print" option  is set to a custom value, the
@@ -35,18 +35,6 @@
 #'
 #' Modifying the options is especially useful if you want to use the addin
 #' with custom behavior.
-#'
-#' @section print_args:
-#'
-#' Arguments are not always meant to be evaluated if non standard
-#' evaluation is used, if `print_args` is `TRUE` we always try to evaluate them.
-#' Promises are not affected so calls to `substitute()` or `rlang::enquo()` for instance
-#' will work fine.
-#' However pure NSE arguments will be evaluated once instead of not evaluated at all,
-#' and SE arguments will be evaluated twice instead of once. So in the rare case where a function
-#' has an argument whose evaluation has side effects the behavior might be unexpected.
-#' Simple side effects such as printing, messaging, warning or failing are silenced when
-#' evaluating arguments the first time.
 #'
 #' @export
 #'

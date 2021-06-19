@@ -26,7 +26,7 @@ unless the option \code{"boom.ignore"} is modified. \code{::} and \code{:::} are
 by default they are unless the option \code{"boom.visible_only"} is set to \code{TRUE}.}
 
 \item{print_args}{whether to print the values of the arguments provided to a rigged
-function. Use with caution, see details.}
+function. They are printed when they are evaluated, if they are evaluated.}
 }
 \value{
 a list containing the arguments, with the class "rigger" to enable
