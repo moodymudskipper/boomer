@@ -1,6 +1,6 @@
 #' @importFrom stats setNames
 #' @importFrom utils getParseData head capture.output
-#' @importFrom methods allNames
+#' @importFrom methods allNames formalArgs
 NULL
 
 promise_evaled <- getFromNamespace("promise_evaled", "pryr")
