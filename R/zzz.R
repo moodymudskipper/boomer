@@ -3,6 +3,8 @@
 #' @importFrom methods allNames
 NULL
 
+promise_evaled <- getFromNamespace("promise_evaled", "pryr")
+
 .onLoad <- function(libname, pkgname) {
   #nocov start
   op <- options()

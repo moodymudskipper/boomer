@@ -16,6 +16,7 @@ RoxygenNote: 7.1.1.9001
 Imports: 
     crayon,
     methods,
+    pryr,
     rlang,
     rstudioapi,
     styler,
