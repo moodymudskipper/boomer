@@ -1,6 +1,7 @@
 options(boom.safe_print = TRUE)
 
 test_that("rig_in_namespace() works", {
+  skip_on_ci()
   expect_snapshot({
     fake_package("fake", list(
       add2 = function(a, b) {
