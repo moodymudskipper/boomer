@@ -19,10 +19,14 @@
 bquote2 <- function (expr, where = parent.frame(), splice = FALSE)
 {
   if (!is.environment(where))
+    # nocov start
     where <- as.environment(where)
+    # nocov end
   unquote <- function(e) {
     if (is.pairlist(e))
+      # nocov start
       as.pairlist(lapply(e, unquote))
+      # nocov end
     else if (is.call(e)) {
       if (is.name(e[[1L]]) && as.character(e[[1]]) == ".")
         eval(e[[2L]], where)
@@ -40,11 +44,13 @@ bquote2 <- function (expr, where = parent.frame(), splice = FALSE)
         }
         # EDIT ENDS HERE
       } else if (splice) {
+        # nocov start
         if (is.name(e[[1L]]) && as.character(e[[1L]]) ==
             "..")
           stop("can only splice inside a call",
                call. = FALSE)
         else as.call(unquote.list(e))
+        # nocov end
       }
       else {
         e <- as.call(lapply(e, unquote))
@@ -61,6 +67,7 @@ bquote2 <- function (expr, where = parent.frame(), splice = FALSE)
   is.splice.macro <- function(e) is.call(e) && is.name(e[[1L]]) &&
     as.character(e[[1L]]) == ".."
   unquote.list <- function(e) {
+    # nocov start
     p <- Position(is.splice.macro, e, nomatch = NULL)
     if (is.null(p))
       lapply(e, unquote)
@@ -78,6 +85,7 @@ bquote2 <- function (expr, where = parent.frame(), splice = FALSE)
         stop("can only splice vectors")
       c(lapply(head, unquote), mexp, as.list(unquote.list(tail)))
     }
+    # nocov end
   }
   unquote(substitute(expr))
 }
