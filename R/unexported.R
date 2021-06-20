@@ -92,8 +92,6 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
       }
     })
 
-    if(success && !res$visible && .(visible_only)) return(invisible(res$value))
-
     # always display function call
     call_txt <- deparse1(sc_bkp, collapse = paste0("\n", strrep(" ", globals$n_indent + 3)))
     call_txt <- styler::style_text(call_txt)
@@ -103,6 +101,15 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
       crayon::cyan(call_txt),
       "\n",
       sep ="")
+
+
+    # return invisible result early
+    if(success && !res$visible && .(visible_only)) {
+      # for some reason {covr} doesn't catch this but tests do go there
+      #nocov start
+      return(invisible(res$value))
+      #nocov end
+    }
 
     # rethrow on failure
     if (!success) {
@@ -166,6 +173,7 @@ update_times_df_and_get_true_time <- function(
   globals$times <- rbind(globals$times, times_row)
 
   # build message with appropriate unit
+  #nocov start
   if(true_time < 1e-6) {
     true_time_msg <- paste("time:", round(true_time*1e6, 3), "us")
   } else if(true_time < 1e-3) {
@@ -173,6 +181,7 @@ update_times_df_and_get_true_time <- function(
   } else {
     true_time_msg <- paste("time:", round(true_time, 3), "s")
   }
+  #nocov end
   true_time_msg
 }
 
