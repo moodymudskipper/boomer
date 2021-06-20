@@ -43,6 +43,22 @@
         n <- 1 + 2 * 3
         sum(base::nchar(utils:::head(x, -n)))
       })
+      r <- rigger()
+      r[["print"]] <- NULL
+      r
+    Output
+      # rigger object, use the syntax `rigger(...) + function(...) {...}` to create a rigged function conveniently
+      
+      $clock
+      [1] FALSE
+      
+      $ignore
+      [1] "~"   "{"   "("   "<-"  "<<-" "="  
+      
+      $visible_only
+      [1] FALSE
+      
+    Code
       rigged <- rigger() + fun
       rigged(letters)
     Output

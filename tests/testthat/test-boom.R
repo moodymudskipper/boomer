@@ -1,10 +1,19 @@
 options(boom.safe_print = TRUE)
 
-test_that("boom()", {
+test_that("boom() works", {
   expect_snapshot({
     boom(1 + 2 * 3)
     boom(sum(base::nchar(utils:::head(letters, -3))))
     boom(for(i in 1:10) i)
+  })
+})
+
+test_that("boom() works with a namespaced non function", {
+  expect_snapshot({
+    boom(base::letters)
+  })
+  expect_snapshot({
+    boom(base:::letters)
   })
 })
 
@@ -13,7 +22,7 @@ test_that("boom() works with a global function", {
     fun <- function(x) {
       x
     }
-    boomer::boom(fun(1:3))
+    boom(fun(1:3))
   })
 })
 
@@ -30,6 +39,23 @@ test_that("boom() works with README examples", {
       boom()
     boom(head(sapply(seq(10^6), sqrt)), print = str)
   })
+})
+
+test_that("print arg works", {
+  expect_snapshot({
+    boom(data.frame(a=1, b=2), print = str)
+  })
+})
+
+test_that("clock arg works", {
+  # can't reproduce output because time can change between iterations
+  # so just taking that it doesn't fail
+  expect_error(
+    capture.output(boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE)), NA
+  )
+  expect_error(
+    capture.output(boom(base::subset(utils:::head(mtcars, 2), qsec > 17), clock = TRUE)), NA
+  )
 })
 
 test_that("visible_only arg works", {

@@ -18,6 +18,10 @@ test_that("rigger() works", {
       n <- 1 + 2 * 3
       sum(base::nchar(utils:::head(x, -n)))
     }
+    # we print it without the print fun so the bytecode doesn't destabilize the snapshot
+    r <- rigger()
+    r[["print"]] <- NULL
+    r
     rigged <- rigger() + fun
     rigged(letters)
   })

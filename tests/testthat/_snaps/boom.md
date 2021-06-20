@@ -1,4 +1,4 @@
-# boom()
+# boom() works
 
     Code
       boom(1 + 2 * 3)
@@ -41,13 +41,29 @@
        [1]  1  2  3  4  5  6  7  8  9 10
       
 
+# boom() works with a namespaced non function
+
+    Code
+      boom(base::letters)
+    Output
+       [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+      [20] "t" "u" "v" "w" "x" "y" "z"
+
+---
+
+    Code
+      boom(base:::letters)
+    Output
+       [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+      [20] "t" "u" "v" "w" "x" "y" "z"
+
 # boom() works with a global function
 
     Code
       fun <- (function(x) {
         x
       })
-      boomer::boom(fun(1:3))
+      boom(fun(1:3))
     Output
       < fun
       . < :
@@ -143,6 +159,20 @@
       
       [1] 1.000000 1.414214 1.732051 2.000000 2.236068 2.449490
 
+# print arg works
+
+    Code
+      boom(data.frame(a = 1, b = 2), print = str)
+    Output
+      < data.frame
+      > data.frame(a = 1, b = 2)
+      'data.frame':	1 obs. of  2 variables:
+       $ a: num 1
+       $ b: num 2
+      
+        a b
+      1 1 2
+
 # visible_only arg works
 
     Code
@@ -165,6 +195,7 @@
     Output
       < +
       . < invisible
+      . > invisible(1)
       > 1 + invisible(1)
       [1] 2
       
