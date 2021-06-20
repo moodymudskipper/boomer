@@ -63,16 +63,17 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     cat(dots, wrap_open, crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
 
     # evaluate call with original function
-    .IF(clock, evaluation_time_start <- Sys.time())
+
     success <- FALSE
     error <- tryCatch(
       {
+        .IF(clock, evaluation_time_start <- Sys.time())
         res <- withVisible(rlang::eval_bare(sc, parent.frame()))
+        .IF(clock, evaluation_time_end <- Sys.time())
         success <- TRUE
       },
       error = identity
     )
-    .IF(clock, evaluation_time_end <- Sys.time())
 
     # if arguments have been evaled, print them
     .IF(print_args && !is.null(nm), {
