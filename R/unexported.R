@@ -14,11 +14,13 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
       wrap_close <- crayon::bold(crayon::yellow("> "))
       dot        <- crayon::yellow(". ")
     }, {
+      # nocov start
       rig_open  <- "\U0001f447 "
       rig_close <- "\U0001f446 "
       wrap_open <- "\U0001f4a3 "
       wrap_close <- "\U0001f4a5 "
       dot        <- crayon::yellow("\ub7 ")
+      # nocov end
     }
     )
 
