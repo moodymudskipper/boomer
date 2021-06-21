@@ -39,6 +39,9 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
       mask <- parent.env(parent.frame())
       # is this wrapped function call the first of the body?
       if(isTRUE(mask$..FIRST_CALL..)) {
+        # load pryr early to print early "Registered S3 method overwritten..."
+        .IF(print_args, loadNamespace("pryr"))
+
         cat(dots, rig_open, crayon::yellow(.(nm)),"\n", sep = "")
 
         # when exiting rigged function, inform and reset ..FIRST_CALL..
