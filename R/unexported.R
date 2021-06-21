@@ -105,10 +105,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
 
     # return invisible result early
     if(success && !res$visible && .(visible_only)) {
-      # for some reason {covr} doesn't catch this but tests do go there
-      #nocov start
       return(invisible(res$value))
-      #nocov end
     }
 
     # rethrow on failure

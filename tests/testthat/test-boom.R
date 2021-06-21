@@ -11,9 +11,9 @@ test_that("boom() works", {
 test_that("boom() works with a namespaced non function", {
   expect_snapshot({
     boom(base::letters)
-  })
-  expect_snapshot({
     boom(base:::letters)
+    boom(base::letters, clock = TRUE)
+    boom(base:::letters, clock = TRUE)
   })
 })
 
@@ -47,6 +47,14 @@ test_that("print arg works", {
   })
 })
 
+test_that("print arg works with list", {
+  expect_snapshot({
+    boom(data.frame(a=1, b=2), print = list(data.frame = str))
+    boom(data.frame(a=1, b=2), print = list(data.frame = str, print))
+    boom(data.frame(a=1, b=2), print = list(str))
+  })
+})
+
 test_that("clock arg works", {
   # can't reproduce output because time can change between iterations
   # so just taking that it doesn't fail
@@ -61,8 +69,6 @@ test_that("clock arg works", {
 test_that("visible_only arg works", {
   expect_snapshot({
     boom(1 + invisible(1))
-  })
-  expect_snapshot({
     boom(1 + invisible(1), visible_only = TRUE)
   })
 })
@@ -110,4 +116,22 @@ test_that("functions created at runtime are boomed", {
     SQRT <- sqrt
     SQRT(x)
   }))
+})
+
+test_that("assignments work", {
+  expect_snapshot({
+    boom({
+      x <- 1 + 2
+      y <- quote(a)
+      u = 1 + 2
+      v = quote(a)
+    })
+
+    boom({
+      x <- 1 + 2
+      y <- quote(a)
+      u = 1 + 2
+      v = quote(a)
+    }, ignore = NULL)
+  })
 })

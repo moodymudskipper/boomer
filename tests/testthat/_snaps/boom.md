@@ -48,11 +48,18 @@
     Output
        [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
       [20] "t" "u" "v" "w" "x" "y" "z"
-
----
-
     Code
       boom(base:::letters)
+    Output
+       [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+      [20] "t" "u" "v" "w" "x" "y" "z"
+    Code
+      boom(base::letters, clock = TRUE)
+    Output
+       [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+      [20] "t" "u" "v" "w" "x" "y" "z"
+    Code
+      boom(base:::letters, clock = TRUE)
     Output
        [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
       [20] "t" "u" "v" "w" "x" "y" "z"
@@ -173,6 +180,42 @@
         a b
       1 1 2
 
+# print arg works with list
+
+    Code
+      boom(data.frame(a = 1, b = 2), print = list(data.frame = str))
+    Output
+      < data.frame
+      > data.frame(a = 1, b = 2)
+      'data.frame':	1 obs. of  2 variables:
+       $ a: num 1
+       $ b: num 2
+      
+        a b
+      1 1 2
+    Code
+      boom(data.frame(a = 1, b = 2), print = list(data.frame = str, print))
+    Output
+      < data.frame
+      > data.frame(a = 1, b = 2)
+      'data.frame':	1 obs. of  2 variables:
+       $ a: num 1
+       $ b: num 2
+      
+        a b
+      1 1 2
+    Code
+      boom(data.frame(a = 1, b = 2), print = list(str))
+    Output
+      < data.frame
+      > data.frame(a = 1, b = 2)
+      'data.frame':	1 obs. of  2 variables:
+       $ a: num 1
+       $ b: num 2
+      
+        a b
+      1 1 2
+
 # visible_only arg works
 
     Code
@@ -187,9 +230,6 @@
       [1] 2
       
       [1] 2
-
----
-
     Code
       boom(1 + invisible(1), visible_only = TRUE)
     Output
@@ -289,4 +329,92 @@
       [1] 2
       
       [1] 2
+
+# assignments work
+
+    Code
+      boom({
+        x <- 1 + 2
+        y <- quote(a)
+        u = 1 + 2
+        v = quote(a)
+      })
+    Output
+      < +
+      > 1 + 2
+      [1] 3
+      
+      < quote
+      > quote(a)
+      a
+      
+      < quote
+      > quote(a)
+      a
+      
+      < +
+      > 1 + 2
+      [1] 3
+      
+      < quote
+      > quote(a)
+      a
+      
+      < quote
+      > quote(a)
+      a
+      
+    Code
+      boom({
+        x <- 1 + 2
+        y <- quote(a)
+        u = 1 + 2
+        v = quote(a)
+      }, ignore = NULL)
+    Output
+      < {
+      . < <-
+      . . < +
+      . . > 1 + 2
+      . . [1] 3
+      . . 
+      . > x <- 1 + 2
+      . [1] 3
+      . 
+      . < <-
+      . . < quote
+      . . > quote(a)
+      . . a
+      . . 
+      . . < quote
+      . . > quote(a)
+      . . a
+      . . 
+      . > y <- quote(a)
+      . a
+      . 
+      . < =
+      . . < +
+      . . > 1 + 2
+      . . [1] 3
+      . . 
+      . > u <- 1 + 2
+      . [1] 3
+      . 
+      . < =
+      . . < quote
+      . . > quote(a)
+      . . a
+      . . 
+      . . < quote
+      . . > quote(a)
+      . . a
+      . . 
+      . > v <- quote(a)
+      . a
+      . 
+      > {  x <- 1 + 2  y <- quote(a)  u <- 1 + 2  v <- quote(a)}
+      a
+      
+      a
 
