@@ -59,10 +59,32 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     sc  <- sys.call()
     sc_bkp <- sc
     sc[[1]] <- .(fun_val)
-    cat(dots, wrap_open, crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
+#browser()
+    call_txt <- deparse(sc_bkp)# deparse1(sc_bkp, collapse = paste0("\n", strrep(" ", globals$n_indent + 3)))
+    call_txt <- styler::style_text(call_txt)
+
+    # if all args are "atomic" (symbols or numbers) we can print open and close in one go
+    # we need a workaround for magrittr here
+    all_args_are_atomic <-
+      all(lengths(as.list(sc[-1])) == 1) && !any(sapply(sc[-1], identical, quote(.)))
+    if(all_args_are_atomic) {
+      wrap_close <- paste0(wrap_open, wrap_close)
+    } else {
+      if(getOption("boom.abbreviate")) {
+        cat(dots, wrap_open, crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
+      } else {
+        call_txt_open <- call_txt
+        if(length(call_txt_open) > 1) {
+          call_txt_open <- paste0(call_txt_open[1], "...")
+        }
+        if(nchar(call_txt_open) > 40) {
+          call_txt_open <- paste0(substr(call_txt_open, 1,37), "...")
+        }
+        cat(dots, wrap_open, crayon::cyan(call_txt_open), "\n", sep ="")
+      }
+    }
 
     # evaluate call with original function
-
     success <- FALSE
     error <- tryCatch(
       {
@@ -92,12 +114,10 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     })
 
     # always display function call
-    call_txt <- deparse1(sc_bkp, collapse = paste0("\n", strrep(" ", globals$n_indent + 3)))
-    call_txt <- styler::style_text(call_txt)
     cat(
       dots,
       wrap_close,
-      crayon::cyan(call_txt),
+      paste(crayon::cyan(call_txt), collapse = paste0("\n", strrep(" ", globals$n_indent + 3))),
       "\n",
       sep ="")
 

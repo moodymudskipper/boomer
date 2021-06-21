@@ -14,7 +14,8 @@ promise_evaled <- getFromNamespace("promise_evaled", "pryr")
     boom.ignore = c("~", "{", "(", "<-", "<<-", "="),
     boom.visible_only = FALSE,
     boom.print_args = FALSE,
-    boom.safe_print = FALSE
+    boom.safe_print = FALSE,
+    boom.abbreviate = FALSE
   )
   toset <- !(names(op.boom) %in% names(op))
   if(any(toset)) options(op.boom[toset])

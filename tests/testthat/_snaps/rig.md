@@ -9,19 +9,17 @@
       rigged(letters)
     Output
       { fun
-      < +
-      . < *
-      . > 2 * 3
+      < 1 + 2 * 3
+      . < > 2 * 3
       . [1] 6
       . 
       > 1 + 2 * 3
       [1] 7
       
-      < sum
-      . < base::nchar
-      . . < utils:::head
-      . . . < -
-      . . . > -n
+      < sum(base::nchar(utils:::head(x, -n)))
+      . < base::nchar(utils:::head(x, -n))
+      . . < utils:::head(x, -n)
+      . . . < > -n
       . . . [1] -7
       . . . 
       . . > utils:::head(x, -n)
@@ -63,19 +61,17 @@
       rigged(letters)
     Output
       { e2
-      < +
-      . < *
-      . > 2 * 3
+      < 1 + 2 * 3
+      . < > 2 * 3
       . [1] 6
       . 
       > 1 + 2 * 3
       [1] 7
       
-      < sum
-      . < base::nchar
-      . . < utils:::head
-      . . . < -
-      . . . > -n
+      < sum(base::nchar(utils:::head(x, -n)))
+      . < base::nchar(utils:::head(x, -n))
+      . . < utils:::head(x, -n)
+      . . . < > -n
       . . . [1] -7
       . . . 
       . . > utils:::head(x, -n)
@@ -98,12 +94,10 @@
       `SQRT()` is undefined outside of `foo2()` and its output might not be shown.
     Output
       { foo2
-      < *
-      > x * 2
+      < > x * 2
       [1] 4
       
-      < SQRT
-      > SQRT(x)
+      < > SQRT(x)
       [1] 2
       
       } foo2

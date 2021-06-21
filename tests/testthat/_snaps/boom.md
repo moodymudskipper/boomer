@@ -3,9 +3,8 @@
     Code
       boom(1 + 2 * 3)
     Output
-      < +
-      . < *
-      . > 2 * 3
+      < 1 + 2 * 3
+      . < > 2 * 3
       . [1] 6
       . 
       > 1 + 2 * 3
@@ -15,11 +14,10 @@
     Code
       boom(sum(base::nchar(utils:::head(letters, -3))))
     Output
-      < sum
-      . < base::nchar
-      . . < utils:::head
-      . . . < -
-      . . . > -3
+      < sum(base::nchar(utils:::head(letters,...
+      . < base::nchar(utils:::head(letters, -3))
+      . . < utils:::head(letters, -3)
+      . . . < > -3
       . . . [1] -3
       . . . 
       . . > utils:::head(letters, -3)
@@ -36,8 +34,7 @@
     Code
       boom(for (i in 1:10) i)
     Output
-      < :
-      > 1:10
+      < > 1:10
        [1]  1  2  3  4  5  6  7  8  9 10
       
 
@@ -72,9 +69,8 @@
       })
       boom(fun(1:3))
     Output
-      < fun
-      . < :
-      . > 1:3
+      < fun(1:3)
+      . < > 1:3
       . [1] 1 2 3
       . 
       > fun(1:3)
@@ -87,10 +83,9 @@
     Code
       boom(1 + (!1 * 2))
     Output
-      < +
-      . < !
-      . . < *
-      . . > 1 * 2
+      < 1 + (!1 * 2)
+      . < !1 * 2
+      . . < > 1 * 2
       . . [1] 2
       . . 
       . > !1 * 2
@@ -103,15 +98,13 @@
     Code
       boom(subset(head(mtcars, 2), qsec > 17))
     Output
-      < subset
-      . < head
-      . > head(mtcars, 2)
+      < subset(head(mtcars, 2), qsec > 17)
+      . < > head(mtcars, 2)
       .               mpg cyl disp  hp drat    wt  qsec vs am gear carb
       . Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4
       . Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
       . 
-      . < >
-      . > qsec > 17
+      . < > qsec > 17
       . [1] FALSE  TRUE
       . 
       > subset(head(mtcars, 2), qsec > 17)
@@ -123,23 +116,24 @@
     Code
       mtcars %>% head(2) %>% subset(qsec > 17) %>% boom()
     Output
-      < %>%
-      . < subset
-      . . < head
+      < mtcars %>%...
+      . < subset(., qsec > 17)
+      . . < head(., 2)
       . . > head(., 2)
       . .               mpg cyl disp  hp drat    wt  qsec vs am gear carb
       . . Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4
       . . Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
       . . 
-      . . < >
-      . . > qsec > 17
+      . . < > qsec > 17
       . . [1] FALSE  TRUE
       . . 
       . > subset(., qsec > 17)
       .               mpg cyl disp  hp drat    wt  qsec vs am gear carb
       . Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
       . 
-      > mtcars %>%  head(2) %>%  subset(qsec > 17)
+      > mtcars %>%
+           head(2) %>%
+           subset(qsec > 17)
                     mpg cyl disp  hp drat    wt  qsec vs am gear carb
       Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
       
@@ -148,11 +142,10 @@
     Code
       boom(head(sapply(seq(10^6), sqrt)), print = str)
     Output
-      < head
-      . < sapply
-      . . < seq
-      . . . < ^
-      . . . > 10^6
+      < head(sapply(seq(10^6), sqrt))
+      . < sapply(seq(10^6), sqrt)
+      . . < seq(10^6)
+      . . . < > 10^6
       . . .  num 1e+06
       . . . 
       . . > seq(10^6)
@@ -171,8 +164,7 @@
     Code
       boom(data.frame(a = 1, b = 2), print = str)
     Output
-      < data.frame
-      > data.frame(a = 1, b = 2)
+      < > data.frame(a = 1, b = 2)
       'data.frame':	1 obs. of  2 variables:
        $ a: num 1
        $ b: num 2
@@ -185,8 +177,7 @@
     Code
       boom(data.frame(a = 1, b = 2), print = list(data.frame = str))
     Output
-      < data.frame
-      > data.frame(a = 1, b = 2)
+      < > data.frame(a = 1, b = 2)
       'data.frame':	1 obs. of  2 variables:
        $ a: num 1
        $ b: num 2
@@ -196,8 +187,7 @@
     Code
       boom(data.frame(a = 1, b = 2), print = list(data.frame = str, print))
     Output
-      < data.frame
-      > data.frame(a = 1, b = 2)
+      < > data.frame(a = 1, b = 2)
       'data.frame':	1 obs. of  2 variables:
        $ a: num 1
        $ b: num 2
@@ -207,8 +197,7 @@
     Code
       boom(data.frame(a = 1, b = 2), print = list(str))
     Output
-      < data.frame
-      > data.frame(a = 1, b = 2)
+      < > data.frame(a = 1, b = 2)
       'data.frame':	1 obs. of  2 variables:
        $ a: num 1
        $ b: num 2
@@ -221,9 +210,8 @@
     Code
       boom(1 + invisible(1))
     Output
-      < +
-      . < invisible
-      . > invisible(1)
+      < 1 + invisible(1)
+      . < > invisible(1)
       . [1] 1
       . 
       > 1 + invisible(1)
@@ -233,9 +221,8 @@
     Code
       boom(1 + invisible(1), visible_only = TRUE)
     Output
-      < +
-      . < invisible
-      . > invisible(1)
+      < 1 + invisible(1)
+      . < > invisible(1)
       > 1 + invisible(1)
       [1] 2
       
@@ -246,27 +233,32 @@
     Code
       1 %>% identity() %>% I() %>% boomer::boom()
     Output
-      < %>%
-      . < I
-      . . < identity
+      < 1 %>%...
+      . < I(.)
+      . . < identity(.)
       . . > identity(.)
       . . [1] 1
       . . 
       . > I(.)
       . [1] 1
       . 
-      > 1 %>%  identity() %>%  I()
+      > 1 %>%
+           identity() %>%
+           I()
       [1] 1
       
       [1] 1
     Code
       1 %>% identity() %>% missing_function() %>% I() %>% boomer::boom()
     Output
-      < %>%
-      . < I
+      < 1 %>%...
+      . < I(.)
       . > I(.)
       Error: simpleError/error/condition
-      > 1 %>%  identity() %>%  missing_function() %>%  I()
+      > 1 %>%
+           identity() %>%
+           missing_function() %>%
+           I()
       Error: simpleError/error/condition
     Error <simpleError>
       could not find function "missing_function"
@@ -276,14 +268,17 @@
       })
       1 %>% identity() %>% eagerly_failing_function() %>% I() %>% boomer::boom()
     Output
-      < %>%
-      . < I
-      . . < eagerly_failing_function
+      < 1 %>%...
+      . < I(.)
+      . . < eagerly_failing_function(.)
       . . > eagerly_failing_function(.)
       Error: simpleError/error/condition
       . > I(.)
       Error: simpleError/error/condition
-      > 1 %>%  identity() %>%  eagerly_failing_function() %>%  I()
+      > 1 %>%
+           identity() %>%
+           eagerly_failing_function() %>%
+           I()
       Error: simpleError/error/condition
     Error <simpleError>
       oops
@@ -294,10 +289,10 @@
       })
       1 %>% identity() %>% failing_function() %>% I() %>% boomer::boom()
     Output
-      < %>%
-      . < I
-      . . < failing_function
-      . . . < identity
+      < 1 %>%...
+      . < I(.)
+      . . < failing_function(.)
+      . . . < identity(.)
       . . . > identity(.)
       . . . [1] 1
       . . . 
@@ -305,7 +300,10 @@
       Error: simpleError/error/condition
       . > I(.)
       Error: simpleError/error/condition
-      > 1 %>%  identity() %>%  failing_function() %>%  I()
+      > 1 %>%
+           identity() %>%
+           failing_function() %>%
+           I()
       Error: simpleError/error/condition
     Error <simpleError>
       oops
@@ -320,12 +318,10 @@
         SQRT(x)
       })
     Output
-      < *
-      > x * 2
+      < > x * 2
       [1] 4
       
-      < SQRT
-      > SQRT(x)
+      < > SQRT(x)
       [1] 2
       
       [1] 2
@@ -340,28 +336,22 @@
         v = quote(a)
       })
     Output
-      < +
-      > 1 + 2
+      < > 1 + 2
       [1] 3
       
-      < quote
-      > quote(a)
+      < > quote(a)
       a
       
-      < quote
-      > quote(a)
+      < > quote(a)
       a
       
-      < +
-      > 1 + 2
+      < > 1 + 2
       [1] 3
       
-      < quote
-      > quote(a)
+      < > quote(a)
       a
       
-      < quote
-      > quote(a)
+      < > quote(a)
       a
       
     Code
@@ -372,48 +362,47 @@
         v = quote(a)
       }, ignore = NULL)
     Output
-      < {
-      . < <-
-      . . < +
-      . . > 1 + 2
+      < {...
+      . < x <- 1 + 2
+      . . < > 1 + 2
       . . [1] 3
       . . 
       . > x <- 1 + 2
       . [1] 3
       . 
-      . < <-
-      . . < quote
-      . . > quote(a)
+      . < y <- quote(a)
+      . . < > quote(a)
       . . a
       . . 
-      . . < quote
-      . . > quote(a)
+      . . < > quote(a)
       . . a
       . . 
       . > y <- quote(a)
       . a
       . 
-      . < =
-      . . < +
-      . . > 1 + 2
+      . < u <- 1 + 2
+      . . < > 1 + 2
       . . [1] 3
       . . 
       . > u <- 1 + 2
       . [1] 3
       . 
-      . < =
-      . . < quote
-      . . > quote(a)
+      . < v <- quote(a)
+      . . < > quote(a)
       . . a
       . . 
-      . . < quote
-      . . > quote(a)
+      . . < > quote(a)
       . . a
       . . 
       . > v <- quote(a)
       . a
       . 
-      > {  x <- 1 + 2  y <- quote(a)  u <- 1 + 2  v <- quote(a)}
+      > {
+           x <- 1 + 2
+           y <- quote(a)
+           u <- 1 + 2
+           v <- quote(a)
+         }
       a
       
       a
