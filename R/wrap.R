@@ -1,151 +1,250 @@
-wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args = FALSE) {
+#' wrap
+#'
+#' `wrap()` curries a function to signal when a call is entered and exited, and print
+#' its output with appropriate indentation.
+#'
+#' The original function is the wrapped function, the output of `wrap()` is the
+#' wrapper function.
+#'
+#' The `wrap()`er function optionally prints the execution time of the call.
+#'
+#' Indentation is done through a global variable `globals$n_indent`.
+#'
+#' If `wrap()` is called from a function rigged using `rig` or `rig_in_namespace`,
+#' the `wrap()`per function will check if we entered the first call of the rigged
+#' function by checking in `mask` if `..FIRST_CALL..` is `TRUE`. If it is we
+#' signal that we entered the rigged function, and use `withr::defer` to
+#' signal when the rigged function will be exited. This complex mechanism is
+#' used so that the rigged function's body stays unchanged and boomer's behavior
+#' can be more robust.
+#'
+#' If called from such a rigged function, a `wrap()`er function optionally
+#' checks after each call if the arguments of the rigged function were evaluated,
+#' and prints them as soon as they are.
+#'
+#' @inheritParams rig
+#' @param fun_val the function to wrap
+#' @param clock whether to clock
+#' @param print_fun A function, a formula or a list of functions or formulas.
+#' @param nm The name of the rigged function containing the wrapper function calls
+#' @param mask The enclosing environment of the rigged function, where wrapper functions are stored
+#' @noRd
+wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args = FALSE, mask = NULL) {
   # for CRAN notes
-  .IF <- . <- NULL
-  as.function(envir = asNamespace("boomer"), c(alist(...=), bquote2({
-    # set icons, this is slightly inefficient but easier and more readable than
-    .IF(getOption("boom.safe_print"), {
-      rig_open   <- crayon::bold(crayon::yellow("{ "))
-      rig_close  <- crayon::bold(crayon::yellow("} "))
-      wrap_open  <- crayon::bold(crayon::yellow("< "))
-      wrap_close <- crayon::bold(crayon::yellow("> "))
-      dot        <- crayon::yellow(". ")
-    }, {
-      # nocov start
-      rig_open  <- "\U0001f447 "
-      rig_close <- "\U0001f446 "
-      wrap_open <- "\U0001f4a3 "
-      wrap_close <- "\U0001f4a5 "
-      dot        <- crayon::yellow("\ub7 ")
-      # nocov end
-    }
-    )
+  . <- NULL
+  as.function(envir = asNamespace("boomer"), c(alist(...=), bquote({
+    # Since we set the enclosing env to {boomer}'s namespace
+    # we use `bquote()` to get `wrap()`'s arguments in
+    fun_val <- .(fun_val)
+    clock <- .(clock)
+    print_fun <- .(print_fun)
+    visible_only <- .(visible_only)
+    nm <- .(nm)
+    print_args <- .(print_args)
+    mask <- .(mask)
+
+    # gather options at run time
+    safe_print <- getOption("boom.safe_print")
+
+    # fetch caller (rigged function) env
+    rigged_fun_exec_env <- parent.frame()
 
     # start the clock
-    .IF(clock, total_time_start <- Sys.time())
+    total_time_start <- if(clock) Sys.time()
 
     # set indentation
     globals$n_indent <- globals$n_indent + 1
 
-    dots <- strrep(dot, globals$n_indent)
-    on.exit({
-      globals$n_indent <- globals$n_indent - 1
-      # update last_total_time_end on exit, we do it this way so our total
-      # time doesn't leave out the updating of the times df with this value
-      .IF(clock, globals$last_total_time_end <- Sys.time())
-    })
+    # set emojis
+    ej <- set_emojis(safe_print, globals$n_indent)
 
-    # is the wrapped function called by a rigged function?
-    .IF(!is.null(nm), {
-      mask <- parent.env(parent.frame())
-      # is this wrapped function call the first of the body?
-      if(isTRUE(mask$..FIRST_CALL..)) {
-        # load pryr early to print early "Registered S3 method overwritten..."
-        .IF(print_args, loadNamespace("pryr"))
+    # reset indentation and update times
+    on.exit(update_globals_on_exit(clock))
 
-        cat(dots, rig_open, crayon::yellow(.(nm)),"\n", sep = "")
+    # !!! this adds calls on.exit of caller (rigged) function !!!
+    signal_rigged_function_and_args(nm, mask, ej, print_args, rigged_fun_exec_env)
 
-        # when exiting rigged function, inform and reset ..FIRST_CALL..
-        withr::defer_parent({
-          cat(dots, rig_close, crayon::yellow(.(nm)),"\n", sep = "")
-          mask$..FIRST_CALL.. <- TRUE
-          mask$..EVALED_ARGS..[] <- FALSE
-        })
-
-        mask$..FIRST_CALL.. <- FALSE
-      }
-    })
-
-    # manipulate call to use original function
+    # build calls to be displayed on top and bottom of wrapped call
     sc  <- sys.call()
-    sc_bkp <- sc
-    sc[[1]] <- .(fun_val)
-#browser()
-    call_txt <- deparse(sc_bkp)# deparse1(sc_bkp, collapse = paste0("\n", strrep(" ", globals$n_indent + 3)))
-    call_txt <- styler::style_text(call_txt)
+    deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent)
 
-    # if all args are "atomic" (symbols or numbers) we can print open and close in one go
-    # we need a workaround for magrittr here
-    all_args_are_atomic <-
-      all(lengths(as.list(sc[-1])) == 1) && !any(sapply(sc[-1], identical, quote(.)))
-    if(all_args_are_atomic) {
-      wrap_close <- paste0(wrap_open, wrap_close)
-    } else {
-      if(getOption("boom.abbreviate")) {
-        cat(dots, wrap_open, crayon::cyan(deparse1(sc_bkp[[1]])), "\n", sep ="")
-      } else {
-        call_txt_open <- call_txt
-        if(length(call_txt_open) > 1) {
-          call_txt_open <- paste0(call_txt_open[1], "...")
-        }
-        if(nchar(call_txt_open) > 40) {
-          call_txt_open <- paste0(substr(call_txt_open, 1,37), "...")
-        }
-        cat(dots, wrap_open, crayon::cyan(call_txt_open), "\n", sep ="")
-      }
+    # display wrapped call at the top if relevant
+    if(!is.null(deparsed_calls$open)) {
+      cat(deparsed_calls$open, "\n")
     }
 
-    # evaluate call with original function
-    success <- FALSE
-    error <- tryCatch(
-      {
-        .IF(clock, evaluation_time_start <- Sys.time())
-        res <- withVisible(rlang::eval_bare(sc, parent.frame()))
-        .IF(clock, evaluation_time_end <- Sys.time())
-        success <- TRUE
-      },
-      error = identity
-    )
+    # evaluate call with original wrapped function
+    res <- try(eval_wrapped_call(sc, fun_val, clock, rigged_fun_exec_env), silent = TRUE)
+    success <- !inherits(res, "try-error")
 
-    # if arguments have been evaled, print them
-    .IF(print_args && !is.null(nm), {
-      for (arg in names(mask$..EVALED_ARGS..)) {
-        if(!mask$..EVALED_ARGS..[[arg]]) {
-          evaled <- promise_evaled(arg, parent.frame())
-          if(evaled) {
-            mask$..EVALED_ARGS..[[arg]] <- TRUE
-            arg_val <- get(arg, envir = parent.frame())
-            print_fun <- fetch_print_fun(.(print_fun), arg_val)
-            output <- capture.output(print_fun(arg_val))
-            writeLines(paste0(
-              dots, c(crayon::green(arg, ":"), output)))
-          }
-        }
-      }
-    })
+    # if rigged fun args have been evaled, print them
+    print_arguments(print_args, nm, mask, print_fun, ej, rigged_fun_exec_env)
 
-    # always display function call
-    cat(
-      dots,
-      wrap_close,
-      paste(crayon::cyan(call_txt), collapse = paste0("\n", strrep(" ", globals$n_indent + 3))),
-      "\n",
-      sep ="")
+    # display wrapped call at the bottom
+    cat(deparsed_calls$close, "\n")
 
-
-    # return invisible result early
-    if(success && !res$visible && .(visible_only)) {
-      return(invisible(res$value))
-    }
-
-    # rethrow on failure
+    # rethrow error on failure
     if (!success) {
+      error <- attr(res, "condition")
       writeLines(crayon::magenta("Error:", paste0(class(error), collapse = "/")))
       stop(error)
     }
 
+    # return invisible result early
+    if(!res$visible && visible_only) {
+      return(invisible(res$value))
+    }
+
     # update the global `times` data frame and compute the true time
-    .IF(clock, true_time_msg <- update_times_df_and_get_true_time(
-      call, total_time_start, evaluation_time_start, evaluation_time_end))
+    if(clock) {
+      true_time_msg <- update_times_df_and_get_true_time(
+        call, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
+      writeLines(crayon::blue(true_time_msg))
+    }
 
-    # otherwise print result
+    # print output with appropriate print fun and indentation
     res <- res$value
-    .IF(clock, writeLines(crayon::blue(true_time_msg)))
-
-    print_fun <- fetch_print_fun(.(print_fun), res)
-    writeLines(c(paste0(dots, capture.output(print_fun(res))), dots))
+    print_fun <- fetch_print_fun(print_fun, res)
+    writeLines(c(paste0(ej$dots, capture.output(print_fun(res))), ej$dots))
 
     res
   })))
+}
+
+set_emojis <- function(safe_print, n_indent) {
+  ej <- list()
+  if (safe_print) {
+    ej$rig_open   <- crayon::bold(crayon::yellow("{ "))
+    ej$rig_close  <- crayon::bold(crayon::yellow("} "))
+    ej$wrap_open  <- crayon::bold(crayon::yellow("<  "))
+    ej$wrap_close <- crayon::bold(crayon::yellow(">  "))
+    ej$dots       <- crayon::yellow(strrep(". ", n_indent))
+  } else {
+    # nocov start
+    ej$rig_open   <- "\U0001f447 "
+    ej$rig_close  <- "\U0001f446 "
+    ej$wrap_open  <- "\U0001f4a3 "
+    ej$wrap_close <- "\U0001f4a5 "
+    ej$dots       <- crayon::yellow(strrep("\ub7 ", n_indent))
+    # nocov end
+  }
+  ej
+}
+
+update_globals_on_exit <- function(clock) {
+  globals$n_indent <- globals$n_indent - 1
+  # update last_total_time_end on exit, we do it this way so our total
+  # time doesn't leave out the updating of the times df with this value
+  if(clock) globals$last_total_time_end <- Sys.time()
+  invisible(NULL)
+}
+
+signal_rigged_function_and_args <- function(nm, mask, ej, print_args, rigged_fun_exec_env) {
+  # is the wrapped function called by a rigged function?
+  if(!is.null(nm)) {
+    # is this wrapped function call the first of the body?
+    if(mask$..FIRST_CALL..) {
+      # load pryr early to print early "Registered S3 method overwritten..."
+      if(print_args) loadNamespace("pryr")
+
+      cat(ej$dots, ej$rig_open, crayon::yellow(nm),"\n", sep = "")
+
+      # when exiting rigged function, inform and reset ..FIRST_CALL..
+      withr::defer({
+        cat(ej$dots, ej$rig_close, crayon::yellow(nm),"\n", sep = "")
+        mask$..FIRST_CALL.. <- TRUE
+        mask$..EVALED_ARGS..[] <- FALSE
+      }, envir = rigged_fun_exec_env)
+
+      mask$..FIRST_CALL.. <- FALSE
+    }
+  }
+}
+
+build_deparsed_calls <- function(sc, ej, n_indent) {
+  # manipulate call to use original function
+  sc <- sc
+
+  deparsed_calls <- list()
+
+  call_chr <- deparse(sc)
+  call_chr <- styler::style_text(call_chr)
+
+  # if all args are "atomic" (symbols or numbers) we can print open and close in one go
+  all_args_are_atomic <- all(lengths(as.list(sc[-1])) == 1)
+  # we need a workaround for magrittr here
+  no_dot_in_args <- !any(sapply(sc[-1], identical, quote(.)))
+  if(length(call_chr) == 1) {
+    if(all_args_are_atomic && no_dot_in_args) {
+      deparsed_calls$close <-
+        paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::cyan(call_chr))
+    } else {
+      deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr))
+      if(getOption("boom.abbreviate")) {
+        call_chr <- deparse1(sc[[1]])
+      }
+      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
+
+      if(crayon::col_nchar(deparsed_calls$open) > 80) {
+        deparsed_calls$open <- paste0(
+          crayon::col_substr(deparsed_calls$open, 1, 77), crayon::cyan("..."))
+      }
+    }
+  } else {
+    if(all_args_are_atomic && no_dot_in_args) {
+      line1 <- paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::cyan(call_chr[1]))
+      other_lines <-  paste0(ej$dots, "      ", crayon::cyan(call_chr[-1]))
+      deparsed_calls$close <- paste(c(line1, other_lines), collapse = "\n")
+    } else {
+      line1 <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr[1]))
+      other_lines <-  paste0(ej$dots, "   ", crayon::cyan(call_chr[-1]))
+      deparsed_calls$close <-  paste(c(line1, other_lines), collapse = "\n")
+      if(getOption("boom.abbreviate")) {
+        call_chr <- deparse1(sc[[1]])
+      }
+      if(length(call_chr) > 1) {
+        call_chr <- paste0(call_chr[1], "...")
+      }
+      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
+
+      if(crayon::col_nchar(deparsed_calls$open) > 80) {
+        deparsed_calls$open <- paste0(
+          crayon::col_substr(deparsed_calls$open, 1, 77), crayon::cyan("..."))
+      }
+    }
+  }
+  deparsed_calls
+}
+
+eval_wrapped_call <- function(sc, fun_val, clock, rigged_fun_exec_env) {
+  sc[[1]] <- fun_val
+  if (clock) {
+    evaluation_time_start <- Sys.time()
+    res <- withVisible(rlang::eval_bare(sc, rigged_fun_exec_env))
+    res$evaluation_time_end <- Sys.time()
+    res$evaluation_time_start <- evaluation_time_start
+  } else {
+    res <- withVisible(rlang::eval_bare(sc, rigged_fun_exec_env))
+  }
+  res
+}
+
+print_arguments <- function(print_args, nm, mask, print_fun, ej, rigged_fun_exec_env) {
+  rigged <- !is.null(nm)
+  if(!print_args || ! rigged) return(invisible(NULL))
+  for (arg in names(mask$..EVALED_ARGS..)) {
+    if(!mask$..EVALED_ARGS..[[arg]]) {
+      evaled <- promise_evaled(arg, rigged_fun_exec_env)
+      if(evaled) {
+        mask$..EVALED_ARGS..[[arg]] <- TRUE
+        arg_val <- get(arg, envir = rigged_fun_exec_env)
+        print_fun <- fetch_print_fun(print_fun, arg_val)
+        output <- capture.output(print_fun(arg_val))
+        writeLines(paste0(
+          ej$dots, c(crayon::green(arg, ":"), output)))
+      }
+    }
+  }
 }
 
 update_times_df_and_get_true_time <- function(

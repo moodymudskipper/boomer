@@ -33,11 +33,11 @@ rig_impl <- function(
       fun_env <- asNamespace("base")
     }
 
-    f <- wrap(fun_val, clock, print, visible_only, nm = nm, print_args = print_args)
+    f <- wrap(fun_val, clock, print, visible_only, nm, print_args, mask)
     mask[[fun_chr]] <- f
   }
-  mask$`::` <- double_colon(clock, print, visible_only, nm, print_args)
-  mask$`:::` <- triple_colon(clock, print, visible_only, nm, print_args)
+  mask$`::` <- double_colon(clock, print, visible_only, nm, print_args, mask)
+  mask$`:::` <- triple_colon(clock, print, visible_only, nm, print_args, mask)
   mask$..FIRST_CALL.. <- TRUE
   arg_nms <- formalArgs(fun)
   mask$..EVALED_ARGS.. <- setNames(rep(FALSE, length(arg_nms)), arg_nms)
@@ -64,7 +64,7 @@ build_shimmed_assign <- function(symbol, ignore, clock, print_fun, visible_only)
   f
 }
 
-double_colon <- function(clock, print_fun, visible_only, nm, print_args) {
+double_colon <- function(clock, print_fun, visible_only, nm, print_args, mask) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`::`
@@ -73,7 +73,7 @@ double_colon <- function(clock, print_fun, visible_only, nm, print_args) {
       fun_val <- getExportedValue(pkg, name)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap(fun_val, TRUE, print_fun, visible_only, nm, print_args)
+      wrap(fun_val, TRUE, print_fun, visible_only, nm, print_args, mask)
     }
   } else {
     function(pkg, name) {
@@ -83,12 +83,12 @@ double_colon <- function(clock, print_fun, visible_only, nm, print_args) {
       fun_val <- getExportedValue(pkg, name)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap(fun_val, FALSE, print_fun, visible_only, nm, print_args)
+      wrap(fun_val, FALSE, print_fun, visible_only, nm, print_args, mask)
     }
   }
 }
 
-triple_colon <- function(clock, print_fun, visible_only, nm, print_args) {
+triple_colon <- function(clock, print_fun, visible_only, nm, print_args, mask) {
   if(clock) {
     function(pkg, name) {
       # code borrowed from base::`:::`
@@ -97,7 +97,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm, print_args) {
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap(fun_val, TRUE, print_fun, visible_only, nm, print_args)
+      wrap(fun_val, TRUE, print_fun, visible_only, nm, print_args, mask)
     }
   } else {
     function(pkg, name) {
@@ -107,7 +107,7 @@ triple_colon <- function(clock, print_fun, visible_only, nm, print_args) {
       fun_val <- get(name, envir = asNamespace(pkg), inherits = FALSE)
       if(!is.function(fun_val)) return(fun_val)
 
-      wrap(fun_val, FALSE, print_fun, visible_only, nm, print_args)
+      wrap(fun_val, FALSE, print_fun, visible_only, nm, print_args, mask)
     }
   }
 }
