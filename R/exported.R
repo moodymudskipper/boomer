@@ -182,7 +182,6 @@ rig_in_namespace <- function(
   wrapped_funs <- mapply(
     wrap,
     rigged_funs,
-    nm = nms,
     MoreArgs = list(clock = clock, print_fun = print, visible_only = visible_only,
                     print_args = print_args))
 
