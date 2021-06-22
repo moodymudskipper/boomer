@@ -159,7 +159,9 @@ rig_in_namespace <- function(
   nms <- as.character(substitute(alist(...))[-1])
   vals <- list(...)
 
-  ## rig all functions in their own namespace
+  # rig all functions in their own namespace
+  # i.e. keep their binding in the namespace but insert a parent on top
+  # of their enclosing env and fill it with wrapped shims
   for (i in seq_along(vals)) {
 
     nm <- nms[[i]]
