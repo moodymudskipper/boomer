@@ -322,33 +322,3 @@ fetch_print_fun <- function(print_fun, res) {
   print_fun
 }
 
-fetch_functions <- function(expr, ignore) {
-  dismissed_token_types <-
-    c("EQ_ASSIGN",      # dealt with through shim_assign() so ignored here
-      "LEFT_ASSIGN",    # dealt with through shim_assign() so ignored here
-      "expr",           #
-      "expr_or_assign_or_help",
-      "forcond",        # ignore token after `for`
-      "SYMBOL",         # regular symbols not used before `(`
-      "SYMBOL_SUB",     # argument names
-      "NUM_CONST",      # numbers
-      "STR_CONST",      # strings
-      "EQ_SUB",         # `=` in argument definition
-      "SYMBOL_PACKAGE", # rhs of `::` or `:::`
-      "NS_GET_INT",     # `:::`
-      "NS_GET",         # `::`
-      "ELSE",           # not a function
-      "IN",             # not a function
-      "WHILE",          # always returns NULL
-      "REPEAT",         # always returns NULL
-      "FOR")            # always returns NULL
-  parse_data <- getParseData(parse(text = deparse(expr), keep.source = TRUE))
-  # remove rows which follow `:::` or `::`
-  to_remove <- which(parse_data$token %in% c("NS_GET", "NS_GET_INT")) + 1
-  if(length(to_remove)) parse_data <- parse_data[- to_remove,]
-  # keep only eligible token types
-  funs <- parse_data$text[! parse_data$token %in% dismissed_token_types]
-  # remove tokens that are not functions
-  funs <- setdiff(unique(funs), c(ignore, ")", "}", ",", "]"))
-  funs
-}
