@@ -1,4 +1,4 @@
-options(boom.safe_print = TRUE)
+options(boomer.safe_print = TRUE)
 
 test_that("boom() works", {
   expect_snapshot({
@@ -37,7 +37,7 @@ test_that("boom() works with README examples", {
       head(2) %>%
       subset(qsec > 17) %>%
       boom()
-    boom(head(sapply(seq(10^6), sqrt)), print = str)
+    boom(head(sapply(seq(10^2), sqrt)), print = str)
   })
 })
 
@@ -69,7 +69,9 @@ test_that("clock arg works", {
 test_that("visible_only arg works", {
   expect_snapshot({
     boom(1 + invisible(1))
-    boom(1 + invisible(1), visible_only = TRUE)
+    options(boomer.visible_only = TRUE)
+    boom(1 + invisible(1))
+    options(boomer.visible_only = FALSE)
   })
 })
 
@@ -127,11 +129,41 @@ test_that("assignments work", {
       v = quote(a)
     })
 
+    options(boomer.ignore = NULL)
     boom({
       x <- 1 + 2
       y <- quote(a)
       u = 1 + 2
       v = quote(a)
-    }, ignore = NULL)
+    })
+    options(boomer.ignore = c("~", "{", "(", "<-", "<<-", "="))
+  })
+})
+
+test_that("multi-line calls are collapsed properly", {
+  expect_snapshot({
+    boom(c(0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9,0))
+    boom(c(0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9,c(0, 1)))
+  })
+})
+
+test_that("long calls are trimmed", {
+  expect_snapshot({
+  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa <- 1
+  bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb <- 2
+  boom(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 + bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
+  })
+})
+
+test_that("`boomer.abbreviate` option works", {
+  expect_snapshot({
+    options(boomer.abbreviate = TRUE)
+    boom(1 + 2 * 3)
+    boom(c(0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9,0))
+    boom(c(0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9,c(0, 1)))
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa <- 1
+    bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb <- 2
+    boom(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 + bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
+    options(boomer.abbreviate = FALSE)
   })
 })

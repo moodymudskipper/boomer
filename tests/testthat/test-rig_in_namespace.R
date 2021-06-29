@@ -1,4 +1,4 @@
-options(boom.safe_print = TRUE)
+options(boomer.safe_print = TRUE)
 
 test_that("rig_in_namespace() works", {
   skip_on_ci()
@@ -9,16 +9,14 @@ test_that("rig_in_namespace() works", {
       },
       add4 = function(a, b, c, d) {
         add2(a, b) + add2(c, d)
-      },
-      rec_factorial = function(x) {
-        if(x == 1) return(1)
-        x * rec_factorial(x-1)
       }
     ))
 
-    rig_in_namespace(add2, add4, rec_factorial, print_args = TRUE)
+    options(boomer.print_args = TRUE)
+    rig_in_namespace(add2, add4)
 
     # works
     add4(1, 2, 3, 4)
+    options(boomer.print_args = FALSE)
   })
 })

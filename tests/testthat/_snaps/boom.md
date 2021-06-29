@@ -140,21 +140,21 @@
                     mpg cyl disp  hp drat    wt  qsec vs am gear carb
       Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
     Code
-      boom(head(sapply(seq(10^6), sqrt)), print = str)
+      boom(head(sapply(seq(10^2), sqrt)), print = str)
     Output
-      <  head(sapply(seq(10^6), sqrt)) 
-      . <  sapply(seq(10^6), sqrt) 
-      . . <  seq(10^6) 
-      . . . <  >  10^6 
-      . . .  num 1e+06
+      <  head(sapply(seq(10^2), sqrt)) 
+      . <  sapply(seq(10^2), sqrt) 
+      . . <  seq(10^2) 
+      . . . <  >  10^2 
+      . . .  num 100
       . . . 
-      . . >  seq(10^6) 
-      . .  int [1:1000000] 1 2 3 4 5 6 7 8 9 10 ...
+      . . >  seq(10^2) 
+      . .  int [1:100] 1 2 3 4 5 6 7 8 9 10 ...
       . . 
-      . >  sapply(seq(10^6), sqrt) 
-      .  num [1:1000000] 1 1.41 1.73 2 2.24 ...
+      . >  sapply(seq(10^2), sqrt) 
+      .  num [1:100] 1 1.41 1.73 2 2.24 ...
       . 
-      >  head(sapply(seq(10^6), sqrt)) 
+      >  head(sapply(seq(10^2), sqrt)) 
        num [1:6] 1 1.41 1.73 2 2.24 ...
       
       [1] 1.000000 1.414214 1.732051 2.000000 2.236068 2.449490
@@ -219,7 +219,8 @@
       
       [1] 2
     Code
-      boom(1 + invisible(1), visible_only = TRUE)
+      options(boomer.visible_only = TRUE)
+      boom(1 + invisible(1))
     Output
       <  1 + invisible(1) 
       . <  >  invisible(1) 
@@ -227,6 +228,8 @@
       [1] 2
       
       [1] 2
+    Code
+      options(boomer.visible_only = FALSE)
 
 # can debug failing pipes (#17)
 
@@ -354,13 +357,15 @@
       <  >  quote(a) 
       a
       
+      a
     Code
+      options(boomer.ignore = NULL)
       boom({
         x <- 1 + 2
         y <- quote(a)
         u = 1 + 2
         v = quote(a)
-      }, ignore = NULL)
+      })
     Output
       <  {... 
       . <  x <- 1 + 2 
@@ -406,4 +411,105 @@
       a
       
       a
+    Code
+      options(boomer.ignore = c("~", "{", "(", "<-", "<<-", "="))
+
+# multi-line calls are collapsed properly
+
+    Code
+      boom(c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0))
+    Output
+      <  >  c(
+              0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+              0
+            ) 
+       [1] 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+      
+       [1] 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+    Code
+      boom(c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, c(0, 1)))
+    Output
+      <  c(... 
+      . <  >  c(0, 1) 
+      . [1] 0 1
+      . 
+      >  c(
+           0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+           c(0, 1)
+         ) 
+       [1] 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      
+       [1] 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+
+# long calls are trimmed
+
+    Code
+      aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa <- 1
+      bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb <- 2
+      boom(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 +
+        bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
+    Output
+      <  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 + bbbbbbbbbbbbbbbbbb... 
+      . <  >  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 
+      . [1] 2
+      . 
+      >  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 + bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb 
+      [1] 4
+      
+      [1] 4
+
+# `boomer.abbreviate` option works
+
+    Code
+      options(boomer.abbreviate = TRUE)
+      boom(1 + 2 * 3)
+    Output
+      <  + 
+      . <  >  2 * 3 
+      . [1] 6
+      . 
+      >  1 + 2 * 3 
+      [1] 7
+      
+      [1] 7
+    Code
+      boom(c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0))
+    Output
+      <  >  c(
+              0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+              0
+            ) 
+       [1] 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+      
+       [1] 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+    Code
+      boom(c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, c(0, 1)))
+    Output
+      <  c 
+      . <  >  c(0, 1) 
+      . [1] 0 1
+      . 
+      >  c(
+           0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+           c(0, 1)
+         ) 
+       [1] 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+      
+       [1] 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    Code
+      aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa <- 1
+      bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb <- 2
+      boom(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 +
+        bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
+    Output
+      <  + 
+      . <  >  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 
+      . [1] 2
+      . 
+      >  aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 + bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb 
+      [1] 4
+      
+      [1] 4
+    Code
+      options(boomer.abbreviate = FALSE)
 

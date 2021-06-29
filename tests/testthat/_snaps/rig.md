@@ -19,6 +19,9 @@
       <  sum(base::nchar(utils:::head(x, -n))) 
       . <  base::nchar(utils:::head(x, -n)) 
       . . <  utils:::head(x, -n) 
+      . . . x :
+      . . .  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+      . . . [20] "t" "u" "v" "w" "x" "y" "z"
       . . . <  >  -n 
       . . . [1] -7
       . . . 
@@ -48,13 +51,7 @@
       # rigger object, use the syntax `rigger(...) + function(...) {...}` to create a rigged function conveniently
       
       $clock
-      [1] FALSE
-      
-      $ignore
-      [1] "~"   "{"   "("   "<-"  "<<-" "="  
-      
-      $visible_only
-      [1] FALSE
+      NULL
       
     Code
       rigged <- rigger() + fun
@@ -71,6 +68,9 @@
       <  sum(base::nchar(utils:::head(x, -n))) 
       . <  base::nchar(utils:::head(x, -n)) 
       . . <  utils:::head(x, -n) 
+      . . . x :
+      . . .  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
+      . . . [20] "t" "u" "v" "w" "x" "y" "z"
       . . . <  >  -n 
       . . . [1] -7
       . . . 
@@ -94,6 +94,8 @@
       `SQRT()` is undefined outside of `foo2()` and its output might not be shown.
     Output
       { foo2
+      x :
+      [1] 2
       <  >  x * 2 
       [1] 4
       

@@ -1,4 +1,4 @@
-options(boom.safe_print = TRUE)
+options(boomer.safe_print = TRUE)
 
 test_that("rig() works", {
   expect_snapshot({
