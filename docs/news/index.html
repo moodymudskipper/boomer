@@ -79,7 +79,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">boomer</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
       </span>
     </div>
 
@@ -122,19 +122,25 @@
       <small>Source: <a href='https://github.com/moodymudskipper/boomer/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
-    <div id="boomer-0009000" class="section level1">
-<h1 class="page-header" data-toc-text="0.0.0.9000">
-<a href="#boomer-0009000" class="anchor"></a>boomer 0.0.0.9000</h1>
+    <div id="boomer-010" class="section level1">
+<h1 class="page-header" data-toc-text="0.1.0">
+<a href="#boomer-010" class="anchor"></a>boomer 0.1.0</h1>
 <ul>
-<li>
-<code><a href="../reference/boom.html">boom()</a></code> to explode a call and print outputs of intermediate steps</li>
-<li>
-<code><a href="../reference/boom.html">rig()</a></code> to set up a function so that all its call will be exploded</li>
+<li>Call <code><a href="../reference/boom.html">boom()</a></code> to explode a call and print outputs of intermediate steps</li>
+<li>Call <code><a href="../reference/boom.html">rig()</a></code> to set up a function so that all its call will be exploded</li>
 <li>
 <code>clock</code> argument to clock steps</li>
 <li>
 <code>print</code> argument for custom printing of intermediate outputs</li>
-<li>addin “Explode a call with <code><a href="../reference/boom.html">boom()</a></code>” to <code><a href="../reference/boom.html">boom()</a></code> selection</li>
+<li>Addin “Explode a call with <code><a href="../reference/boom.html">boom()</a></code>” to <code><a href="../reference/boom.html">boom()</a></code> selection</li>
+<li>Call <code><a href="../reference/boom.html">rigger()</a></code> to define an anonymous rigged function</li>
+<li>Call <code><a href="../reference/rig_in_namespace.html">rig_in_namespace()</a></code> to rig a function in place in its package</li>
+<li>Several options are implemented to customize the output</li>
+<li>Output is made more readable, using indents and emoticons</li>
+<li>The names of the rigged functions are displayed when entered</li>
+<li>The values of the arguments of rigged functions are displayed when they are evaluated</li>
+<li>We use {styler} to display readable calls</li>
+<li>Robustness was significantly improved</li>
 </ul>
 </div>
   </div>
