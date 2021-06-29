@@ -5,7 +5,7 @@
 \alias{boomer-package}
 \alias{_PACKAGE}
 \alias{boomer}
-\title{boomer: Print the Output of Intermediate Steps of a Call}
+\title{boomer: Debugging Tools to Inspect the Intermediate Steps of a Call}
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
