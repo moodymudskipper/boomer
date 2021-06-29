@@ -17,11 +17,16 @@ knitr::opts_chunk$set(
 
 # boomer <img src='man/figures/logo.png' align="right" height="139" />
 
-*{boomer}* is a debugging tool that lets you look at intermediate results of a
-call. It "explodes" the call into its parts hence the name.
+The *{boomer}* package provides debugging tools that let you inspect the
+intermediate results of a call. The output looks as if we explode a call
+into its parts hence the name.
 
-A function can be "rigged", so it will print the result of all the function 
-calls of their body.
+* `boom()` prints the intermediate results of a call or a code chunk.
+* `rig()` creates a copy of a function which will display the intermediate
+  results of all the calls of it body.
+* `rig_in_namespace()` rigs a namespaced function in place, so its always
+  verbose even when called by other existing functions. It is especially handy
+  for package development.
 
 ## Installation
 
@@ -71,13 +76,13 @@ it can help with debugging:
 
 ![](man/figures/README-4.png)
 
-`boom()` features optional arguments, the main ones are : 
+`boom()` features optional arguments : 
 
 * `clock`: set to `TRUE` to see how long each step (in isolation!) took to run.
 
 * `print`: set to a function such as `str` to change what is printed (see `?boom` to see how to print differently depending on class). Useful alternatives would be `dplyr::glimpse` of `invisible` (to print nothing).
 
-This is useful when the output is too long.
+One use case is when the output is too long.
 
 ```{r, eval = FALSE}
 boom(lapply(head(cars), sqrt), clock = TRUE, print = str)
@@ -95,7 +100,8 @@ boom(lapply(head(cars), sqrt), clock = TRUE, print = str)
 
 ## `rig()`
 
-`rig()` a function in order to `boom()` its body :
+`rig()` a function in order to `boom()` its body, its arguments are printed
+by default when they're evaluated.
 
 ```{r, eval = FALSE}
 hello <- function(x) {
@@ -137,41 +143,26 @@ cylinder_vol(3,10)
 ```
 
 ![](man/figures/README-9.png)
-
 ## Addin
 
 To avoid typing `boom()` all the time you can use the provided addin named *"Explode a call with `boom()`"*:
 just attribute a key combination to it (I use ctrl+shift+alt+B on windows), select the
 call you'd like to explode and fire away!
 
-The default values of the optional arguments of `boom()` are given
-by the options `"boomer.clock"`, `"boomer.print"` etc, so by modifying those you
-will change the behavior of the addin.
+## Options
+
+Several options are proposed to weak he printed output of {boomer}'s functions
+and addin, see `?boomer` to learn about them.
+
+In particular on some operating systems *{boomer}*'s functions' output might 
+not always look good in markdown report or reprexes. 
+It's due to how he system handles UTF-8 characters. In this case
+one can use `options(boomer.safe_print = TRUE)` for a more satisfactory input. 
 
 ## Notes
-
-For windows users *{boom}* doesn't look good in markdown report or reprexes
-at the moment.
 
 *{boomer}* prints the output of intermediate steps as they are executed, and 
 thus doesn't say anything about what isn't executed, it is in contrast with
 functions like `lobstr::ast()` which return the parse tree. 
 
-This will be noticeable with some uses of non standard evaluation.
-
-```{r}
-lobstr::ast(deparse(quote(1+2+3+4)))
-```
-
-
-```{r, eval = FALSE}
-boom(deparse(quote(1+2+3+4)))
-```
-
-![](man/figures/README-8.png)
-
-An earlier version of the package was released as *{boom}*, but a package *{Boom}*
-already exists on CRAN so it was renamed. *{boom}* won't be maintained and will
-be archived, possibly removed.
-
-Thanks to @data_question for suggesting the name *{boomer}*.
+Thanks to @data_question for suggesting the name *{boomer}* on [twitter](https://twitter.com/data_question/status/1356615026988179464).

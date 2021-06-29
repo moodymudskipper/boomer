@@ -4,32 +4,30 @@
 \alias{rig_in_namespace}
 \title{rig functions directly in their namespace}
 \usage{
-rig_in_namespace(
-  ...,
-  clock = getOption("boom.clock"),
-  print = getOption("boom.print"),
-  ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only"),
-  print_args = getOption("boom.print_args")
-)
+rig_in_namespace(..., clock = NULL, print = NULL)
 }
 \arguments{
 \item{...}{functions to rig}
 
-\item{clock}{whether to time intermediate steps, \code{FALSE} by default unless you
-set \code{options(boom.clock = TRUE)}. The execution time of a step doesn't include the
-execution time of its previously printed sub-steps.}
+\item{clock}{whether to time intermediate steps. Defaults to \code{getOption("boomer.clock")}
+evaluated at run time (\code{FALSE} unless you change it). The execution time of
+a step doesn't include the execution time of its previously printed sub-steps.}
 
-\item{print}{A function, a formula or a list of functions or formulas.}
+\item{print}{A function, a formula or a list of functions or formulas, used to
+modify the way the output is printed. Defaults to \code{getOption("boomer.print")}
+evaluated at run time (\code{base::print} unless you change it)'.
 
-\item{ignore}{functions to ignore, defaults to \code{c("~", "\\{", "(", "<-", "<<-", "=")}
-unless the option \code{"boom.ignore"} is modified. \code{::} and \code{:::} are always ignored.}
+If the \code{print} argument is a function, it will be used to print, or to transform the output
+before it's printed. Use \code{invisible} to display nothing, useful possibilities are
+\code{str} or \code{dplyr::glimpse}.
 
-\item{visible_only}{whether functions returning invisibly should be considered,
-by default they are unless the option \code{"boom.visible_only"} is set to \code{TRUE}.}
+\emph{{rlang}}'s formula notation is supported, so for instance you can type:
+\code{print = ~ dplyr::glimpse(., width = 50)}.
 
-\item{print_args}{whether to print the values of the arguments provided to a rigged
-function. They are printed when they are evaluated, if they are evaluated.}
+Sometimes you might want to print a specific type of object in a custom way,
+in this case you can provide a named list, if you provide an unnamed element
+it will be used as the default, and named elements will define how objects
+of the given S3 class are printed. For instance \code{print = list(str, data.frame = tibble::as_tibble)}}
 }
 \description{
 To recover original functions, restart the R session
