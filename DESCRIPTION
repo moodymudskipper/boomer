@@ -1,12 +1,14 @@
 Package: boomer
-Title: Print the Output of Intermediate Steps of a Call
+Title: Debugging Tools to Inspect the Intermediate Steps of a Call
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Antoine",
            family = "Fabri",
            role = c("aut", "cre"),
            email = "antoine.fabri@gmail.com")
-Description: 'boomer' allows one to print the output of intermediate steps of a call, it is useful for debugging and teaching operation precedence.
+Description: The 'boomer' package provides debugging tools that let you inspect the
+    intermediate results of a call. The output looks as if we explode a call
+    into its parts hence the name.
 License: GPL-3
 Encoding: UTF-8
 Language: en
