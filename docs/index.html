@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Print the Output of Intermediate Steps of a Call • boomer</title>
+<title>Debugging Tools to Inspect the Intermediate Steps of a Call • boomer</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
@@ -17,8 +17,10 @@
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
-<script src="pkgdown.js"></script><meta property="og:title" content="Print the Output of Intermediate Steps of a Call">
-<meta property="og:description" content="boomer allows one to print the output of intermediate steps of a call, it is useful for debugging and teaching operation precedence.">
+<script src="pkgdown.js"></script><meta property="og:title" content="Debugging Tools to Inspect the Intermediate Steps of a Call">
+<meta property="og:description" content="The boomer package provides debugging tools that let you inspect the
+    intermediate results of a call. The output looks as if we explode a call
+    into its parts hence the name.">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -76,130 +78,110 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
+
 <div id="boomer-" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#boomer-" class="anchor"></a>boomer <img src="reference/figures/logo.png" align="right" height="139">
 </h1></div>
-<p><em>{boomer}</em> lets you look at intermediate results of a call. It “explodes” the call into its parts hence the name. It is useful for debugging and teaching operation precedence.</p>
+<p>The <em>{boomer}</em> package provides debugging tools that let you inspect the intermediate results of a call. The output looks as if we explode a call into its parts hence the name.</p>
+<ul>
+<li>
+<code><a href="reference/boom.html">boom()</a></code> prints the intermediate results of a call or a code chunk.</li>
+<li>
+<code><a href="reference/boom.html">rig()</a></code> creates a copy of a function which will display the intermediate results of all the calls of it body.</li>
+<li>
+<code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code> rigs a namespaced function in place, so its always verbose even when called by other existing functions. It is especially handy for package development.</li>
+</ul>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Install with:</p>
 <div class="sourceCode" id="cb1"><pre class="r"><span class="kw pkg">remotes</span><span class="kw ns">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span>(<span class="st">"moodymudskipper/boomer"</span>)</pre></div>
 </div>
-<div id="examples" class="section level2">
+<div id="boom" class="section level2">
 <h2 class="hasAnchor">
-<a href="#examples" class="anchor"></a>Examples</h2>
+<a href="#boom" class="anchor"></a><code>boom()</code>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">boomer</span>)
-<span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fl">1</span> + !<span class="fl">1</span> * <span class="fl">2</span>)
-<span class="co">#&gt; 1 * 2</span>
-<span class="co">#&gt; [1] 2</span>
-<span class="co">#&gt; !1 * 2</span>
-<span class="co">#&gt; [1] FALSE</span>
-<span class="co">#&gt; 1 + !1 * 2</span>
-<span class="co">#&gt; [1] 1</span>
-
-<span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">mtcars</span>, <span class="fl">2</span>), <span class="no">qsec</span> <span class="kw">&gt;</span> <span class="fl">17</span>))
-<span class="co">#&gt; head(mtcars, 2)</span>
-<span class="co">#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb</span>
-<span class="co">#&gt; Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4</span>
-<span class="co">#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</span>
-<span class="co">#&gt; qsec &gt; 17</span>
-<span class="co">#&gt; [1] FALSE  TRUE</span>
-<span class="co">#&gt; subset(head(mtcars, 2), qsec &gt; 17)</span>
-<span class="co">#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb</span>
-<span class="co">#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</span></pre></div>
+<span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fl">1</span> + !<span class="fl">1</span> * <span class="fl">2</span>)</pre></div>
+<p><img src="reference/figures/README-1.png"></p>
+<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">mtcars</span>, <span class="fl">2</span>), <span class="no">qsec</span> <span class="kw">&gt;</span> <span class="fl">17</span>))</pre></div>
+<p><img src="reference/figures/README-2.png"></p>
 <p>You can use <code><a href="reference/boom.html">boom()</a></code> with <em>{magrittr}</em> pipes, just pipe to <code><a href="reference/boom.html">boom()</a></code> at the end of a pipe chain.</p>
-<div class="sourceCode" id="cb3"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)
+<div class="sourceCode" id="cb4"><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)
 <span class="no">mtcars</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fl">2</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/subset.html">subset</a></span>(<span class="no">qsec</span> <span class="kw">&gt;</span> <span class="fl">17</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="reference/boom.html">boom</a></span>()
-<span class="co">#&gt; head(., 2)</span>
-<span class="co">#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb</span>
-<span class="co">#&gt; Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4</span>
-<span class="co">#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</span>
-<span class="co">#&gt; qsec &gt; 17</span>
-<span class="co">#&gt; [1] FALSE  TRUE</span>
-<span class="co">#&gt; subset(., qsec &gt; 17)</span>
-<span class="co">#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb</span>
-<span class="co">#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</span>
-<span class="co">#&gt; mtcars %&gt;% head(2) %&gt;% subset(qsec &gt; 17)</span>
-<span class="co">#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb</span>
-<span class="co">#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</span></pre></div>
+  <span class="fu"><a href="reference/boom.html">boom</a></span>()</pre></div>
+<p><img src="reference/figures/README-3.png"></p>
 <p>If a call fails, <em>{boomer}</em> will print intermediate outputs up to the occurrence of the error, it can help with debugging:</p>
-<div class="sourceCode" id="cb4"><pre class="r"><span class="st">"tomato"</span> <span class="kw">%&gt;%</span>
+<div class="sourceCode" id="cb5"><pre class="r"><span class="st">"tomato"</span> <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/substr.html">substr</a></span>(<span class="fl">1</span>, <span class="fl">3</span>) <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/chartr.html">toupper</a></span>() <span class="kw">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html">sqrt</a></span>() <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="reference/boom.html">boom</a></span>()
-<span class="co">#&gt; substr(., 1, 3)</span>
-<span class="co">#&gt; [1] "tom"</span>
-<span class="co">#&gt; toupper(.)</span>
-<span class="co">#&gt; [1] "TOM"</span>
-<span class="co">#&gt; Error in .Primitive("sqrt")(.): non-numeric argument to mathematical function</span></pre></div>
-<p><code><a href="reference/boom.html">boom()</a></code> features a couple of optional arguments:</p>
+  <span class="fu"><a href="reference/boom.html">boom</a></span>()</pre></div>
+<p><img src="reference/figures/README-4.png"></p>
+<p><code><a href="reference/boom.html">boom()</a></code> features optional arguments :</p>
 <ul>
-<li><p>Set <code>clock</code> to <code>TRUE</code> to see how long each step (in isolation!) took to run.</p></li>
-<li><p>Set the <code>print</code> argument to a function such as <code>str</code> to change what is printed (see <code><a href="reference/boom.html">?boom</a></code> to see how to print differently depending on class). Useful alternatives would be <code><a href="https://dplyr.tidyverse.org/reference/reexports.html">dplyr::glimpse</a></code> of <code>invisible</code> (to print nothing). This is useful when the output is too long.</p></li>
+<li><p><code>clock</code>: set to <code>TRUE</code> to see how long each step (in isolation!) took to run.</p></li>
+<li><p><code>print</code>: set to a function such as <code>str</code> to change what is printed (see <code><a href="reference/boom.html">?boom</a></code> to see how to print differently depending on class). Useful alternatives would be <code><a href="https://dplyr.tidyverse.org/reference/reexports.html">dplyr::glimpse</a></code> of <code>invisible</code> (to print nothing).</p></li>
 </ul>
-<!-- end list --><div class="sourceCode" id="cb5"><pre class="r"><span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/lapply.html">sapply</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span>(<span class="fl">10</span>^<span class="fl">6</span>), <span class="no">sqrt</span>)), <span class="kw">clock</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">print</span> <span class="kw">=</span> <span class="no">str</span>)
-<span class="co">#&gt; 10^6</span>
-<span class="co">#&gt; time: 0 us</span>
-<span class="co">#&gt;  num 1e+06</span>
-<span class="co">#&gt; seq(10^6)</span>
-<span class="co">#&gt; time: 0 us</span>
-<span class="co">#&gt;  int [1:1000000] 1 2 3 4 5 6 7 8 9 10 ...</span>
-<span class="co">#&gt; sapply(seq(10^6), sqrt)</span>
-<span class="co">#&gt; time: 1.454 s</span>
-<span class="co">#&gt;  num [1:1000000] 1 1.41 1.73 2 2.24 ...</span>
-<span class="co">#&gt; head(sapply(seq(10^6), sqrt))</span>
-<span class="co">#&gt; time: 0 us</span>
-<span class="co">#&gt;  num [1:6] 1 1.41 1.73 2 2.24 ...</span></pre></div>
-<p><code><a href="reference/boom.html">boom()</a></code> also works works on loops and multi-line expression, you can also <code><a href="reference/boom.html">rig()</a></code> a function in order to <code><a href="reference/boom.html">boom()</a></code> all the calls of its body :</p>
-<div class="sourceCode" id="cb6"><pre class="r"><span class="co"># try it out on you own, a bit too verbose for a README :)</span>
-<span class="fu"><a href="reference/boom.html">rig</a></span>(<span class="no">ave</span>)(<span class="no">warpbreaks</span>$<span class="no">breaks</span>, <span class="no">warpbreaks</span>$<span class="no">wool</span>)</pre></div>
+<p>One use case is when the output is too long.</p>
+<div class="sourceCode" id="cb6"><pre class="r"><span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/lapply.html">lapply</a></span>(<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cars</span>), <span class="no">sqrt</span>), <span class="kw">clock</span> <span class="kw">=</span> <span class="fl">TRUE</span>, <span class="kw">print</span> <span class="kw">=</span> <span class="no">str</span>)</pre></div>
+<p><img src="reference/figures/README-5.png"></p>
+<p><code><a href="reference/boom.html">boom()</a></code> also works works on loops and multi-line expression.</p>
+<div class="sourceCode" id="cb7"><pre class="r"> <span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="kw">for</span>(<span class="no">i</span> <span class="kw">in</span> <span class="fl">1</span>:<span class="fl">3</span>) <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="no">i</span>, <span class="st">"!"</span>))</pre></div>
+<p><img src="reference/figures/README-6.png"></p>
 </div>
-<div id="addin" class="section level2">
+<div id="rig" class="section level2">
 <h2 class="hasAnchor">
-<a href="#addin" class="anchor"></a>Addin</h2>
+<a href="#rig" class="anchor"></a><code>rig()</code>
+</h2>
+<p><code><a href="reference/boom.html">rig()</a></code> a function in order to <code><a href="reference/boom.html">boom()</a></code> its body, its arguments are printed by default when they’re evaluated.</p>
+<div class="sourceCode" id="cb8"><pre class="r"><span class="no">hello</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">x</span>) {
+  <span class="kw">if</span>(!<span class="fu"><a href="https://rdrr.io/r/base/character.html">is.character</a></span>(<span class="no">x</span>) <span class="kw">|</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span>(<span class="no">x</span>) <span class="kw">!=</span> <span class="fl">1</span>) {
+    <span class="fu"><a href="https://rdrr.io/r/base/stop.html">stop</a></span>(<span class="st">"`x` should be a string"</span>)
+  }
+  <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"Hello "</span>, <span class="no">x</span>, <span class="st">"!"</span>)
+}
+<span class="fu"><a href="reference/boom.html">rig</a></span>(<span class="no">hello</span>)(<span class="st">"world"</span>)</pre></div>
+<p><img src="reference/figures/README-7.png"></p>
+</div>
+<div id="rig_in_namespace" class="section level2">
+<h2 class="hasAnchor">
+<a href="#rig_in_namespace" class="anchor"></a><code>rig_in_namespace()</code>
+</h2>
+<p><code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code> was designed to assist package development. Functions are rigged in place and we can explode the calls of the bodies of several functions at a time.</p>
+<p>For instance you might have these functions in a package :</p>
+<div class="sourceCode" id="cb9"><pre class="r"><span class="no">cylinder_vol</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">r</span>, <span class="no">h</span>) {
+  <span class="no">h</span> * <span class="fu">disk_area</span>(<span class="no">r</span>)
+}
+
+<span class="no">disk_area</span> <span class="kw">&lt;-</span> <span class="kw">function</span>(<span class="no">r</span>) {
+  <span class="no">pi</span> * <span class="no">r</span>^<span class="fl">2</span>
+}</pre></div>
+<p><code>cylinder_vol</code> depends on <code>disk_area</code>, call <code><a href="https://devtools.r-lib.org//reference/load_all.html">devtools::load_all()</a></code> then <code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code> on both and enjoy the detailed output:</p>
+<div class="sourceCode" id="cb10"><pre class="r"><span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://devtools.r-lib.org//reference/load_all.html">load_all</a></span>()
+<span class="fu"><a href="reference/rig_in_namespace.html">rig_in_namespace</a></span>(<span class="no">cylinder_vol</span>, <span class="no">disk_area</span>)
+<span class="fu">cylinder_vol</span>(<span class="fl">3</span>,<span class="fl">10</span>)</pre></div>
+<p><img src="reference/figures/README-9.png"> ## Addin</p>
 <p>To avoid typing <code><a href="reference/boom.html">boom()</a></code> all the time you can use the provided addin named <em>“Explode a call with <code><a href="reference/boom.html">boom()</a></code>”</em>: just attribute a key combination to it (I use ctrl+shift+alt+B on windows), select the call you’d like to explode and fire away!</p>
-<p>The default values of the <code>clock</code> and <code>print</code> arguments of <code><a href="reference/boom.html">boom()</a></code> are given by the options <code>"boomer.clock"</code> and <code>"boomer.print"</code>, so by modifying those you will change the behavior of the addin.</p>
+</div>
+<div id="options" class="section level2">
+<h2 class="hasAnchor">
+<a href="#options" class="anchor"></a>Options</h2>
+<p>Several options are proposed to weak he printed output of {boomer}’s functions and addin, see <code><a href="reference/boomer-package.html">?boomer</a></code> to learn about them.</p>
+<p>In particular on some operating systems <em>{boomer}</em>’s functions’ output might not always look good in markdown report or reprexes. It’s due to how he system handles UTF-8 characters. In this case one can use <code><a href="https://rdrr.io/r/base/options.html">options(boomer.safe_print = TRUE)</a></code> for a more satisfactory input.</p>
 </div>
 <div id="notes" class="section level2">
 <h2 class="hasAnchor">
 <a href="#notes" class="anchor"></a>Notes</h2>
 <p><em>{boomer}</em> prints the output of intermediate steps as they are executed, and thus doesn’t say anything about what isn’t executed, it is in contrast with functions like <code><a href="https://rdrr.io/pkg/lobstr/man/ast.html">lobstr::ast()</a></code> which return the parse tree.</p>
-<p>This will be noticeable with some uses of non standard evaluation.</p>
-<div class="sourceCode" id="cb7"><pre class="r"><span class="kw pkg">lobstr</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/lobstr/man/ast.html">ast</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/deparse.html">deparse</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substitute.html">quote</a></span>(<span class="fl">1</span>+<span class="fl">2</span>+<span class="fl">3</span>+<span class="fl">4</span>)))
-<span class="co">#&gt; o-deparse </span>
-<span class="co">#&gt; \-o-quote </span>
-<span class="co">#&gt;   \-o-`+` </span>
-<span class="co">#&gt;     +-o-`+` </span>
-<span class="co">#&gt;     | +-o-`+` </span>
-<span class="co">#&gt;     | | +-1 </span>
-<span class="co">#&gt;     | | \-2 </span>
-<span class="co">#&gt;     | \-3 </span>
-<span class="co">#&gt;     \-4</span>
-
-<span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/deparse.html">deparse</a></span>(<span class="fu"><a href="https://rdrr.io/r/base/substitute.html">quote</a></span>(<span class="fl">1</span>+<span class="fl">2</span>+<span class="fl">3</span>+<span class="fl">4</span>)))
-<span class="co">#&gt; quote(1 + 2 + 3 + 4)</span>
-<span class="co">#&gt; 1 + 2 + 3 + 4</span>
-<span class="co">#&gt; deparse(quote(1 + 2 + 3 + 4))</span>
-<span class="co">#&gt; [1] "1 + 2 + 3 + 4"</span>
-
-<span class="co"># standard evaluation</span>
-<span class="fu"><a href="reference/boom.html">boom</a></span>(<span class="fl">1</span>+<span class="fl">2</span>+<span class="fl">3</span>+<span class="fl">4</span>)
-<span class="co">#&gt; 1 + 2</span>
-<span class="co">#&gt; [1] 3</span>
-<span class="co">#&gt; 1 + 2 + 3</span>
-<span class="co">#&gt; [1] 6</span>
-<span class="co">#&gt; 1 + 2 + 3 + 4</span>
-<span class="co">#&gt; [1] 10</span></pre></div>
-<p>An earlier version of the package was released as <em>{boom}</em>, but a package <em>{Boom}</em> already exists on CRAN so it was renamed. <em>{boom}</em> won’t be maintained and will be archived, possibly removed.</p>
-<p>Thanks to @data_question for suggesting the name <em>{boomer}</em>.</p>
+<p>Thanks to @data_question for suggesting the name <em>{boomer}</em> on <a href="https://twitter.com/data_question/status/1356615026988179464">twitter</a>.</p>
 </div>
 </div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -225,7 +207,13 @@
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/moodymudskipper/boomer/actions"><img src="https://github.com/moodymudskipper/boomer/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 

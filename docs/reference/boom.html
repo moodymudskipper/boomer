@@ -47,8 +47,18 @@
 
 
 <meta property="og:title" content="Print the Output of Intermediate Steps of a Call — boom" />
-<meta property="og:description" content="boom() will explode a call into the output of its parts.
-rig() a function to make all the calls of its body boom()." />
+<meta property="og:description" content="
+
+boom() prints the intermediate results of a call or a code chunk.
+rig() creates a copy of a function which will display the intermediate
+results of all the calls of it body.
+rig_in_namespace() rigs a namespaced function in place, so its always
+verbose even when called by other existing functions. It is especially handy
+for package development.
+rigger() provides a convenient way to rig an
+anonymous function by using the rigger(...) + function(...) {...} syntax.
+
+" />
 <meta property="og:image" content="/logo.png" />
 
 
@@ -126,13 +136,25 @@ rig() a function to make all the calls of its body boom()." />
     </div>
 
     <div class="ref-description">
-    <p><code>boom()</code> will explode a call into the output of its parts.
-<code>rig()</code> a function to make all the calls of its body <code>boom()</code>.</p>
+    
+<ul>
+<li><p><code>boom()</code> prints the intermediate results of a call or a code chunk.</p></li>
+<li><p><code>rig()</code> creates a copy of a function which will display the intermediate
+results of all the calls of it body.</p></li>
+<li><p><code><a href='rig_in_namespace.html'>rig_in_namespace()</a></code> rigs a namespaced function in place, so its always
+verbose even when called by other existing functions. It is especially handy
+for package development.</p></li>
+<li><p><code>rigger()</code> provides a convenient way to rig an
+anonymous function by using the <code>rigger(...) + function(...) {...}</code> syntax.</p></li>
+</ul>
+
     </div>
 
-    <pre class="usage"><span class='fu'>boom</span>(<span class='no'>expr</span>, <span class='kw'>clock</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"boom.clock"</span>), <span class='kw'>print</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"boom.print"</span>))
+    <pre class="usage"><span class='fu'>boom</span>(<span class='no'>expr</span>, <span class='kw'>clock</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
-<span class='fu'>rig</span>(<span class='no'>fun</span>, <span class='kw'>clock</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"boom.clock"</span>), <span class='kw'>print</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/options.html'>getOption</a></span>(<span class='st'>"boom.print"</span>))</pre>
+<span class='fu'>rig</span>(<span class='no'>fun</span>, <span class='kw'>clock</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>rigger</span>(<span class='kw'>clock</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -143,13 +165,24 @@ rig() a function to make all the calls of its body boom()." />
     </tr>
     <tr>
       <th>clock</th>
-      <td><p>whether to time intermediate steps, <code>FALSE</code> by default unless you
-set <code><a href='https://rdrr.io/r/base/options.html'>options(boom.clock = TRUE)</a></code>. The execution time of a step doesn't include the
-execution time of its previously printed sub-steps.</p></td>
+      <td><p>whether to time intermediate steps. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>getOption("boomer.clock")</a></code>
+evaluated at run time (<code>FALSE</code> unless you change it). The execution time of
+a step doesn't include the execution time of its previously printed sub-steps.</p></td>
     </tr>
     <tr>
       <th>print</th>
-      <td><p>A function, a formula or a list of functions or formulas.</p></td>
+      <td><p>A function, a formula or a list of functions or formulas, used to
+modify the way the output is printed. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>getOption("boomer.print")</a></code>
+evaluated at run time (<code><a href='https://rdrr.io/r/base/print.html'>base::print</a></code> unless you change it)'.</p>
+<p>If the <code>print</code> argument is a function, it will be used to print, or to transform the output
+before it's printed. Use <code>invisible</code> to display nothing, useful possibilities are
+<code>str</code> or <code><a href='https://dplyr.tidyverse.org/reference/reexports.html'>dplyr::glimpse</a></code>.</p>
+<p><em>rlang</em>'s formula notation is supported, so for instance you can type:
+<code>print = ~ dplyr::glimpse(., width = 50)</code>.</p>
+<p>Sometimes you might want to print a specific type of object in a custom way,
+in this case you can provide a named list, if you provide an unnamed element
+it will be used as the default, and named elements will define how objects
+of the given S3 class are printed. For instance <code>print = list(str, data.frame = tibble::as_tibble)</code></p></td>
     </tr>
     <tr>
       <th>fun</th>
@@ -157,53 +190,52 @@ execution time of its previously printed sub-steps.</p></td>
     </tr>
     </table>
 
-    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>By default, unless <code><a href='https://rdrr.io/r/base/options.html'>options(boom.clock = print)</a></code> is set to a custom value, the
-output of every step is printed in a standard way.</p>
-<p>If you provide another function such as
-<code>str</code>, the console output of <code>str</code> will be printed. Use <code>invisible</code> to display
-nothing, another useful alternative would be <code><a href='https://dplyr.tidyverse.org/reference/reexports.html'>dplyr::glimpse</a></code>.</p>
-<p><em>rlang</em>'s formula notation is supported, so for instance you can type:
-<code>print = ~ dplyr::glimpse(., width = 50)</code>.</p>
-<p>Sometimes you might want to print a specific type of object in a custom way,
-in this case you can provide a named list, if you provide an unnamed element
-it will be used as the default, and named elements will define how objects
-of the given S3 class are printed. For instance <code>print = list(str, data.frame = tibble::as_tibble)</code></p>
-<p>Modifying the options is especially useful if you want to use the addin
-with custom behavior.</p>
+    <p><code>boom()</code> returns the output of the call. <code>rig()</code> returns the modified
+input function. <code><a href='rig_in_namespace.html'>rig_in_namespace()</a></code> returns <code><a href='https://rdrr.io/r/base/invisible.html'>invisible(NULL)</a></code> and is called
+for side effects. <code>rigger()</code> returns a list containing the arguments, with
+the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code></p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='co'># explode a simple call</span>
-<span class='fu'>boom</span>(<span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>mtcars</span>, <span class='fl'>2</span>), <span class='no'>qsec</span> <span class='kw'>&gt;</span> <span class='fl'>17</span>))</div><div class='output co'>#&gt; <span style='color: #00BBBB;'>head(mtcars, 2)</span><span>
+<span class='fu'>boom</span>(<span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>mtcars</span>, <span class='fl'>2</span>), <span class='no'>qsec</span> <span class='kw'>&gt;</span> <span class='fl'>17</span>))</div><div class='output co'>#&gt; &lt;U+0001F4A3&gt; <span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>head(mtcars, 2)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>              mpg cyl disp  hp drat    wt  qsec vs am gear carb
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>qsec &gt; 17</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] FALSE  TRUE
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span> 
 #&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb
-#&gt; Mazda RX4      21   6  160 110  3.9 2.620 16.46  0  1    4    4
 #&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4
-#&gt; </span><span style='color: #00BBBB;'>qsec &gt; 17</span><span>
-#&gt; [1] FALSE  TRUE
-#&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span>
-#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb
+#&gt; </div><div class='output co'>#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb
 #&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</div><div class='input'>
 <span class='co'># clock calls and customize how to print output</span>
-<span class='fu'>boom</span>(<span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>mtcars</span>, <span class='fl'>2</span>), <span class='no'>qsec</span> <span class='kw'>&gt;</span> <span class='fl'>17</span>), <span class='kw'>clock</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='no'>str</span>)</div><div class='output co'>#&gt; </span><span style='color: #00BBBB;'>head(mtcars, 2)</span><span>
-#&gt; </span><span style='color: #0000BB;'>time: 0.001 s</span><span>
-#&gt; 'data.frame':	2 obs. of  11 variables:
-#&gt;  $ mpg : num  21 21
-#&gt;  $ cyl : num  6 6
-#&gt;  $ disp: num  160 160
-#&gt;  $ hp  : num  110 110
-#&gt;  $ drat: num  3.9 3.9
-#&gt;  $ wt  : num  2.62 2.88
-#&gt;  $ qsec: num  16.5 17
-#&gt;  $ vs  : num  0 0
-#&gt;  $ am  : num  1 1
-#&gt;  $ gear: num  4 4
-#&gt;  $ carb: num  4 4
-#&gt; </span><span style='color: #00BBBB;'>qsec &gt; 17</span><span>
+<span class='fu'>boom</span>(<span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>mtcars</span>, <span class='fl'>2</span>), <span class='no'>qsec</span> <span class='kw'>&gt;</span> <span class='fl'>17</span>), <span class='kw'>clock</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='no'>str</span>)</div><div class='output co'>#&gt; &lt;U+0001F4A3&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>head(mtcars, 2)</span><span> 
 #&gt; </span><span style='color: #0000BB;'>time: 0 us</span><span>
-#&gt;  logi [1:2] FALSE TRUE
-#&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span>
-#&gt; </span><span style='color: #0000BB;'>time: 0.001 s</span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>'data.frame':	2 obs. of  11 variables:
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ mpg : num  21 21
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ cyl : num  6 6
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ disp: num  160 160
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ hp  : num  110 110
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ drat: num  3.9 3.9
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ wt  : num  2.62 2.88
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ qsec: num  16.5 17
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ vs  : num  0 0
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ am  : num  1 1
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ gear: num  4 4
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ carb: num  4 4
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>qsec &gt; 17</span><span> 
+#&gt; </span><span style='color: #0000BB;'>time: 0 us</span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> logi [1:2] FALSE TRUE
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span> 
+#&gt; </span><span style='color: #0000BB;'>time: 0 us</span><span>
 #&gt; 'data.frame':	1 obs. of  11 variables:
 #&gt;  $ mpg : num 21
 #&gt;  $ cyl : num 6
@@ -215,24 +247,29 @@ with custom behavior.</p>
 #&gt;  $ vs  : num 0
 #&gt;  $ am  : num 1
 #&gt;  $ gear: num 4
-#&gt;  $ carb: num 4</div><div class='input'>
+#&gt;  $ carb: num 4
+#&gt; </div><div class='output co'>#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb
+#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</div><div class='input'>
 <span class='co'># print str only for data frames</span>
-<span class='fu'>boom</span>(<span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>mtcars</span>, <span class='fl'>2</span>), <span class='no'>qsec</span> <span class='kw'>&gt;</span> <span class='fl'>17</span>), <span class='kw'>print</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>data.frame</span> <span class='kw'>=</span> <span class='no'>str</span>))</div><div class='output co'>#&gt; </span><span style='color: #00BBBB;'>head(mtcars, 2)</span><span>
-#&gt; 'data.frame':	2 obs. of  11 variables:
-#&gt;  $ mpg : num  21 21
-#&gt;  $ cyl : num  6 6
-#&gt;  $ disp: num  160 160
-#&gt;  $ hp  : num  110 110
-#&gt;  $ drat: num  3.9 3.9
-#&gt;  $ wt  : num  2.62 2.88
-#&gt;  $ qsec: num  16.5 17
-#&gt;  $ vs  : num  0 0
-#&gt;  $ am  : num  1 1
-#&gt;  $ gear: num  4 4
-#&gt;  $ carb: num  4 4
-#&gt; </span><span style='color: #00BBBB;'>qsec &gt; 17</span><span>
-#&gt; [1] FALSE  TRUE
-#&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span>
+<span class='fu'>boom</span>(<span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>mtcars</span>, <span class='fl'>2</span>), <span class='no'>qsec</span> <span class='kw'>&gt;</span> <span class='fl'>17</span>), <span class='kw'>print</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='kw'>data.frame</span> <span class='kw'>=</span> <span class='no'>str</span>))</div><div class='output co'>#&gt; &lt;U+0001F4A3&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>head(mtcars, 2)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>'data.frame':	2 obs. of  11 variables:
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ mpg : num  21 21
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ cyl : num  6 6
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ disp: num  160 160
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ hp  : num  110 110
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ drat: num  3.9 3.9
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ wt  : num  2.62 2.88
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ qsec: num  16.5 17
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ vs  : num  0 0
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ am  : num  1 1
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ gear: num  4 4
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> $ carb: num  4 4
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>qsec &gt; 17</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] FALSE  TRUE
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span> 
 #&gt; 'data.frame':	1 obs. of  11 variables:
 #&gt;  $ mpg : num 21
 #&gt;  $ cyl : num 6
@@ -244,83 +281,98 @@ with custom behavior.</p>
 #&gt;  $ vs  : num 0
 #&gt;  $ am  : num 1
 #&gt;  $ gear: num 4
-#&gt;  $ carb: num 4</div><div class='input'>
-<span class='co'># rig a function</span>
-<span class='fu'>rig</span>(<span class='no'>ave</span>)(<span class='no'>warpbreaks</span>$<span class='no'>breaks</span>, <span class='no'>warpbreaks</span>$<span class='no'>wool</span>)</div><div class='output co'>#&gt; </span><span style='color: #00BBBB;'>missing(...)</span><span>
-#&gt; [1] FALSE
-#&gt; </span><span style='color: #00BBBB;'>interaction(...)</span><span>
-#&gt;  [1] A A A A A A A A A A A A A A A A A A A A A A A A A A A B B B B B B B B B B B
-#&gt; [39] B B B B B B B B B B B B B B B B
-#&gt; Levels: A B
-#&gt; </span><span style='color: #00BBBB;'>g &lt;- interaction(...)</span><span>
-#&gt;  [1] A A A A A A A A A A A A A A A A A A A A A A A A A A A B B B B B B B B B B B
-#&gt; [39] B B B B B B B B B B B B B B B B
-#&gt; Levels: A B
-#&gt; </span><span style='color: #00BBBB;'>split(x, g)</span><span>
-#&gt; $A
-#&gt;  [1] 26 30 54 25 70 52 51 26 67 18 21 29 17 12 18 35 30 36 36 21 24 18 10 43 28
-#&gt; [26] 15 26
-#&gt; 
-#&gt; $B
-#&gt;  [1] 27 14 29 19 29 31 41 20 44 42 26 19 16 39 28 21 39 29 20 21 24 17 13 15 15
-#&gt; [26] 16 28
-#&gt; 
-#&gt; </span><span style='color: #00BBBB;'>lapply(split(x, g), FUN)</span><span>
+#&gt;  $ carb: num 4
+#&gt; </div><div class='output co'>#&gt;               mpg cyl disp  hp drat    wt  qsec vs am gear carb
+#&gt; Mazda RX4 Wag  21   6  160 110  3.9 2.875 17.02  0  1    4    4</div><div class='input'>
+<span class='co'># rig an existing function</span>
+<span class='fu'>rig</span>(<span class='no'>ave</span>)(<span class='no'>warpbreaks</span>$<span class='no'>breaks</span>, <span class='no'>warpbreaks</span>$<span class='no'>wool</span>)</div><div class='output co'>#&gt; <span class='message'>`FUN()` is undefined outside of `ave()` and its output might not be shown.</span></div><div class='output co'>#&gt; <span class='message'>Registered S3 method overwritten by 'pryr':</span>
+#&gt; <span class='message'>  method      from</span>
+#&gt; <span class='message'>  print.bytes Rcpp</span></div><div class='output co'>#&gt; &lt;U+0001F447&gt; </span><span style='color: #BBBB00;'>ave</span><span>
+#&gt; &lt;U+0001F4A3&gt; </span><span style='color: #00BBBB;'>if (missing(...)) {...</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span style='color: #00BB00;'>... :</span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;...&gt;
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>missing(...)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] FALSE
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>interaction(...)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span> [1] A A A A A A A A A A A A A A A A A A A A A A A A A A A B B B B B B B B B B B
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[39] B B B B B B B B B B B B B B B B
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>Levels: A B
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; </span><span style='color: #00BBBB;'>lapply(split(x, g), FUN)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span style='color: #00BB00;'>x :</span><span>
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span> [1] 26 30 54 25 70 52 51 26 67 18 21 29 17 12 18 35 30 36 36 21 24 18 10 43 28
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>[26] 15 26 27 14 29 19 29 31 41 20 44 42 26 19 16 39 28 21 39 29 20 21 24 17 13
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>[51] 15 15 16 28
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span style='color: #00BB00;'>FUN :</span><span>
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>function (x, ...) 
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>UseMethod("mean")
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>&lt;bytecode: 0x000000001553d510&gt;
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>&lt;environment: namespace:base&gt;
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>split(x, g)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>$A
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span> [1] 26 30 54 25 70 52 51 26 67 18 21 29 17 12 18 35 30 36 36 21 24 18 10 43 28
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>[26] 15 26
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>$B
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span> [1] 27 14 29 19 29 31 41 20 44 42 26 19 16 39 28 21 39 29 20 21 24 17 13 15 15
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>[26] 16 28
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>lapply(split(x, g), FUN)</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>$A
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] 31.03704
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>$B
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] 25.25926
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>if (missing(...)) {</span><span>
+#&gt;    </span><span style='color: #00BBBB;'>  x[] &lt;- FUN(x)</span><span>
+#&gt;    </span><span style='color: #00BBBB;'>} else {</span><span>
+#&gt;    </span><span style='color: #00BBBB;'>  g &lt;- interaction(...)</span><span>
+#&gt;    </span><span style='color: #00BBBB;'>  split(x, g) &lt;- lapply(split(x, g), FUN)</span><span>
+#&gt;    </span><span style='color: #00BBBB;'>}</span><span> 
 #&gt; $A
 #&gt; [1] 31.03704
 #&gt; 
 #&gt; $B
 #&gt; [1] 25.25926
 #&gt; 
-#&gt; </span><span style='color: #00BBBB;'>split(x, g) &lt;- lapply(split(x, g), FUN)</span><span>
-#&gt; $A
-#&gt; [1] 31.03704
 #&gt; 
-#&gt; $B
-#&gt; [1] 25.25926
-#&gt; 
-#&gt; </span><span style='color: #00BBBB;'>{</span><span>
-#&gt; </span><span style='color: #00BBBB;'>    g &lt;- interaction(...)</span><span>
-#&gt; </span><span style='color: #00BBBB;'>    split(x, g) &lt;- lapply(split(x, g), FUN)</span><span>
-#&gt; </span><span style='color: #00BBBB;'>}</span><span>
-#&gt; $A
-#&gt; [1] 31.03704
-#&gt; 
-#&gt; $B
-#&gt; [1] 25.25926
-#&gt; 
-#&gt; </span><span style='color: #00BBBB;'>if (missing(...)) x[] &lt;- FUN(x) else {</span><span>
-#&gt; </span><span style='color: #00BBBB;'>    g &lt;- interaction(...)</span><span>
-#&gt; </span><span style='color: #00BBBB;'>    split(x, g) &lt;- lapply(split(x, g), FUN)</span><span>
-#&gt; </span><span style='color: #00BBBB;'>}</span><span>
-#&gt; $A
-#&gt; [1] 31.03704
-#&gt; 
-#&gt; $B
-#&gt; [1] 25.25926
-#&gt; 
-#&gt; </span><span style='color: #00BBBB;'>{</span><span>
-#&gt; </span><span style='color: #00BBBB;'>    if (missing(...)) </span><span>
-#&gt; </span><span style='color: #00BBBB;'>        x[] &lt;- FUN(x)</span><span>
-#&gt; </span><span style='color: #00BBBB;'>    else {</span><span>
-#&gt; </span><span style='color: #00BBBB;'>        g &lt;- interaction(...)</span><span>
-#&gt; </span><span style='color: #00BBBB;'>        split(x, g) &lt;- lapply(split(x, g), FUN)</span><span>
-#&gt; </span><span style='color: #00BBBB;'>    }</span><span>
-#&gt; </span><span style='color: #00BBBB;'>    x</span><span>
-#&gt; </span><span style='color: #00BBBB;'>}</span><span>
-#&gt;  [1] 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704
+#&gt; &lt;U+0001F446&gt; </span><span style='color: #BBBB00;'>ave</span><span></div><div class='output co'>#&gt;  [1] 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704
 #&gt;  [9] 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704
 #&gt; [17] 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704
 #&gt; [25] 31.03704 31.03704 31.03704 25.25926 25.25926 25.25926 25.25926 25.25926
 #&gt; [33] 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926
 #&gt; [41] 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926
-#&gt; [49] 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926</div><div class='output co'>#&gt;  [1] 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704
-#&gt;  [9] 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704
-#&gt; [17] 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704 31.03704
-#&gt; [25] 31.03704 31.03704 31.03704 25.25926 25.25926 25.25926 25.25926 25.25926
-#&gt; [33] 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926
-#&gt; [41] 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926
-#&gt; [49] 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926</div></span></pre>
+#&gt; [49] 25.25926 25.25926 25.25926 25.25926 25.25926 25.25926</div><div class='input'>
+<span class='co'># rig an anonymous function</span>
+<span class='no'>fun1</span> <span class='kw'>&lt;-</span> <span class='fu'>rigger</span>() + <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>x</span> + <span class='fl'>1</span> + <span class='fl'>2</span> <span class='co'># same as rig(function(x) x + 1 + 2))</span>
+<span class='fu'>fun1</span>(<span class='fl'>1</span>)</div><div class='output co'>#&gt; &lt;U+0001F447&gt; </span><span style='color: #BBBB00;'>e2</span><span>
+#&gt; &lt;U+0001F4A3&gt; </span><span style='color: #00BBBB;'>x + 1 + 2</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span style='color: #00BB00;'>x :</span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] 1
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>x + 1</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] 2
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>x + 1 + 2</span><span> 
+#&gt; [1] 4
+#&gt; 
+#&gt; &lt;U+0001F446&gt; </span><span style='color: #BBBB00;'>e2</span><span></div><div class='output co'>#&gt; [1] 4</div><div class='input'><span class='no'>fun2</span> <span class='kw'>&lt;-</span> <span class='fu'>rigger</span>(<span class='fl'>TRUE</span>, <span class='no'>typeof</span>) + <span class='kw'>function</span>(<span class='no'>x</span>) <span class='no'>x</span> + <span class='fl'>1</span> + <span class='fl'>2</span>
+<span class='fu'>fun2</span>(<span class='fl'>1</span>)</div><div class='output co'>#&gt; &lt;U+0001F447&gt; </span><span style='color: #BBBB00;'>e2</span><span>
+#&gt; &lt;U+0001F4A3&gt; </span><span style='color: #00BBBB;'>x + 1 + 2</span><span> 
+#&gt; </span><span style='color: #BBBB00;'>· </span><span style='color: #00BB00;'>x :</span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] "double"
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>x + 1</span><span> 
+#&gt; </span><span style='color: #0000BB;'>time: 0 us</span><span>
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>[1] "double"
+#&gt; </span><span style='color: #BBBB00;'>· </span><span>
+#&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>x + 1 + 2</span><span> 
+#&gt; </span><span style='color: #0000BB;'>time: 0.035 s</span><span>
+#&gt; [1] "double"
+#&gt; 
+#&gt; &lt;U+0001F446&gt; </span><span style='color: #BBBB00;'>e2</span><span></div><div class='output co'>#&gt; [1] 4</div></span></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
