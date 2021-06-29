@@ -26,31 +26,46 @@
 #' @param fun_val the function to wrap
 #' @param clock whether to clock
 #' @param print_fun A function, a formula or a list of functions or formulas.
-#' @param nm The name of the rigged function containing the wrapper function calls
+#' @param rigged_nm The name of the rigged function containing the wrapper function calls
+#' @param wrapped_nm The name of the wrapped function
 #' @param mask The enclosing environment of the rigged function, where wrapper functions are stored
 #' @noRd
-wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args = FALSE, mask = NULL) {
+wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, mask = NULL) {
   # for CRAN notes
   . <- NULL
   as.function(envir = asNamespace("boomer"), c(alist(...=), bquote({
     # Since we set the enclosing env to {boomer}'s namespace
     # we use `bquote()` to get `wrap()`'s arguments in
-    fun_val <- .(fun_val)
-    clock <- .(clock)
-    print_fun <- .(print_fun)
-    visible_only <- .(visible_only)
-    nm <- .(nm)
-    print_args <- .(print_args)
-    mask <- .(mask)
 
-    # gather options at run time
-    safe_print <- getOption("boom.safe_print")
-
-    # fetch caller (rigged function) env
-    rigged_fun_exec_env <- parent.frame()
+    # return early if function is to be ignored
+    wrapped_nm <- .(wrapped_nm)
+    fun_val   <- .(fun_val)
+    ignore <- getOption("boomer.ignore")
+    sc  <- sys.call()
+    if(wrapped_nm %in% ignore) {
+      res <- rlang::eval_bare(as.call(c(fun_val, as.list(sc[-1]))), parent.frame())
+      return(res)
+    }
 
     # start the clock
+    clock <- .(clock)
+    if(is.null(clock)) clock <- getOption("boomer.clock")
     total_time_start <- if(clock) Sys.time()
+
+    # fetch other args
+    print_fun <- .(print_fun)
+    rigged_nm <- .(rigged_nm)
+    mask      <- .(mask)
+
+    # gather other options at run time
+    if(is.null(print_fun)) print_fun <- getOption("boomer.print")
+    visible_only <- getOption("boomer.visible_only")
+    print_args <- getOption("boomer.print_args")
+    safe_print <- getOption("boomer.safe_print")
+
+    # fetch rigged function's execution env
+    # this is not always right but this is always right for the first call
+    rigged_fun_exec_env <- parent.frame()
 
     # set indentation
     globals$n_indent <- globals$n_indent + 1
@@ -62,10 +77,9 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     on.exit(update_globals_on_exit(clock))
 
     # !!! this adds calls on.exit of caller (rigged) function !!!
-    signal_rigged_function_and_args(nm, mask, ej, print_args, rigged_fun_exec_env)
+    signal_rigged_function_and_args(rigged_nm, mask, ej, print_args, rigged_fun_exec_env)
 
     # build calls to be displayed on top and bottom of wrapped call
-    sc  <- sys.call()
     deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent)
 
     # display wrapped call at the top if relevant
@@ -78,7 +92,7 @@ wrap <- function(fun_val, clock, print_fun, visible_only, nm = NULL, print_args 
     success <- !inherits(res, "try-error")
 
     # if rigged fun args have been evaled, print them
-    print_arguments(print_args, nm, mask, print_fun, ej, rigged_fun_exec_env)
+    print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env)
 
     # display wrapped call at the bottom
     cat(deparsed_calls$close, "\n")
@@ -139,19 +153,19 @@ update_globals_on_exit <- function(clock) {
   invisible(NULL)
 }
 
-signal_rigged_function_and_args <- function(nm, mask, ej, print_args, rigged_fun_exec_env) {
+signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rigged_fun_exec_env) {
   # is the wrapped function called by a rigged function?
-  if(!is.null(nm)) {
+  if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
     if(mask$..FIRST_CALL..) {
       # load pryr early to print early "Registered S3 method overwritten..."
       if(print_args) loadNamespace("pryr")
 
-      cat(ej$dots, ej$rig_open, crayon::yellow(nm),"\n", sep = "")
+      cat(ej$dots, ej$rig_open, crayon::yellow(rigged_nm),"\n", sep = "")
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
-        cat(ej$dots, ej$rig_close, crayon::yellow(nm),"\n", sep = "")
+        cat(ej$dots, ej$rig_close, crayon::yellow(rigged_nm),"\n", sep = "")
         mask$..FIRST_CALL.. <- TRUE
         mask$..EVALED_ARGS..[] <- FALSE
       }, envir = rigged_fun_exec_env)
@@ -180,7 +194,7 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
         paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::cyan(call_chr))
     } else {
       deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr))
-      if(getOption("boom.abbreviate")) {
+      if(getOption("boomer.abbreviate")) {
         call_chr <- deparse1(sc[[1]])
       }
       deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
@@ -199,7 +213,7 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
       line1 <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr[1]))
       other_lines <-  paste0(ej$dots, "   ", crayon::cyan(call_chr[-1]))
       deparsed_calls$close <-  paste(c(line1, other_lines), collapse = "\n")
-      if(getOption("boom.abbreviate")) {
+      if(getOption("boomer.abbreviate")) {
         call_chr <- deparse1(sc[[1]])
       }
       if(length(call_chr) > 1) {
@@ -208,8 +222,11 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
       deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
 
       if(crayon::col_nchar(deparsed_calls$open) > 80) {
+        # couldn' find example to test this so using nocov, but it's he same as above
+        # nocov start
         deparsed_calls$open <- paste0(
           crayon::col_substr(deparsed_calls$open, 1, 77), crayon::cyan("..."))
+        # nocov end
       }
     }
   }
@@ -229,8 +246,8 @@ eval_wrapped_call <- function(sc, fun_val, clock, rigged_fun_exec_env) {
   res
 }
 
-print_arguments <- function(print_args, nm, mask, print_fun, ej, rigged_fun_exec_env) {
-  rigged <- !is.null(nm)
+print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env) {
+  rigged <- !is.null(rigged_nm)
   if(!print_args || ! rigged) return(invisible(NULL))
   for (arg in names(mask$..EVALED_ARGS..)) {
     if(!mask$..EVALED_ARGS..[[arg]]) {

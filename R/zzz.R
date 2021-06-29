@@ -9,13 +9,13 @@ promise_evaled <- getFromNamespace("promise_evaled", "pryr")
   #nocov start
   op <- options()
   op.boom <- list(
-    boom.clock = FALSE,
-    boom.print = print,
-    boom.ignore = c("~", "{", "(", "<-", "<<-", "="),
-    boom.visible_only = FALSE,
-    boom.print_args = FALSE,
-    boom.safe_print = FALSE,
-    boom.abbreviate = FALSE
+    boomer.clock = FALSE,
+    boomer.print = print,
+    boomer.ignore = c("~", "{", "(", "<-", "<<-", "="),
+    boomer.visible_only = FALSE,
+    boomer.print_args = TRUE,
+    boomer.safe_print = FALSE,
+    boomer.abbreviate = FALSE
   )
   toset <- !(names(op.boom) %in% names(op))
   if(any(toset)) options(op.boom[toset])

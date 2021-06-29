@@ -1,29 +1,27 @@
 
 #' Print the Output of Intermediate Steps of a Call
 #'
-#' `boom()` will explode a call into the output of its parts.
-#' `rig()` a function to make all the calls of its body `boom()`.
+#' - `boom()` prints the intermediate results of a call or a code chunk.
+#' - `rig()` creates a copy of a function which will display the intermediate
+#' results of all the calls of it body.
+#' - `rig_in_namespace()` rigs a namespaced function in place, so its always
+#' verbose even when called by other existing functions. It is especially handy
+#' for package development.
+#' - `rigger()` provides a convenient way to rig an
+#' anonymous function by using the `rigger(...) + function(...) {...}` syntax.
 #'
 #' @param expr call to explode
 #' @param fun function ro `rig()`
-#' @param clock whether to time intermediate steps, `FALSE` by default unless you
-#' set `options(boom.clock = TRUE)`. The execution time of a step doesn't include the
-#' execution time of its previously printed sub-steps.
-#' @param print A function, a formula or a list of functions or formulas.
-#' @param ignore functions to ignore, defaults to `c("~", "\{", "(", "<-", "<<-", "=")`
-#'   unless the option `"boom.ignore"` is modified. `::` and `:::` are always ignored.
-#' @param visible_only whether functions returning invisibly should be considered,
-#'   by default they are unless the option `"boom.visible_only"` is set to `TRUE`.
-#' @param print_args whether to print the values of the arguments provided to a rigged
-#'   function. They are printed when they are evaluated, if they are evaluated.
+#' @param clock whether to time intermediate steps. Defaults to `getOption("boomer.clock")`
+#' evaluated at run time (`FALSE` unless you change it). The execution time of
+#' a step doesn't include the execution time of its previously printed sub-steps.
+#' @param print A function, a formula or a list of functions or formulas, used to
+#' modify the way the output is printed. Defaults to `getOption("boomer.print")`
+#' evaluated at run time (`base::print` unless you change it)'.
 #'
-#' @details
-#' By default, unless the "boom.print" option  is set to a custom value, the
-#' output of every step is printed in a standard way.
-#'
-#' If you provide another function such, for instance `options(boom.print = str)`
-#' the console output of `str` will be printed. Use `invisible` to display
-#' nothing, another useful alternative would be `dplyr::glimpse`.
+#' If the `print` argument is a function, it will be used to print, or to transform the output
+#' before it's printed. Use `invisible` to display nothing, useful possibilities are
+#' `str` or `dplyr::glimpse`.
 #'
 #' *{rlang}*'s formula notation is supported, so for instance you can type:
 #' `print = ~ dplyr::glimpse(., width = 50)`.
@@ -33,10 +31,11 @@
 #' it will be used as the default, and named elements will define how objects
 #' of the given S3 class are printed. For instance `print = list(str, data.frame = tibble::as_tibble)`
 #'
-#' Modifying the options is especially useful if you want to use the addin
-#' with custom behavior.
-#'
 #' @export
+#' @return `boom()` returns the output of the call. `rig()` returns the modified
+#' input function. `rig_in_namespace()` returns `invisible(NULL)` and is called
+#' for side effects. `rigger()` returns a list containing the arguments, with
+#' the class "rigger" to enable `+.rigger` and `print.rigger`
 #'
 #' @examples
 #' # explode a simple call
@@ -48,16 +47,18 @@
 #' # print str only for data frames
 #' boom(subset(head(mtcars, 2), qsec > 17), print = list(data.frame = str))
 #'
-#' # rig a function
+#' # rig an existing function
 #' rig(ave)(warpbreaks$breaks, warpbreaks$wool)
 #'
-
+#' # rig an anonymous function
+#' fun1 <- rigger() + function(x) x + 1 + 2 # same as rig(function(x) x + 1 + 2))
+#' fun1(1)
+#' fun2 <- rigger(TRUE, typeof) + function(x) x + 1 + 2
+#' fun2(1)
 boom <- function(
   expr,
-  clock = getOption("boom.clock"),
-  print = getOption("boom.print"),
-  ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only")) {
+  clock = NULL,
+  print = NULL) {
 
   # if we are in a pipe chain, explode the chain above
   scs <- sys.calls()
@@ -73,7 +74,7 @@ boom <- function(
   }
 
   fun <- as.function(list(substitute(expr)), envir = parent.frame())
-  fun <- rig_impl(fun, clock, print, ignore, visible_only, nm = NULL)
+  fun <- rig_impl(fun, clock, print, rigged_nm = NULL)
   fun()
 }
 
@@ -81,39 +82,17 @@ boom <- function(
 #' @rdname boom
 rig <- function(
   fun,
-  clock = getOption("boom.clock"),
-  print = getOption("boom.print"),
-  ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only"),
-  print_args = getOption("boom.print_args")) {
-  rig_impl(fun, clock, print, ignore, visible_only,
-           nm = as.character(substitute(fun)),
-           print_args = print_args)
+  clock = NULL,
+  print = NULL) {
+  rig_impl(fun, clock, print, rigged_nm = as.character(substitute(fun)))
 }
 
-#' Create rigged function conveniently
-#'
-#' Allows `rigger(...) + function(...) {...}` syntax to create a rigged function
-#' conveniently.
-#'
-#' @inheritParams boom
-#'
-#' @return a list containing the arguments, with the class "rigger" to enable
-#' `+.rigger` and `print.rigger`
 #' @export
-#' @examples
-#' fun1 <- rigger() + function(x) x + 1 + 2
-#' fun1(1)
-#' fun2 <- rigger(TRUE, typeof) + function(x) x + 1 + 2
-#' fun2(1)
+#' @rdname boom
 rigger <- function(
-  clock = getOption("boom.clock"),
-  print = getOption("boom.print"),
-  ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only"),
-  print_args = getOption("boom.print_args")) {
-  res <- list(
-    clock = clock, print = print, ignore = ignore, visible_only = visible_only)
+  clock = NULL,
+  print = NULL) {
+  res <- list(clock = clock, print = print)
   class(res) <- "rigger"
   res
 }
@@ -133,9 +112,7 @@ print.rigger <- function(x, ...) {
 `+.rigger` <- function(e1, e2) {
   rig(e2,
       clock = e1$clock,
-      print = e1$print,
-      ignore = e1$ignore,
-      visible_only = e1$visible_only)
+      print = e1$print)
 }
 
 
@@ -150,11 +127,8 @@ print.rigger <- function(x, ...) {
 #' @export
 rig_in_namespace <- function(
   ...,
-  clock = getOption("boom.clock"),
-  print = getOption("boom.print"),
-  ignore = getOption("boom.ignore"),
-  visible_only = getOption("boom.visible_only"),
-  print_args = getOption("boom.print_args")) {
+  clock = NULL,
+  print = NULL) {
 
   nms <- as.character(substitute(alist(...))[-1])
   vals <- list(...)
@@ -166,8 +140,7 @@ rig_in_namespace <- function(
 
     nm <- nms[[i]]
     ns <- environment(vals[[i]])
-    vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, ignore = ignore,
-                     visible_only = visible_only, nm = nms[[i]], print_args = print_args)
+    vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, rigged_nm = nms[[i]])
     val <- vals[[i]]
     ub <- unlockBinding
     ub(nm, ns)
@@ -182,8 +155,7 @@ rig_in_namespace <- function(
   wrapped_funs <- mapply(
     wrap,
     rigged_funs,
-    MoreArgs = list(clock = clock, print_fun = print, visible_only = visible_only,
-                    print_args = print_args))
+    MoreArgs = list(clock = clock, print_fun = print))
 
   # add all modified functions to each function's environment
   for(fun in vals) {
