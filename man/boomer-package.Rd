@@ -9,9 +9,9 @@
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
-The 'boomer' package provides debugging tools that let you inspect the
+Provides debugging tools that let you inspect the
     intermediate results of a call. The output looks as if we explode a call
-    into its parts hence the name.
+    into its parts hence the package name.
 }
 \details{
 \itemize{

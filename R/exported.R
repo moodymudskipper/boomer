@@ -97,8 +97,6 @@ rigger <- function(
   res
 }
 
-
-
 #' @export
 print.rigger <- function(x, ...) {
   writeLines(paste0(
@@ -116,15 +114,8 @@ print.rigger <- function(x, ...) {
 }
 
 
-#' rig functions directly in their namespace
-#'
-#' To recover original functions, restart the R session
-#'
-#'
-#' @inheritParams boom
-#' @param ... functions to rig
-#'
 #' @export
+#' @rdname boom
 rig_in_namespace <- function(
   ...,
   clock = NULL,

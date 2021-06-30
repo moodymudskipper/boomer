@@ -4,6 +4,7 @@
 \alias{boom}
 \alias{rig}
 \alias{rigger}
+\alias{rig_in_namespace}
 \title{Print the Output of Intermediate Steps of a Call}
 \usage{
 boom(expr, clock = NULL, print = NULL)
@@ -11,6 +12,8 @@ boom(expr, clock = NULL, print = NULL)
 rig(fun, clock = NULL, print = NULL)
 
 rigger(clock = NULL, print = NULL)
+
+rig_in_namespace(..., clock = NULL, print = NULL)
 }
 \arguments{
 \item{expr}{call to explode}
