@@ -6,9 +6,9 @@ Authors@R:
            family = "Fabri",
            role = c("aut", "cre"),
            email = "antoine.fabri@gmail.com")
-Description: The 'boomer' package provides debugging tools that let you inspect the
+Description: Provides debugging tools that let you inspect the
     intermediate results of a call. The output looks as if we explode a call
-    into its parts hence the name.
+    into its parts hence the package name.
 License: GPL-3
 Encoding: UTF-8
 Language: en
