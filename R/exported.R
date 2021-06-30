@@ -18,6 +18,7 @@
 #' @param print A function, a formula or a list of functions or formulas, used to
 #' modify the way the output is printed. Defaults to `getOption("boomer.print")`
 #' evaluated at run time (`base::print` unless you change it)'.
+#' @... Functions to rig in their namespace
 #'
 #' If the `print` argument is a function, it will be used to print, or to transform the output
 #' before it's printed. Use `invisible` to display nothing, useful possibilities are
