@@ -19,7 +19,13 @@ into its parts hence the name.
 
 ## Installation
 
-Install with:
+Install CRAN version with:
+
+``` r
+install.packages("boomer")
+```
+
+Or development version with:
 
 ``` r
 remotes::install_github("moodymudskipper/boomer")
