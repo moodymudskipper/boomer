@@ -27,6 +27,20 @@ modify the way the output is printed. Defaults to \code{getOption("boomer.print"
 evaluated at run time (\code{base::print} unless you change it)'.}
 
 \item{fun}{function ro \code{rig()}}
+
+\item{...}{Functions to rig in their namespace
+
+If the \code{print} argument is a function, it will be used to print, or to transform the output
+before it's printed. Use \code{invisible} to display nothing, useful possibilities are
+\code{str} or \code{dplyr::glimpse}.
+
+\emph{{rlang}}'s formula notation is supported, so for instance you can type:
+\code{print = ~ dplyr::glimpse(., width = 50)}.
+
+Sometimes you might want to print a specific type of object in a custom way,
+in this case you can provide a named list, if you provide an unnamed element
+it will be used as the default, and named elements will define how objects
+of the given S3 class are printed. For instance \code{print = list(str, data.frame = tibble::as_tibble)}}
 }
 \value{
 \code{boom()} returns the output of the call. \code{rig()} returns the modified
