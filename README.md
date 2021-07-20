@@ -142,7 +142,9 @@ rig_in_namespace(cylinder_vol, disk_area)
 cylinder_vol(3,10)
 ```
 
-![](man/figures/README-9.png) \#\# Addin
+![](man/figures/README-9.png)
+
+## Addin
 
 To avoid typing `boom()` all the time you can use the provided addin
 named *“Explode a call with `boom()`”*: just attribute a key combination

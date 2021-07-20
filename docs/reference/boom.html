@@ -91,7 +91,7 @@ anonymous function by using the rigger(...) + function(...) {...} syntax.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">boomer</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0.9000</span>
       </span>
     </div>
 
@@ -141,7 +141,7 @@ anonymous function by using the rigger(...) + function(...) {...} syntax.
 <li><p><code>boom()</code> prints the intermediate results of a call or a code chunk.</p></li>
 <li><p><code>rig()</code> creates a copy of a function which will display the intermediate
 results of all the calls of it body.</p></li>
-<li><p><code><a href='rig_in_namespace.html'>rig_in_namespace()</a></code> rigs a namespaced function in place, so its always
+<li><p><code>rig_in_namespace()</code> rigs a namespaced function in place, so its always
 verbose even when called by other existing functions. It is especially handy
 for package development.</p></li>
 <li><p><code>rigger()</code> provides a convenient way to rig an
@@ -154,7 +154,9 @@ anonymous function by using the <code>rigger(...) + function(...) {...}</code> s
 
 <span class='fu'>rig</span>(<span class='no'>fun</span>, <span class='kw'>clock</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
 
-<span class='fu'>rigger</span>(<span class='kw'>clock</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+<span class='fu'>rigger</span>(<span class='kw'>clock</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)
+
+<span class='fu'>rig_in_namespace</span>(<span class='no'>...</span>, <span class='kw'>clock</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -173,7 +175,15 @@ a step doesn't include the execution time of its previously printed sub-steps.</
       <th>print</th>
       <td><p>A function, a formula or a list of functions or formulas, used to
 modify the way the output is printed. Defaults to <code><a href='https://rdrr.io/r/base/options.html'>getOption("boomer.print")</a></code>
-evaluated at run time (<code><a href='https://rdrr.io/r/base/print.html'>base::print</a></code> unless you change it)'.</p>
+evaluated at run time (<code><a href='https://rdrr.io/r/base/print.html'>base::print</a></code> unless you change it)'.</p></td>
+    </tr>
+    <tr>
+      <th>fun</th>
+      <td><p>function ro <code>rig()</code></p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Functions to rig in their namespace</p>
 <p>If the <code>print</code> argument is a function, it will be used to print, or to transform the output
 before it's printed. Use <code>invisible</code> to display nothing, useful possibilities are
 <code>str</code> or <code><a href='https://dplyr.tidyverse.org/reference/reexports.html'>dplyr::glimpse</a></code>.</p>
@@ -184,16 +194,12 @@ in this case you can provide a named list, if you provide an unnamed element
 it will be used as the default, and named elements will define how objects
 of the given S3 class are printed. For instance <code>print = list(str, data.frame = tibble::as_tibble)</code></p></td>
     </tr>
-    <tr>
-      <th>fun</th>
-      <td><p>function ro <code>rig()</code></p></td>
-    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p><code>boom()</code> returns the output of the call. <code>rig()</code> returns the modified
-input function. <code><a href='rig_in_namespace.html'>rig_in_namespace()</a></code> returns <code><a href='https://rdrr.io/r/base/invisible.html'>invisible(NULL)</a></code> and is called
+input function. <code>rig_in_namespace()</code> returns <code><a href='https://rdrr.io/r/base/invisible.html'>invisible(NULL)</a></code> and is called
 for side effects. <code>rigger()</code> returns a list containing the arguments, with
 the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code></p>
 
@@ -216,7 +222,7 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 <span class='co'># clock calls and customize how to print output</span>
 <span class='fu'>boom</span>(<span class='fu'><a href='https://rdrr.io/r/base/subset.html'>subset</a></span>(<span class='fu'><a href='https://rdrr.io/r/utils/head.html'>head</a></span>(<span class='no'>mtcars</span>, <span class='fl'>2</span>), <span class='no'>qsec</span> <span class='kw'>&gt;</span> <span class='fl'>17</span>), <span class='kw'>clock</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>print</span> <span class='kw'>=</span> <span class='no'>str</span>)</div><div class='output co'>#&gt; &lt;U+0001F4A3&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span> 
 #&gt; </span><span style='color: #BBBB00;'>· </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>head(mtcars, 2)</span><span> 
-#&gt; </span><span style='color: #0000BB;'>time: 0 us</span><span>
+#&gt; </span><span style='color: #0000BB;'>time: 0.001 s</span><span>
 #&gt; </span><span style='color: #BBBB00;'>· </span><span>'data.frame':	2 obs. of  11 variables:
 #&gt; </span><span style='color: #BBBB00;'>· </span><span> $ mpg : num  21 21
 #&gt; </span><span style='color: #BBBB00;'>· </span><span> $ cyl : num  6 6
@@ -235,7 +241,7 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 #&gt; </span><span style='color: #BBBB00;'>· </span><span> logi [1:2] FALSE TRUE
 #&gt; </span><span style='color: #BBBB00;'>· </span><span>
 #&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>subset(head(mtcars, 2), qsec &gt; 17)</span><span> 
-#&gt; </span><span style='color: #0000BB;'>time: 0.002 s</span><span>
+#&gt; </span><span style='color: #0000BB;'>time: 0.001 s</span><span>
 #&gt; 'data.frame':	1 obs. of  11 variables:
 #&gt;  $ mpg : num 21
 #&gt;  $ cyl : num 6
@@ -307,7 +313,7 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 #&gt; </span><span style='color: #BBBB00;'>· · </span><span style='color: #00BB00;'>FUN :</span><span>
 #&gt; </span><span style='color: #BBBB00;'>· · </span><span>function (x, ...) 
 #&gt; </span><span style='color: #BBBB00;'>· · </span><span>UseMethod("mean")
-#&gt; </span><span style='color: #BBBB00;'>· · </span><span>&lt;bytecode: 0x000000001555bb20&gt;
+#&gt; </span><span style='color: #BBBB00;'>· · </span><span>&lt;bytecode: 0x000000001554c1b0&gt;
 #&gt; </span><span style='color: #BBBB00;'>· · </span><span>&lt;environment: namespace:base&gt;
 #&gt; </span><span style='color: #BBBB00;'>· · </span><span>&lt;U+0001F4A3&gt; &lt;U+0001F4A5&gt; </span><span style='color: #00BBBB;'>split(x, g)</span><span> 
 #&gt; </span><span style='color: #BBBB00;'>· · </span><span>$A
