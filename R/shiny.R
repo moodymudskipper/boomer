@@ -19,77 +19,12 @@ rig_shiny <- function(funs = c(
   if(!requireNamespace("shiny", quietly =  TRUE)) {
     stop("You must install the {shiny} package to use `boomer::rig_shiny()`")
   }
-  # backups
-  globals$shiny_backups <- list()
-  globals$shiny_backups$shinyApp <- shiny::shinyApp
-  # globals$shiny_backups[funs] <- mget(funs, asNamespace("shiny"))
 
   boomer_shims <- sapply(funs, rig_shiny_fun)
   attach(boomer_shims)
-  # for (fun_nm in funs)
-  #   ge <- .GlobalEnv
-  #   assign(fun_nm, rig_shiny_fun(fun_nm), ge)
-  # }
-  #
-  #   reactives <- extract_shiny_reactives(funs)
-  #   selected <- if(select) reactives
-  #
-  #   new_shinyApp <- function(ui, server, ...) {
-  #     ui <- shiny::fluidPage(
-  #       shiny::tabsetPanel(
-  #         shiny::tabPanel("app", ui),
-  #         shiny::tabPanel("boomer log options", shiny::checkboxGroupInput("boomer_checkboxes", "reactives", reactives, selected)))
-  #     )
-  #     on.exit({
-  #       globals <- getFromNamespace("globals", "boomer")
-  #       assign("shinyApp", globals$shiny_backups$shinyApp, asNamespace("shiny"))
-  #       assign("shinyApp", globals$shiny_backups$shinyApp, as.environment("package:shiny"))
-  #       # for(fun_nm in funs) {
-  #       #   assign(fun_nm, boomer:::globals$shiny_backups[[fun_nm]], asNamespace("shiny"))
-  #       #   assign(fun_nm, boomer:::globals$shiny_backups[[fun_nm]], as.environment("package:shiny"))
-  #       # }
-  #     })
-  #     globals$shiny_backups$shinyApp(ui, server, ...)
-  #   }
-  #
-  #
-  #   ub <- unlockBinding
-  #   ub("shinyApp", asNamespace("shiny"))
-  #   ub("shinyApp", as.environment("package:shiny"))
-  #   assign("shinyApp", new_shinyApp, asNamespace("shiny"))
-  #   assign("shinyApp", new_shinyApp, as.environment("package:shiny"))
-  #   # for(fun_nm in funs) {
-  #   #   print(fun_nm)
-  #   #   unlockBinding(fun_nm, asNamespace("shiny"))
-  #   #   unlockBinding(fun_nm, as.environment("package:shiny"))
-  #   #   rigged_fun <- rig_shiny_fun(fun_nm)
-  #   #   assign(fun_nm, rigged_fun, asNamespace("shiny"))
-  #   #   assign(fun_nm, rigged_fun, asNamespace("shiny"))
-  #   # }
-
   trace_shinyApp()
 }
 
-
-#' This should be run on the existing ui if we use runApp rather than shinyApp
-#' @export
-rig_shiny_ui <- function(ui, funs = c(
-  "reactive", "renderCachedPlot", "renderDataTable", "renderImage", "renderPlot",
-  "renderPrint", "renderTable", "renderText", "renderUI"), select = TRUE) {
-
-  if(!requireNamespace("shiny", quietly =  TRUE)) {
-    stop("You must install the {shiny} package to use `boomer::rig_shiny_ui()`")
-  }
-
-  reactives <- extract_shiny_reactives(funs)
-  selected <- if(select) reactives
-
-  shiny::fluidPage(
-    shiny::tabsetPanel(
-      shiny::tabPanel("app", ui),
-      shiny::tabPanel("boomer log options", shiny::checkboxGroupInput("boomer_checkboxes", "reactives", reactives, selected)))
-  )
-}
 
 # returns a rigged shiny reactive function
 # rig() would rig the function's body while `rig_shiny_fun` rigs the `expr` argument of
@@ -98,18 +33,7 @@ rig_shiny_fun <- function(shiny_fun_nm) {
   # the shiny function, such as `reactive`, `renderPlot` etc
   shiny_fun <- getFromNamespace(shiny_fun_nm, "shiny")
   new_body <-  bquote({
-
-    # if(!getOption("boomer.rig_shiny")) {
-    #   sc <- sys.call()
-    #   # replace function by original shiny function
-    #   sc[[1]] <- quote(.(str2lang(paste0("shiny::", shiny_fun_nm))))
-    #   return(eval.parent(sc))
-    # }
-
     # explore the call stack to fetch the variable names and modules
-
-    # NOTE : if this fun is called from inside of the original reactive fun
-    # we need to go a bit further with the sys calls
     sc <- sys.call(-1)
     #sc <- sys.call(-4)
     module_server_fun_nm <- deparse1(sc[[1]])
@@ -126,7 +50,6 @@ rig_shiny_fun <- function(shiny_fun_nm) {
       }
     }
     sc <- sys.call()
-    #sc <- sys.call(-3)
     # sc prints as `{var_nm} <- {shiny_fun_nm}(...)` but is not really this
     # expression, so we need to cheat to build it as an expression
     call <- parse(text=capture.output(sc))[[1]]
@@ -158,8 +81,6 @@ rig_shiny_fun <- function(shiny_fun_nm) {
     eval.parent(sc)
   })
   as.function(c(formals(shiny_fun), new_body))
-  # body(shiny_fun) <- new_body
-  # shiny_fun
 }
 
 extract_shiny_reactives <- function(funs = c(
@@ -207,29 +128,6 @@ extract_shiny_reactives <- function(funs = c(
   }))
 }
 
-# to do :
-# * on shiny's load, populate `globals$rigged_funs`
-# * Have `rig_shiny` and `unrig_shiny` toggle `globals$rig_shiny`
-# * Have the log tab in the ui split by function type
-# * .doTrace cannot return (due to its code using eval.parent(substitute(...)), so we need to implement our own trace analog,
-#   Maybe (?) it would be nice if it could return a trace function, printing as a traced function and that we can disable with `untrace()`
-
-# trace_shiny_funs <- function() {
-#   for(fun in c(
-#     "reactive", "renderCachedPlot", "renderDataTable", "renderImage", "renderPlot",
-#     "renderPrint", "renderTable", "renderText", "renderUI", "shinyApp", "runApp")) {
-#     tracer <- quote({
-# if(getOption("boomer.shiny_rig")) {
-#   rigged_fun <- getFromNamespace("globals", "boomer")$rigged_funs[[fun]]
-#   call <- sys.call()
-#   call[[1]] <- rigged_fun
-#   return(eval.parent(call))
-# }
-#     })
-#     suppressMessages(eval(bquote(trace(.(as.name(fun)), tracer, print = FALSE))))
-#   }
-# }
-
 # trace function in attached package
 trace2 <- function(fun_nm, tracer, pkg = "shiny") {
   ns  <- asNamespace(pkg)
@@ -246,20 +144,6 @@ trace2 <- function(fun_nm, tracer, pkg = "shiny") {
   lb <- lockBinding
   lb(fun_nm, ns)
   lb(fun_nm, sp_env)
-}
-
-trace_shiny_reactive_fun <- function(fun_nm) {
-  tracer <- bquote(
-    if(getOption("boomer.rig_shiny")) {
-      boomer_ns <- asNamespace("boomer")
-      new_fun <- boomer_ns[["globals"]]$shiny_rigged_copies[[.(fun_nm)]]
-      sc <- sys.call()
-      sc[[1]] <- new_fun
-      res <- eval(sc, parent.frame())
-      return(res)
-    }
-  )
-  trace2(fun_nm, tracer)
 }
 
 
@@ -282,59 +166,3 @@ trace_shinyApp <- function(funs = c(
   )
   trace2("shinyApp", tracer)
 }
-
-
-# ça ne peut pas marcher avec des traces car `reactive` est appelé dans le code lui
-# même d'ou des pb de recursion, on va devoir utiliser attach
-
-
-prepend_fun <- function(fun_nm, tracer, pkg = "shiny") {
-  fun <- getFromNamespace(fun_nm, pkg)
-  # prepend body of copy of function
-  body(fun) <- bquote({..(list(tracer, body(fun)))}, splice = TRUE)
-  fun
-}
-
-attach_shiny_shims <- function(select = TRUE) {
-  fun_nms <- c(
-    "reactive", "renderCachedPlot", "renderDataTable", "renderImage", "renderPlot",
-    "renderPrint", "renderTable", "renderText", "renderUI")
-  boomer_shiny_shim <- list()
-  for (fun_nm in fun_nms) {
-    tracer <- bquote(
-      if(getOption("boomer.rig_shiny")) {
-        boomer_ns <- asNamespace("boomer")
-        new_fun <- boomer_ns[["rig_shiny_fun"]](.(fun_nm))
-        sc <- sys.call()
-        sc[[1]] <- new_fun
-        res <- eval(sc, parent.frame())
-        return(res)
-      }
-    )
-    boomer_shiny_shim[[fun_nm]] <- prepend_fun(fun_nm, tracer)
-  }
-  reactives <- extract_shiny_reactives(fun_nms)
-  selected <- if(select) reactives
-
-  tracer <- bquote(
-    if(getOption("boomer.rig_shiny")) {
-      # nest app in "app" tabl and add "boomer log options" tab
-      ui <- shiny::fluidPage(
-        shiny::tabsetPanel(
-          shiny::tabPanel("app", ui),
-          shiny::tabPanel("boomer log options", shiny::checkboxGroupInput(
-            "boomer_checkboxes", "reactives", .(reactives), .(selected)))))
-    }
-  )
-  boomer_shiny_shim[["shinyApp"]] <- prepend_fun("shinyApp", tracer)
-  attach(boomer_shiny_shim)
-}
-
-
-# we must first have modified ("rigged") copies of shiny functions stored in globals
-# at load time of shiny
-
-# then we must "trace" shiny's functions in the namespace, so they fire the
-# modified copies if the "rig_shiny" option is TRUE
-
-
