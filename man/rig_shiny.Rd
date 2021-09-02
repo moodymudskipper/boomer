@@ -2,24 +2,15 @@
 % Please edit documentation in R/shiny.R
 \name{rig_shiny}
 \alias{rig_shiny}
+\alias{unrig_shiny}
 \title{Debug a shiny app using boomer}
 \usage{
-rig_shiny(
-  funs = c("reactive", "renderCachedPlot", "renderDataTable", "renderImage",
-    "renderPlot", "renderPrint", "renderTable", "renderText", "renderUI"),
-  select = TRUE
-)
-}
-\arguments{
-\item{funs}{The reactive functions to be affected, by default \code{reactive()} and
-all \verb{render*()} functions from the \emph{{shiny}} package.}
+rig_shiny()
 
-\item{select}{Whether to debug all reacives (\code{TRUE} by default)}
+unrig_shiny()
 }
 \description{
-\code{rig_shiny()} should be called after your \code{library(shiny)} call,
-it will change your global environment so you might want to refresh your session
-after using it. Note that \code{renderPrint()} captures the printed output and in
-doing so diverts boomer's ouput from the console to the app. We might find a
-way to solve it at some point.
+\code{rig_shiny()} modifies the way shiny works so that a debugging tab will be
+added to the shiny app and selected reactive functions will log their
+refreshed boomed ouput to the console. \code{unrig_shiny()} undoes his action.
 }

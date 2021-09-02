@@ -1,6 +1,7 @@
 # will contain `times` data frame and `last_total_time_end` POSIXct
 globals <- new.env()
 globals$n_indent <- -1
+globals$shiny_rigged <- FALSE
 
 reset_globals <- function() {
   # reset the global times table
