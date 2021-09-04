@@ -3,6 +3,7 @@
 S3method("+",rigger)
 S3method(print,rigger)
 export(boom)
+export(boomApp)
 export(rig)
 export(rig_in_namespace)
 export(rig_shiny)

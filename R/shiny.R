@@ -187,24 +187,57 @@ trace2 <- function(fun_nm, tracer, pkg = "shiny") {
 
 trace_uiHttpHandler <- function() {
   tracer <- bquote({
+    reactives <- getFromNamespace("extract_shiny_reactives", "boomer")()
+    ui <- shiny::fluidPage(
+      shiny::tabsetPanel(
+        shiny::tabPanel("app", ui),
+        shiny::tabPanel("boomer log options", shiny::checkboxGroupInput(
+          "boomer_checkboxes", "reactives", reactives, NULL))))
+  })
+  trace2("uiHttpHandler", tracer)
+}
+
+#' boom the reactive calls of a shiny app
+#'
+#' This works just like `shiny::runApp` and has the exact same parameter,
+#' but runs a modified app that allows for easier debugging. It attaches
+#' the shiny package if its not already attached.
+#' @inheritParams shiny::runApp
+#' @export
+boomApp <- function (
+  appDir = getwd(),
+  port = getOption("shiny.port"),
+  launch.browser = getOption("shiny.launch.browser", interactive()),
+  host = getOption("shiny.host",  "127.0.0.1"),
+  workerId = "",
+  quiet = FALSE,
+  display.mode = c("auto", "normal", "showcase"),
+  test.mode = getOption("shiny.testmode", FALSE)) {
+  if(!requireNamespace("shiny", quietly = TRUE)) {
+    stop("`boomApp` requires the 'shiny' package to be installed")
+  }
+  library(shiny)
+  ns <- asNamespace("shiny")
+
+  with(ns, suppressMessages(trace(
+    print = FALSE,
+    what = uiHttpHandler,
+    tracer = bquote({
       reactives <- getFromNamespace("extract_shiny_reactives", "boomer")()
-      # reactives_df <- setNames(
-      #   as.data.frame(do.call(rbind, strsplit(reactives, "/"))),
-      #   c("server_fun", "variable", "reactive_fun"))
-      # reactive_df_split <- split(reactives_df, reactives_df$server_fun)
-      # browser()
-      # nest app in "app" tabl and add "boomer log options" tab
       ui <- shiny::fluidPage(
         shiny::tabsetPanel(
           shiny::tabPanel("app", ui),
           shiny::tabPanel("boomer log options", shiny::checkboxGroupInput(
             "boomer_checkboxes", "reactives", reactives, NULL))))
-  })
-  trace2("uiHttpHandler", tracer)
-}
+    }))))
 
-# to do : * modules broken down in tabs and reactive objects separated by types
-#         * I think we needed to use shims because the code of shiny itself calls
-#         reactive, we might recognize when it's called from the shiny package
-#         and rig it only if it isn't.
-#         * make it work with runApp
+  sc <- sys.call()
+  sc[[1]] <- quote(shiny::runApp)
+  boomer_shims <- sapply(reactive_funs, rig_shiny_fun)
+  suppressMessages(attach(boomer_shims))
+  on.exit({
+    with(ns, suppressMessages(untrace(uiHttpHandler)))
+    detach(boomer_shims)
+  })
+  eval.parent(sc)
+}
