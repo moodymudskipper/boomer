@@ -2,52 +2,6 @@ reactive_funs <- c(
   "reactive", "renderCachedPlot", "renderDataTable", "renderImage", "renderPlot",
   "renderPrint", "renderTable", "renderText", "renderUI")
 
-ub <- unlockBinding
-lb <- lockBinding
-
-#' Debug a shiny app using boomer
-#'
-#' `rig_shiny()` modifies the way shiny works so that a debugging tab will be
-#'  added to the shiny app and selected reactive functions will log their
-#'  refreshed boomed ouput to the console. `unrig_shiny()` undoes his action.
-#'
-#' @export
-rig_shiny <- function() {
-  unrig_shiny()
-  globals$shinyApp_bkp <- shiny::shinyApp
-
-  if(!requireNamespace("shiny", quietly =  TRUE)) {
-    stop("You must install the {shiny} package to use `boomer::rig_shiny()`")
-  }
-
-  boomer_shims <- sapply(reactive_funs, rig_shiny_fun)
-  attach(boomer_shims)
-  trace_uiHttpHandler()
-  globals$shiny_rigged <- TRUE
-  invisible(NULL)
-}
-
-#' @rdname rig_shiny
-#' @export
-unrig_shiny <- function() {
-  if(globals$shiny_rigged) {
-    detach("boomer_shims")
-    ns  <- asNamespace("shiny")
-    sp_env <- as.environment("package:shiny")
-    fun_nm <- "shinyApp"
-    ub(fun_nm, ns)
-    ub(fun_nm, sp_env)
-    assign("shinyApp", globals$shinyApp_bkp, ns)
-    assign("shinyApp", globals$shinyApp_bkp, sp_env)
-    lb(fun_nm, ns)
-    lb(fun_nm, sp_env)
-    globals$shiny_rigged <- FALSE
-  }
-}
-
-
-
-
 # returns a rigged shiny reactive function
 # rig() would rig the function's body while `rig_shiny_fun` rigs the `expr` argument of
 # render* functions or the x arg of `reactive`
@@ -170,38 +124,23 @@ extract_shiny_reactives <- function() {
   }))
 }
 
-# trace function in attached package
-trace2 <- function(fun_nm, tracer, pkg = "shiny") {
-  ns  <- asNamespace(pkg)
-  #sp_env <- as.environment(paste0("package:", pkg))
-  ub(fun_nm, ns)
-  #ub(fun_nm, sp_env)
-  fun <- ns[[fun_nm]]
-  # prepend body of copy of function
-  body(fun) <- bquote({..(list(tracer, body(fun)))}, splice = TRUE)
-  assign(fun_nm, fun, ns)
-  #assign(fun_nm, fun, sp_env)
-  lb(fun_nm, ns)
-  #lb(fun_nm, sp_env)
-}
 
-trace_uiHttpHandler <- function() {
-  tracer <- bquote({
-    reactives <- getFromNamespace("extract_shiny_reactives", "boomer")()
-    ui <- shiny::fluidPage(
-      shiny::tabsetPanel(
-        shiny::tabPanel("app", ui),
-        shiny::tabPanel("boomer log options", shiny::checkboxGroupInput(
-          "boomer_checkboxes", "reactives", reactives, NULL))))
-  })
-  trace2("uiHttpHandler", tracer)
-}
 
 #' boom the reactive calls of a shiny app
 #'
 #' This works just like `shiny::runApp` and has the exact same parameter,
 #' but runs a modified app that allows for easier debugging. It attaches
 #' the shiny package if its not already attached.
+#'
+#' For this function to work properly the main server function should always be
+#'  assigned to an object (usually you'd name it `server`).
+#'
+#' For instance :
+#' * if you have a `server.R` script, make sure to assign your function to `server`
+#' * if you use `shinyServer`, create a `server` function separately and use it
+#' in your `shinyServer` call.
+#'
+#'
 #' @inheritParams shiny::runApp
 #' @export
 boomApp <- function (

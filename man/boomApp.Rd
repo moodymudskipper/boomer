@@ -59,5 +59,17 @@ only used for recording or running automated tests. Defaults to the
 }
 \description{
 This works just like \code{shiny::runApp} and has the exact same parameter,
-but runs a modified app that allows for easier debugging.
+but runs a modified app that allows for easier debugging. It attaches
+the shiny package if its not already attached.
+}
+\details{
+For this function to work properly the main server function should always be
+assigned to an object (usually you'd name it \code{server}).
+
+For instance :
+\itemize{
+\item if you have a \code{server.R} script, make sure to assign your function to \code{server}
+\item if you use \code{shinyServer}, create a \code{server} function separately and use it
+in your \code{shinyServer} call.
+}
 }
