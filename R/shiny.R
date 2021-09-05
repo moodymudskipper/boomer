@@ -128,9 +128,8 @@ extract_shiny_reactives <- function() {
 
 #' boom the reactive calls of a shiny app
 #'
-#' This works just like `shiny::runApp` and has the exact same parameter,
-#' but runs a modified app that allows for easier debugging. It attaches
-#' the shiny package if its not already attached.
+#' These works just like `shiny::shinyApp` and `shiny::runApp` and have the exact same parameters,
+#' except they create/run a modified app that allows for easier debugging.
 #'
 #' For this function to work properly the main server function should always be
 #'  assigned to an object (usually you'd name it `server`).
@@ -140,10 +139,66 @@ extract_shiny_reactives <- function() {
 #' * if you use `shinyServer`, create a `server` function separately and use it
 #' in your `shinyServer` call.
 #'
+#' I also assumes you follow standard practice in your use of `callModule()` or
+#' `moduleServer()`.
 #'
+#' @inheritParams shiny::shinyApp
 #' @inheritParams shiny::runApp
 #' @export
-boomApp <- function (
+boom_shinyApp <- function (
+  ui,
+  server,
+  onStart = NULL,
+  options = list(),
+  uiPattern = "/",
+  enableBookmarking = NULL) {
+  if(!requireNamespace("shiny", quietly = TRUE)) {
+    stop("`boomApp` requires the 'shiny' package to be installed")
+  }
+  reactives <- getFromNamespace("extract_shiny_reactives", "boomer")()
+  ui <- shiny::fluidPage(
+    shiny::tabsetPanel(
+      shiny::tabPanel("app", ui),
+      shiny::tabPanel("boomer log options", shiny::checkboxGroupInput(
+        "boomer_checkboxes", "reactives", reactives, NULL))))
+
+  res <- shiny::shinyApp(
+    ui,
+    server,
+    onStart,
+    options,
+    uiPattern,
+    enableBookmarking)
+
+  class(res) <- c("shiny.boomed_appobj", class(res))
+  res
+}
+
+#' @export
+print.shiny.boomed_appobj <- function(x, ...) {
+  opts <- if (is.null(x$options) || isTRUE(is.na(x$options))) {
+    list()
+  } else {
+    x$options
+  }
+  opts <- opts[names(opts) %in% c("port", "launch.browser",
+                                  "host", "quiet", "display.mode", "test.mode")]
+  args <- c(list(quote(x)), opts)
+
+  boomer_shims <- sapply(reactive_funs, rig_shiny_fun)
+  # to avoid note, attaching is OK since we detach right away on exit
+  attach_ <- attach
+  suppressMessages(attach_(boomer_shims))
+  on.exit({
+    detach(boomer_shims)
+  })
+  do.call(shiny::runApp, args)
+}
+
+
+#' @rdname boom_shinyApp
+#' @export
+boom_runApp <- function (
   appDir = getwd(),
   port = getOption("shiny.port"),
   launch.browser = getOption("shiny.launch.browser", interactive()),
@@ -186,3 +241,4 @@ boomApp <- function (
   })
   eval.parent(sc)
 }
+

@@ -2,8 +2,10 @@
 
 S3method("+",rigger)
 S3method(print,rigger)
+S3method(print,shiny.boomed_appobj)
 export(boom)
-export(boomApp)
+export(boom_runApp)
+export(boom_shinyApp)
 export(rig)
 export(rig_in_namespace)
 export(rigger)
