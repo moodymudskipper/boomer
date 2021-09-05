@@ -155,7 +155,11 @@ boomApp <- function (
   if(!requireNamespace("shiny", quietly = TRUE)) {
     stop("`boomApp` requires the 'shiny' package to be installed")
   }
-  library(shiny)
+
+  # to avoid note, library is OK since runApp attaches shiny anyway,
+  # but we need to attach it first to make sure ou shims are visible
+  library_ <- library
+  library_("shiny")
   ns <- asNamespace("shiny")
 
   with(ns, suppressMessages(trace(
@@ -173,7 +177,9 @@ boomApp <- function (
   sc <- sys.call()
   sc[[1]] <- quote(shiny::runApp)
   boomer_shims <- sapply(reactive_funs, rig_shiny_fun)
-  suppressMessages(attach(boomer_shims))
+  # to avoid note, attaching is OK since we detach right away on exit
+  attach_ <- attach
+  suppressMessages(attach_(boomer_shims))
   on.exit({
     with(ns, suppressMessages(untrace(uiHttpHandler)))
     detach(boomer_shims)
