@@ -7,7 +7,7 @@
 \alias{boomer}
 \title{boomer: Debugging Tools to Inspect the Intermediate Steps of a Call}
 \description{
-\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
 Provides debugging tools that let you inspect the intermediate results of a call. The output looks as if we explode a call into its parts hence the package name.
 }
