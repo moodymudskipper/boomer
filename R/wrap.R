@@ -251,7 +251,7 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
   if(!print_args || ! rigged) return(invisible(NULL))
   for (arg in names(mask$..EVALED_ARGS..)) {
     if(!mask$..EVALED_ARGS..[[arg]]) {
-      evaled <- promise_evaled(arg, rigged_fun_exec_env)
+      evaled <- promise_evaled_fixed(arg, rigged_fun_exec_env)
       if(evaled) {
         mask$..EVALED_ARGS..[[arg]] <- TRUE
         arg_val <- get(arg, envir = rigged_fun_exec_env)
@@ -262,6 +262,14 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
       }
     }
   }
+}
+
+promise_evaled <- getFromNamespace("promise_evaled", "pryr")
+# fixed so it returns FALSE if arg is missing
+promise_evaled_fixed <- function (name, env) {
+  arg_is_missing <- eval(substitute(missing(ARG), list(ARG = as.symbol(name))), env)
+  if (arg_is_missing) return(FALSE)
+  promise_evaled(name, env)
 }
 
 update_times_df_and_get_true_time <- function(
