@@ -1,6 +1,6 @@
 Package: boomer
 Title: Debugging Tools to Inspect the Intermediate Steps of a Call
-Version: 0.1.0
+Version: 0.1.0.9000
 Authors@R: 
     person(given = "Antoine",
            family = "Fabri",
@@ -23,9 +23,13 @@ Imports:
     styler,
     withr
 Suggests: 
+    shiny,
     lobstr,
     magrittr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
 URL: https://github.com/moodymudskipper/boomer
 BugReports: https://github.com/moodymudskipper/boomer/issues
 Config/testthat/edition: 3
+VignetteBuilder: knitr

@@ -17,7 +17,5 @@ NULL
   )
   toset <- !(names(op.boom) %in% names(op))
   if(any(toset)) options(op.boom[toset])
-
-  invisible(NULL)
   #nocov end
 }

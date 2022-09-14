@@ -1,5 +1,5 @@
 #' @importFrom stats setNames
-#' @importFrom utils getParseData head capture.output
+#' @importFrom utils getParseData head capture.output getFromNamespace
 #' @importFrom methods allNames formalArgs
 #' @aliases boomer boomer-package
 #' @details
