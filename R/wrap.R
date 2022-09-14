@@ -191,13 +191,13 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
   if(length(call_chr) == 1) {
     if(all_args_are_atomic && no_dot_in_args) {
       deparsed_calls$close <-
-        paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::cyan(call_chr))
+        paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::green(file_line(sc)), " ", crayon::cyan(call_chr))
     } else {
-      deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr))
+      deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, crayon::green(file_line(sc)), " ", crayon::cyan(call_chr))
       if(getOption("boomer.abbreviate")) {
         call_chr <- deparse1(sc[[1]])
       }
-      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
+      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::green(file_line(sc)), " ", crayon::cyan(call_chr))
 
       if(crayon::col_nchar(deparsed_calls$open) > 80) {
         deparsed_calls$open <- paste0(
@@ -219,7 +219,7 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
       if(length(call_chr) > 1) {
         call_chr <- paste0(call_chr[1], "...")
       }
-      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
+      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::green(file_line(sc)), " ", crayon::cyan(call_chr))
 
       if(crayon::col_nchar(deparsed_calls$open) > 80) {
         # couldn' find example to test this so using nocov, but it's he same as above
@@ -347,3 +347,8 @@ fetch_print_fun <- function(print_fun, res) {
   print_fun
 }
 
+file_line <- function(call) {
+  file <- getSrcFilename(call)
+  line <- unclass(getSrcref(call))[[1]]
+  paste0(file, ":", line)
+}
