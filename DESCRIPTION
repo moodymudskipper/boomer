@@ -26,7 +26,10 @@ Suggests:
     shiny,
     lobstr,
     magrittr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
 URL: https://github.com/moodymudskipper/boomer
 BugReports: https://github.com/moodymudskipper/boomer/issues
 Config/testthat/edition: 3
+VignetteBuilder: knitr
