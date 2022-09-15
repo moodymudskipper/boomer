@@ -58,7 +58,7 @@ boom(subset(head(mtcars, 2), qsec > 17))
 
 ![](man/figures/README-2.png)
 
-You can use `boom()` with *{magrittr}* pipes, just pipe to `boom()` at the end of a pipe chain.
+You can use `boom()` with *{magrittr}* pipes or base R pipes: just pipe to `boom()` at the end of a pipe chain.
 
 ```{r, eval = FALSE}
 library(magrittr)
@@ -124,8 +124,9 @@ rig(hello)("world")
 
 ## `rig_in_namespace()`
 
-`rig_in_namespace()` was designed to assist package development. Functions are
-rigged in place and we can explode the calls of the bodies of several functions at a time.
+`rig()` creates a copy of a function, but when developing a package we might
+want to rig a function in place so it has a verbose output when called by other
+functions. For this we can use `rig_in_namespace()`.
 
 For instance you might have these functions in a package :
 
@@ -150,6 +151,52 @@ cylinder_vol(3,10)
 ```
 
 ![](man/figures/README-9.png)
+
+## `boom_on()` and `boom_off()`
+
+While debugging a function, call `boom_on()` and all subsequent calls will be boomed,
+call `boom_off()` to return to standard debugging.
+
+![](man/figures/README-10.gif)
+
+## `boom_shinyApp()`
+
+A very experimental feature that allows you to rig the reactives of a shiny app. See `vignette("shiny", "boomer")` for more information.
+
+For the following app, saved in a proper project/package:
+
+```{r, eval = FALSE}
+histogramUI <- function(id) {
+  tagList(
+    selectInput(NS(id, "var"), "Variable", choices = names(mtcars)),
+    numericInput(NS(id, "bins"), "bins", value = 10, min = 1),
+    plotOutput(NS(id, "hist"))
+  )
+}
+
+histogramServer <- function(id) {
+  moduleServer(id, function(input, output, session) {
+    data <- reactive(mtcars[[input$var]])
+    output$hist <- renderPlot({
+      hist(data(), breaks = input$bins, main = input$var)
+    }, res = 96)
+  })
+}
+
+ui <- fluidPage(
+  histogramUI("hist1")
+)
+server <- function(input, output, session) {
+  histogramServer("hist1")
+}
+```
+
+The output of `boom_shinyApp(ui, server)` will look like:
+
+![](man/figures/README-11.gif)
+
+There will be issues, please report!
+
 
 ## Addin
 
