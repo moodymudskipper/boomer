@@ -28,7 +28,8 @@ Suggests:
     magrittr,
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    flow
 URL: https://github.com/moodymudskipper/boomer
 BugReports: https://github.com/moodymudskipper/boomer/issues
 Config/testthat/edition: 3
