@@ -139,7 +139,7 @@ extract_shiny_reactives <- function() {
 #' * if you use `shinyServer`, create a `server` function separately and use it
 #' in your `shinyServer` call.
 #'
-#' I also assumes you follow standard practice in your use of `callModule()` or
+#' It also assumes you follow standard practice in your use of `callModule()` or
 #' `moduleServer()`.
 #'
 #' @inheritParams shiny::shinyApp
