@@ -1,0 +1,109 @@
+---
+title: "How boomer works"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How boomer works}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette summarizes how the internals of boomer work.
+
+## Overview
+
+An important principle of {boomer} is that we don't modify the body of the function
+we rig. 
+
+```{r}
+rigged_file_ext <- boomer::rig(tools::file_ext)
+tools::file_ext
+rigged_file_ext
+```
+
+Instead we copy the original function but give it a new environment. 
+This new environment is a child of the original environment, and is populated with
+shims of the functions called by the original function.
+We call this environment the mask.
+
+```{r}
+# the original environment
+environment(tools::file_ext)
+
+# our new environment
+env <- environment(rigged_file_ext)
+env
+
+# its parent
+parent.env(env)
+
+# its content
+ls(env)
+```
+
+`rig_impl()` does this job and is the main function of the package.
+It calls `wrap()`, the other important function, whose mission is to build verbose shims of functions
+used in the rigged function. Both are detailed thereafter.
+
+## Individual functions
+
+### `boom()` and `rig()`
+
+`boom()` is a wrapper around `rig_impl()` , it rigs the calling function and runs the call,
+it also has some hacky code so we can pipe to `boom()` with {magrittr} (The hack is
+not needed for the base pipe)
+
+### `rig_impl()`
+
+Here's the diagram of dependencies of `rig_impl()`
+
+```{r}
+flow::flow_view_deps(boomer:::rig_impl, show_imports = "packages")
+```
+
+`rig_impl()` :
+
+* Creates a new environment (the mask) as a child of the original environment
+* Populates it with shims of `::` and `:::` so when we find `pkg::fun` or `pkg:::fun`
+ in the original function we don't wrap their output and not the `::` or `:::` operator
+* Populates it with shims of `<-` and `=` so functions created in the original function,
+and thus impossible to shim at "rig time", can be made verbose too.
+* Populates it with shims of all other called functions, using `wrap()`
+* Creates special variables `..FIRST_CALL..` and `..EVALED_ARGS..` in this environment,
+`..FIRST_CALL..` is a boolean initiated to `TRUE` and set to `FALSE` once the first
+wrapper call is triggered,  `..EVALED_ARGS..` is a named logical vector that keeps track of which
+arguments have been evaled.
+
+### `wrap()`
+
+`wrap()` builds verbose wrapper functions.
+
+Its main aim is to print information directly related to the wrapped function 
+(e.g. argument values and execution time).
+
+However it does a couple more things:
+
+* If a wrapper function is the first called it
+prints information signaling that we are entering the rig function, and it sets
+up our rigged function so on exit it will print information that we are exiting it.
+This uses the `..FIRST_CALL..` special variable introduced in above section.
+* It checks if the rigged function's arguments have been evaluated (remember in R
+arguments are not evaluated unless their values are requested down the line) and
+prints them when they are. This uses the `..EVALED_ARGS..`` special variable introduced in above section.
+
+### `rig_in_namespace()`
+
+`rig_in_namespace()` calls `rig_impl()` on its inputs but unlike `rig()` we want
+the rigged functions to be bound in the namespace instead of the original functions.
+
+To do this we unlock the namespace and assigned rigged functions there.
+
+Since `rig_in_namespace()` accepts several functions as arguments, and that they might
+call each other, we also make sure we include wrapped versions of our rigged functions
+in all the masks.

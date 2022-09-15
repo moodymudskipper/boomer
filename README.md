@@ -117,9 +117,9 @@ rig(hello)("world")
 
 ## `rig_in_namespace()`
 
-`rig_in_namespace()` was designed to assist package development.
-Functions are rigged in place and we can explode the calls of the bodies
-of several functions at a time.
+`rig()` creates a copy of a function, but when developing a package we
+might want to rig a function in place so it has a verbose output when
+called by other functions. For this we can use `rig_in_namespace()`.
 
 For instance you might have these functions in a package :
 
@@ -187,6 +187,8 @@ server <- function(input, output, session) {
 The output of `boom_shinyApp(ui, server)` will look like:
 
 ![](man/figures/README-11.gif)
+
+There will be issues, please report!
 
 ## Addin
 
