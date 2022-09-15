@@ -1,6 +1,8 @@
-pandoc: 2.7.3
-pkgdown: 1.5.1
+pandoc: 2.17.1.1
+pkgdown: 2.0.1
 pkgdown_sha: ~
-articles: []
-last_built: 2021-07-20T11:58Z
+articles:
+  how-boomer-works: how-boomer-works.html
+  shiny: shiny.html
+last_built: 2022-09-15T20:28Z
 
