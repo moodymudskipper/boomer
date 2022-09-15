@@ -3,6 +3,9 @@
 #' @importFrom methods allNames formalArgs
 NULL
 
+# Use {pryr} to avoid note
+quote(pryr::f())
+
 .onLoad <- function(libname, pkgname) {
   #nocov start
   op <- options()
