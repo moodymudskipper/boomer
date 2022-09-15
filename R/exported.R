@@ -82,10 +82,18 @@ boom <- function(
 #' @export
 #' @rdname boom
 rig <- function(
-  fun,
-  clock = NULL,
-  print = NULL) {
-  rig_impl(fun, clock, print, rigged_nm = as.character(substitute(fun)))
+    fun,
+    clock = NULL,
+    print = NULL
+) {
+  fun_lng <- substitute(fun)
+  if (!is.function(fun)) stop("`fun` should evaluate to a function")
+  if (is.symbol(fun_lng) || rlang::is_call(fun_lng, "::") || rlang::is_call(fun_lng, "::"))  {
+    fun_chr <- paste(deparse(fun_lng), collapse="")
+  } else {
+    stop("`fun` should be provided in one of these forms : `f`, `pkg::f` or `pkg:::f`")
+  }
+  rig_impl(fun, clock, print, rigged_nm = fun_chr)
 }
 
 #' @export
