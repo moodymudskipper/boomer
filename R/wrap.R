@@ -63,9 +63,14 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     print_args <- getOption("boomer.print_args")
     safe_print <- getOption("boomer.safe_print")
 
-    # fetch rigged function's execution env
-    # this is not always right but this is always right for the first call
-    rigged_fun_exec_env <- parent.frame()
+
+    wrapped_fun_caller_env <- parent.frame()
+    # fetch rigged function's execution env, it's the wrapped_fun_caller_env
+    # only at the top level
+    rigged_fun_exec_env <- wrapped_fun_caller_env
+    while (!identical(parent <- parent.env(rigged_fun_exec_env), mask)) {
+      rigged_fun_exec_env <- parent
+    }
 
     # set indentation
     globals$n_indent <- globals$n_indent + 1
@@ -88,7 +93,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     }
 
     # evaluate call with original wrapped function
-    res <- try(eval_wrapped_call(sc, fun_val, clock, rigged_fun_exec_env), silent = TRUE)
+    res <- try(eval_wrapped_call(sc, fun_val, clock, wrapped_fun_caller_env), silent = TRUE)
     success <- !inherits(res, "try-error")
 
     # if rigged fun args have been evaled, print them
@@ -267,7 +272,9 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
 promise_evaled <- getFromNamespace("promise_evaled", "pryr")
 # fixed so it returns FALSE if arg is missing
 promise_evaled_fixed <- function (name, env) {
-  arg_is_missing <- eval(substitute(missing(ARG), list(ARG = as.symbol(name))), env)
+  expr <- substitute(missing(ARG), list(ARG = as.symbol(name)))
+  expr[[1]] <- missing # so it does not collide with a local definition of `missing()`
+  arg_is_missing <- eval(expr, env)
   if (arg_is_missing) return(FALSE)
   promise_evaled(name, env)
 }
