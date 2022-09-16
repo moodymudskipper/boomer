@@ -77,5 +77,5 @@ For instance if we set the number of bins to 15 we will see:
 ![](shiny-3.png){width=600}
 
 
-We hope that this can save developpers from the chore of running and stopping apps repeatedly
+We hope that this can save developers from the chore of running and stopping apps repeatedly
 with different variations of debugging code cluttered in various places.

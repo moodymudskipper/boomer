@@ -1,7 +1,7 @@
 #' @importFrom stats setNames
 #' @importFrom utils getParseData head capture.output
 #' @importFrom methods allNames formalArgs
-#' @importFrom pryr adress
+#' @importFrom pryr address
 NULL
 
 .onLoad <- function(libname, pkgname) {
