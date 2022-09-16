@@ -4,7 +4,7 @@
 #' call `boom_off()` to return to standard debugging.
 #' @inheritParams boom
 #' @export
-#' @value Returns `NULL` invisibly, called for side effects.
+#' @return Returns `NULL` invisibly, called for side effects.
 boom_on <- function(clock = NULL, print = NULL) {
   fun <- sys.function(-1)
   rigged_fun <- rig_impl(fun, clock, print, rigged_nm = NULL)

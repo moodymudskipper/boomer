@@ -18,6 +18,9 @@ a step doesn't include the execution time of its previously printed sub-steps.}
 modify the way the output is printed. Defaults to \code{getOption("boomer.print")}
 evaluated at run time (\code{base::print} unless you change it)'.}
 }
+\value{
+Returns \code{NULL} invisibly, called for side effects.
+}
 \description{
 While debugging a function, call \code{boom_on()} and all subsequent calls will be boomed,
 call \code{boom_off()} to return to standard debugging.
