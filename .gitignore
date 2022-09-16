@@ -5,3 +5,5 @@ inst/doc
 .httr-oauth
 /doc/
 /Meta/
+.DS_Store
+man/.DS_Store
