@@ -145,6 +145,7 @@ extract_shiny_reactives <- function() {
 #' @inheritParams shiny::shinyApp
 #' @inheritParams shiny::runApp
 #' @export
+#' @return See `?shiny::shinyApp` and `?shiny::runApp`
 boom_shinyApp <- function (
   ui,
   server,

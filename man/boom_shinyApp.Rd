@@ -92,6 +92,9 @@ in its \code{DESCRIPTION} file, if any.}
 only used for recording or running automated tests. Defaults to the
 \code{shiny.testmode} option, or FALSE if the option is not set.}
 }
+\value{
+See \code{?shiny::shinyApp} and \code{?shiny::runApp}
+}
 \description{
 These works just like \code{shiny::shinyApp} and \code{shiny::runApp} and have the exact same parameters,
 except they create/run a modified app that allows for easier debugging.
