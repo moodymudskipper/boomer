@@ -7,3 +7,6 @@
 ^pkgdown$
 ^cran-comments\.md$
 ^CRAN-RELEASE$
+^\.httr-oauth$
+^doc$
+^Meta$

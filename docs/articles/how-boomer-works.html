@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">boomer</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
       </span>
     </div>
 
@@ -112,7 +112,7 @@ of the function we rig.</p>
 <span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span>
 <span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x11dd51810&gt;</span>
+<span class="co">#&gt; &lt;bytecode: 0x14b26f770&gt;</span>
 <span class="co">#&gt; &lt;environment: namespace:tools&gt;</span>
 <span class="va">rigged_file_ext</span>
 <span class="co">#&gt; function (x) </span>
@@ -120,7 +120,7 @@ of the function we rig.</p>
 <span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span>
 <span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span>
 <span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;environment: 0x11deaa1f8&gt;</span></code></pre></div>
+<span class="co">#&gt; &lt;environment: 0x14b33dda8&gt;</span></code></pre></div>
 <p>Instead we copy the original function but give it a new environment.
 This new environment is a child of the original environment, and is
 populated with shims of the functions called by the original function.
@@ -133,7 +133,7 @@ We call this environment the mask.</p>
 <span class="co"># our new environment</span>
 <span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="va">rigged_file_ext</span><span class="op">)</span>
 <span class="va">env</span>
-<span class="co">#&gt; &lt;environment: 0x11deaa1f8&gt;</span>
+<span class="co">#&gt; &lt;environment: 0x14b33dda8&gt;</span>
 
 <span class="co"># its parent</span>
 <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">parent.env</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span>
@@ -167,8 +167,8 @@ needed for the base pipe)</p>
 <p>Here’s the diagram of dependencies of <code>rig_impl()</code></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">flow</span><span class="fu">::</span><span class="fu"><a href="https://moodymudskipper.github.io/flow/reference/flow_view_deps.html" class="external-link">flow_view_deps</a></span><span class="op">(</span><span class="fu">boomer</span><span class="fu">:::</span><span class="va">rig_impl</span>, show_imports <span class="op">=</span> <span class="st">"packages"</span><span class="op">)</span></code></pre></div>
-<div id="htmlwidget-8e1eaea23d931d260e5f" style="width:700px;height:432.632880098888px;" class="nomnoml html-widget"></div>
-<script type="application/json" data-for="htmlwidget-8e1eaea23d931d260e5f">{"x":{"code":"# direction: right\n#.expfun: visual=roundrect fill=#ddebf7 title=bold\n#.unexpfun: visual=roundrect fill=#fff2cc title=bold\n#.trimmed: visual=roundrect fill=#fce4d6 dashed title=bold\n#.expdata: visual=database fill=#e2efda title=bold\n#.unexpdata: visual=database fill=#fff2cc title=bold\n#.callroutine: visual=transceiver fill=#ededed\n[<unexpfun> rig_impl (33)|{methods}|{stats}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> build_shimmed_assign (16)]\n[<unexpfun> build_shimmed_assign (16)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> build_deparsed_calls (53)|{crayon}|{styler}]\n[<unexpfun> wrap (65)] -> [<unexpfun> eval_wrapped_call (11)|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> print_arguments (16)|{crayon}|{utils}]\n[<unexpfun> print_arguments (16)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> print_arguments (16)] -> [<unexpfun> promise_evaled_fixed (6)]\n[<unexpfun> promise_evaled_fixed (6)] -> [<unexpfun> promise_evaled (1)]\n[<unexpfun> wrap (65)] -> [<unexpfun> set_emojis (16)|{crayon}]\n[<unexpfun> wrap (65)] -> [<unexpfun> signal_rigged_function_and_args (15)|{crayon}|{withr}]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_globals_on_exit (4)]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_times_df_and_get_true_time (31)]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> double_colon (9)]\n[<unexpfun> double_colon (9)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> fetch_functions (14)|{graphics}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> reset_globals (6)]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> triple_colon (9)]\n[<unexpfun> triple_colon (9)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> build_deparsed_calls (53)|{crayon}|{styler}]\n[<unexpfun> wrap (65)] -> [<unexpfun> eval_wrapped_call (11)|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> print_arguments (16)|{crayon}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> set_emojis (16)|{crayon}]\n[<unexpfun> wrap (65)] -> [<unexpfun> signal_rigged_function_and_args (15)|{crayon}|{withr}]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_globals_on_exit (4)]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_times_df_and_get_true_time (31)]","svg":true},"evals":[],"jsHooks":[]}</script><p><code>rig_impl()</code> :</p>
+<div id="htmlwidget-363102c831d49f422558" style="width:700px;height:432.632880098888px;" class="nomnoml html-widget"></div>
+<script type="application/json" data-for="htmlwidget-363102c831d49f422558">{"x":{"code":"# direction: right\n#.expfun: visual=roundrect fill=#ddebf7 title=bold\n#.unexpfun: visual=roundrect fill=#fff2cc title=bold\n#.trimmed: visual=roundrect fill=#fce4d6 dashed title=bold\n#.expdata: visual=database fill=#e2efda title=bold\n#.unexpdata: visual=database fill=#fff2cc title=bold\n#.callroutine: visual=transceiver fill=#ededed\n[<unexpfun> rig_impl (33)|{methods}|{stats}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> build_shimmed_assign (16)]\n[<unexpfun> build_shimmed_assign (16)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> build_deparsed_calls (53)|{crayon}|{styler}]\n[<unexpfun> wrap (65)] -> [<unexpfun> eval_wrapped_call (11)|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> print_arguments (16)|{crayon}|{utils}]\n[<unexpfun> print_arguments (16)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> print_arguments (16)] -> [<unexpfun> promise_evaled_fixed (6)]\n[<unexpfun> promise_evaled_fixed (6)] -> [<unexpfun> promise_evaled (1)]\n[<unexpfun> wrap (65)] -> [<unexpfun> set_emojis (16)|{crayon}]\n[<unexpfun> wrap (65)] -> [<unexpfun> signal_rigged_function_and_args (15)|{crayon}|{withr}]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_globals_on_exit (4)]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_times_df_and_get_true_time (31)]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> double_colon (9)]\n[<unexpfun> double_colon (9)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> fetch_functions (14)|{graphics}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> reset_globals (6)]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> triple_colon (9)]\n[<unexpfun> triple_colon (9)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> build_deparsed_calls (53)|{crayon}|{styler}]\n[<unexpfun> wrap (65)] -> [<unexpfun> eval_wrapped_call (11)|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> print_arguments (16)|{crayon}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> set_emojis (16)|{crayon}]\n[<unexpfun> wrap (65)] -> [<unexpfun> signal_rigged_function_and_args (15)|{crayon}|{withr}]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_globals_on_exit (4)]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_times_df_and_get_true_time (31)]","svg":true},"evals":[],"jsHooks":[]}</script><p><code>rig_impl()</code> :</p>
 <ul>
 <li>Creates a new environment (the mask) as a child of the original
 environment</li>

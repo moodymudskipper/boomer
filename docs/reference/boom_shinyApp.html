@@ -18,7 +18,7 @@ except they create/run a modified app that allows for easier debugging."><meta p
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">boomer</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
       </span>
     </div>
 
@@ -157,6 +157,10 @@ in its <code>DESCRIPTION</code> file, if any.</p></dd>
 only used for recording or running automated tests. Defaults to the
 <code>shiny.testmode</code> option, or FALSE if the option is not set.</p></dd>
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    <p>See <code><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">?shiny::shinyApp</a></code> and <code><a href="https://rdrr.io/pkg/shiny/man/runApp.html" class="external-link">?shiny::runApp</a></code></p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>For this function to work properly the main server function should always be
@@ -164,7 +168,7 @@ assigned to an object (usually you'd name it <code>server</code>).</p>
 <p>For instance :</p><ul><li><p>if you have a <code>server.R</code> script, make sure to assign your function to <code>server</code></p></li>
 <li><p>if you use <code>shinyServer</code>, create a <code>server</code> function separately and use it
 in your <code>shinyServer</code> call.</p></li>
-</ul><p>I also assumes you follow standard practice in your use of <code>callModule()</code> or
+</ul><p>It also assumes you follow standard practice in your use of <code>callModule()</code> or
 <code>moduleServer()</code>.</p>
     </div>
 

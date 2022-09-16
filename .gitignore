@@ -1,3 +1,7 @@
 .Rhistory
 .RData
 .Rproj.user
+inst/doc
+.httr-oauth
+/doc/
+/Meta/
