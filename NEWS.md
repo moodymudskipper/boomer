@@ -1,3 +1,13 @@
+# boomer 0.1.1
+
+* Call `boom_on()` and `boom_off()` when browsing to toggle "boom debugging" on and off
+* Call `boom_shinyApp()` and `boom_runApp()` to start a shiny app as you would with {shiny}'s
+`shinyApp()` and `runApp()`, but making chosen reactives verbose (very experimental).
+* A new vignette for the above
+* Another new vignette summarizing how {boomer} works
+* {boomer} doesn't choke anymore in case of missing arguments
+* Rigged function names are displayed better when rig is called on a namespaced call
+
 # boomer 0.1.0
 
 * Call `boom()` to explode a call and print outputs of intermediate steps
