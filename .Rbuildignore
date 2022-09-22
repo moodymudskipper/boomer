@@ -10,3 +10,4 @@
 ^\.httr-oauth$
 ^doc$
 ^Meta$
+^CRAN-SUBMISSION$
