@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/404.html</loc>
   </url>
   <url>
-    <loc>/articles/how-boomer-works.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/articles/how-boomer-works.html</loc>
   </url>
   <url>
-    <loc>/articles/index.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/articles/index.html</loc>
   </url>
   <url>
-    <loc>/articles/shiny.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/articles/shiny.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/authors.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/index.html</loc>
   </url>
   <url>
-    <loc>/news/index.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/news/index.html</loc>
   </url>
   <url>
-    <loc>/reference/boom.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/reference/boom.html</loc>
   </url>
   <url>
-    <loc>/reference/boom_on.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/reference/boom_on.html</loc>
   </url>
   <url>
-    <loc>/reference/boom_shinyApp.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/reference/boom_shinyApp.html</loc>
   </url>
   <url>
-    <loc>/reference/boomer-package.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/reference/boomer-package.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://moodymudskipper.github.io/boomer/reference/index.html</loc>
   </url>
 </urlset>
