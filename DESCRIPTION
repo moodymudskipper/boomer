@@ -30,6 +30,8 @@ Suggests:
     knitr,
     rmarkdown,
     flow
+Remotes:
+    moodymudskipper/flow
 URL: https://github.com/moodymudskipper/boomer
 BugReports: https://github.com/moodymudskipper/boomer/issues
 Config/testthat/edition: 3
