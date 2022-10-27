@@ -92,7 +92,8 @@
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>An important principle of {boomer} is that we don’t modify the body of the function we rig.</p>
+<p>An important principle of {boomer} is that we don’t modify the body
+of the function we rig.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rigged_file_ext</span> <span class="op">&lt;-</span> <span class="fu">boomer</span><span class="fu">::</span><span class="fu"><a href="../reference/boom.html">rig</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span><span class="op">)</span></span>
 <span><span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span></span>
@@ -101,7 +102,7 @@
 <span><span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span></span>
 <span><span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55d18cc24bd8&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55af33d857b8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:tools&gt;</span></span>
 <span><span class="va">rigged_file_ext</span></span>
 <span><span class="co">#&gt; function (x) </span></span>
@@ -109,8 +110,11 @@
 <span><span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span></span>
 <span><span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55d18cd29808&gt;</span></span></code></pre></div>
-<p>Instead we copy the original function but give it a new environment. This new environment is a child of the original environment, and is populated with shims of the functions called by the original function. We call this environment the mask.</p>
+<span><span class="co">#&gt; &lt;environment: 0x55af33e8a3e8&gt;</span></span></code></pre></div>
+<p>Instead we copy the original function but give it a new environment.
+This new environment is a child of the original environment, and is
+populated with shims of the functions called by the original function.
+We call this environment the mask.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># the original environment</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span><span class="op">)</span></span>
@@ -119,7 +123,7 @@
 <span><span class="co"># our new environment</span></span>
 <span><span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="va">rigged_file_ext</span><span class="op">)</span></span>
 <span><span class="va">env</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55d18cd29808&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55af33e8a3e8&gt;</span></span>
 <span></span>
 <span><span class="co"># its parent</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">parent.env</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span></span>
@@ -129,7 +133,10 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  [1] "-"         "::"        ":::"       "("         "{"         "+"        </span></span>
 <span><span class="co">#&gt;  [7] "&lt;-"        "="         "&gt;"         "ifelse"    "regexpr"   "substring"</span></span></code></pre></div>
-<p><code>rig_impl()</code> does this job and is the main function of the package. It calls <code>wrap()</code>, the other important function, whose mission is to build verbose shims of functions used in the rigged function. Both are detailed thereafter.</p>
+<p><code>rig_impl()</code> does this job and is the main function of the
+package. It calls <code>wrap()</code>, the other important function,
+whose mission is to build verbose shims of functions used in the rigged
+function. Both are detailed thereafter.</p>
 </div>
 <div class="section level2">
 <h2 id="individual-functions">Individual functions<a class="anchor" aria-label="anchor" href="#individual-functions"></a>
@@ -138,7 +145,10 @@
 <h3 id="boom-and-rig">
 <code>boom()</code> and <code>rig()</code><a class="anchor" aria-label="anchor" href="#boom-and-rig"></a>
 </h3>
-<p><code><a href="../reference/boom.html">boom()</a></code> is a wrapper around <code>rig_impl()</code> , it rigs the calling function and runs the call, it also has some hacky code so we can pipe to <code><a href="../reference/boom.html">boom()</a></code> with {magrittr} (The hack is not needed for the base pipe)</p>
+<p><code><a href="../reference/boom.html">boom()</a></code> is a wrapper around <code>rig_impl()</code> , it
+rigs the calling function and runs the call, it also has some hacky code
+so we can pipe to <code><a href="../reference/boom.html">boom()</a></code> with {magrittr} (The hack is not
+needed for the base pipe)</p>
 </div>
 <div class="section level3">
 <h3 id="rig_impl">
@@ -150,12 +160,24 @@
 <span><span class="co">#&gt; Error in get(target_fun_name, default_env): object 'boomer:::rig_impl' not found</span></span></code></pre></div>
 <p><code>rig_impl()</code> :</p>
 <ul>
-<li>Creates a new environment (the mask) as a child of the original environment</li>
-<li>Populates it with shims of <code>::</code> and <code>:::</code> so when we find <code>pkg::fun</code> or <code>pkg:::fun</code> in the original function we don’t wrap their output and not the <code>::</code> or <code>:::</code> operator</li>
-<li>Populates it with shims of <code>&lt;-</code> and <code>=</code> so functions created in the original function, and thus impossible to shim at “rig time”, can be made verbose too.</li>
-<li>Populates it with shims of all other called functions, using <code>wrap()</code>
+<li>Creates a new environment (the mask) as a child of the original
+environment</li>
+<li>Populates it with shims of <code>::</code> and <code>:::</code> so
+when we find <code>pkg::fun</code> or <code>pkg:::fun</code> in the
+original function we don’t wrap their output and not the <code>::</code>
+or <code>:::</code> operator</li>
+<li>Populates it with shims of <code>&lt;-</code> and <code>=</code> so
+functions created in the original function, and thus impossible to shim
+at “rig time”, can be made verbose too.</li>
+<li>Populates it with shims of all other called functions, using
+<code>wrap()</code>
 </li>
-<li>Creates special variables <code>..FIRST_CALL..</code> and <code>..EVALED_ARGS..</code> in this environment, <code>..FIRST_CALL..</code> is a boolean initiated to <code>TRUE</code> and set to <code>FALSE</code> once the first wrapper call is triggered, <code>..EVALED_ARGS..</code> is a named logical vector that keeps track of which arguments have been evaled.</li>
+<li>Creates special variables <code>..FIRST_CALL..</code> and
+<code>..EVALED_ARGS..</code> in this environment,
+<code>..FIRST_CALL..</code> is a boolean initiated to <code>TRUE</code>
+and set to <code>FALSE</code> once the first wrapper call is triggered,
+<code>..EVALED_ARGS..</code> is a named logical vector that keeps track
+of which arguments have been evaled.</li>
 </ul>
 </div>
 <div class="section level3">
@@ -163,20 +185,33 @@
 <code>wrap()</code><a class="anchor" aria-label="anchor" href="#wrap"></a>
 </h3>
 <p><code>wrap()</code> builds verbose wrapper functions.</p>
-<p>Its main aim is to print information directly related to the wrapped function (e.g. argument values and execution time).</p>
+<p>Its main aim is to print information directly related to the wrapped
+function (e.g. argument values and execution time).</p>
 <p>However it does a couple more things:</p>
 <ul>
-<li>If a wrapper function is the first called it prints information signaling that we are entering the rig function, and it sets up our rigged function so on exit it will print information that we are exiting it. This uses the <code>..FIRST_CALL..</code> special variable introduced in above section.</li>
-<li>It checks if the rigged function’s arguments have been evaluated (remember in R arguments are not evaluated unless their values are requested down the line) and prints them when they are. This uses the `..EVALED_ARGS..`` special variable introduced in above section.</li>
+<li>If a wrapper function is the first called it prints information
+signaling that we are entering the rig function, and it sets up our
+rigged function so on exit it will print information that we are exiting
+it. This uses the <code>..FIRST_CALL..</code> special variable
+introduced in above section.</li>
+<li>It checks if the rigged function’s arguments have been evaluated
+(remember in R arguments are not evaluated unless their values are
+requested down the line) and prints them when they are. This uses the
+`..EVALED_ARGS..`` special variable introduced in above section.</li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="rig_in_namespace">
 <code>rig_in_namespace()</code><a class="anchor" aria-label="anchor" href="#rig_in_namespace"></a>
 </h3>
-<p><code><a href="../reference/boom.html">rig_in_namespace()</a></code> calls <code>rig_impl()</code> on its inputs but unlike <code><a href="../reference/boom.html">rig()</a></code> we want the rigged functions to be bound in the namespace instead of the original functions.</p>
-<p>To do this we unlock the namespace and assigned rigged functions there.</p>
-<p>Since <code><a href="../reference/boom.html">rig_in_namespace()</a></code> accepts several functions as arguments, and that they might call each other, we also make sure we include wrapped versions of our rigged functions in all the masks.</p>
+<p><code><a href="../reference/boom.html">rig_in_namespace()</a></code> calls <code>rig_impl()</code> on its
+inputs but unlike <code><a href="../reference/boom.html">rig()</a></code> we want the rigged functions to be
+bound in the namespace instead of the original functions.</p>
+<p>To do this we unlock the namespace and assigned rigged functions
+there.</p>
+<p>Since <code><a href="../reference/boom.html">rig_in_namespace()</a></code> accepts several functions as
+arguments, and that they might call each other, we also make sure we
+include wrapped versions of our rigged functions in all the masks.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
