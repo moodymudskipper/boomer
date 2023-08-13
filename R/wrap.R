@@ -89,7 +89,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
-      cat(deparsed_calls$open, "\n", sep = "")
+      writeLines(deparsed_calls$open)
     }
 
     # evaluate call with original wrapped function
@@ -100,7 +100,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env)
 
     # display wrapped call at the bottom
-    cat(deparsed_calls$close, "\n", sep = "")
+    writeLines(deparsed_calls$close)
 
     # rethrow error on failure
     if (!success) {
@@ -166,11 +166,11 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
       # load pryr early to print early "Registered S3 method overwritten..."
       if(print_args) loadNamespace("pryr")
 
-      cat(ej$dots, ej$rig_open, crayon::yellow(rigged_nm),"\n", sep = "")
+      writeLines(paste0(ej$dots, ej$rig_open, crayon::yellow(rigged_nm)))
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
-        cat(ej$dots, ej$rig_close, crayon::yellow(rigged_nm),"\n", sep = "")
+        writeLines(paste0(ej$dots, ej$rig_close, crayon::yellow(rigged_nm)))
         mask$..FIRST_CALL.. <- TRUE
         mask$..EVALED_ARGS..[] <- FALSE
       }, envir = rigged_fun_exec_env)
