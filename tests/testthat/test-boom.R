@@ -59,10 +59,16 @@ test_that("clock arg works", {
   # can't reproduce output because time can change between iterations
   # so just taking that it doesn't fail
   expect_error(
-    boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE), NA
+    capture.output(
+      boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE)
+    ),
+    NA
   )
   expect_error(
-    boom(base::subset(utils:::head(mtcars, 2), qsec > 17), clock = TRUE), NA
+    capture.output(
+      boom(base::subset(utils:::head(mtcars, 2), qsec > 17), clock = TRUE)
+    ),
+    NA
   )
 })
 
@@ -121,6 +127,8 @@ test_that("functions created at runtime are boomed", {
 })
 
 test_that("assignments work", {
+  skip_if(getRversion() < "4.0")
+
   expect_snapshot({
     boom({
       x <- 1 + 2
@@ -129,14 +137,13 @@ test_that("assignments work", {
       v = quote(a)
     })
 
-    options(boomer.ignore = NULL)
+    withr::local_options(boomer.ignore = NULL)
     boom({
       x <- 1 + 2
       y <- quote(a)
       u = 1 + 2
       v = quote(a)
     })
-    options(boomer.ignore = c("~", "{", "(", "<-", "<<-", "="))
   })
 })
 
