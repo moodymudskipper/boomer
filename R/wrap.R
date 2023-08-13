@@ -89,7 +89,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
-      cat(deparsed_calls$open, "\n")
+      cat(deparsed_calls$open, "\n", sep = "")
     }
 
     # evaluate call with original wrapped function
@@ -100,7 +100,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env)
 
     # display wrapped call at the bottom
-    cat(deparsed_calls$close, "\n")
+    cat(deparsed_calls$close, "\n", sep = "")
 
     # rethrow error on failure
     if (!success) {
