@@ -59,10 +59,16 @@ test_that("clock arg works", {
   # can't reproduce output because time can change between iterations
   # so just taking that it doesn't fail
   expect_error(
-    boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE), NA
+    capture.output(
+      boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE)
+    ),
+    NA
   )
   expect_error(
-    boom(base::subset(utils:::head(mtcars, 2), qsec > 17), clock = TRUE), NA
+    capture.output(
+      boom(base::subset(utils:::head(mtcars, 2), qsec > 17), clock = TRUE)
+    ),
+    NA
   )
 })
 
