@@ -46,6 +46,8 @@ with all systems. This is useful for reprexes (see {reprex} package) and
 for knitted report in case the output of those doesn't look good on your system.
 \item \code{boomer.abbreviate}: Whether to show only the function's name rather than the
 call when it's entered.
+\item \code{boomer.path}: A file path to write the output to. By default, output is written
+to the console (standard output). Requires the fansi package.
 }
 }
 

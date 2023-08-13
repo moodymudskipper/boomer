@@ -62,6 +62,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     visible_only <- getOption("boomer.visible_only")
     print_args <- getOption("boomer.print_args")
     safe_print <- getOption("boomer.safe_print")
+    path <- getOption("boomer.path")
 
 
     wrapped_fun_caller_env <- parent.frame()
@@ -82,14 +83,14 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     on.exit(update_globals_on_exit(clock))
 
     # !!! this adds calls on.exit of caller (rigged) function !!!
-    signal_rigged_function_and_args(rigged_nm, mask, ej, print_args, rigged_fun_exec_env)
+    signal_rigged_function_and_args(rigged_nm, mask, ej, print_args, rigged_fun_exec_env, path)
 
     # build calls to be displayed on top and bottom of wrapped call
     deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent)
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
-      append_lines(deparsed_calls$open)
+      append_lines(deparsed_calls$open, path)
     }
 
     # evaluate call with original wrapped function
@@ -97,15 +98,15 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     success <- !inherits(res, "try-error")
 
     # if rigged fun args have been evaled, print them
-    print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env)
+    print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env, path)
 
     # display wrapped call at the bottom
-    append_lines(deparsed_calls$close)
+    append_lines(deparsed_calls$close, path)
 
     # rethrow error on failure
     if (!success) {
       error <- attr(res, "condition")
-      append_lines(crayon::magenta("Error:", paste0(class(error), collapse = "/")))
+      append_lines(crayon::magenta("Error:", paste0(class(error), collapse = "/")), path)
       stop(error)
     }
 
@@ -118,20 +119,25 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     if(clock) {
       true_time_msg <- update_times_df_and_get_true_time(
         call, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
-      append_lines(crayon::blue(true_time_msg))
+      append_lines(crayon::blue(true_time_msg), path)
     }
 
     # print output with appropriate print fun and indentation
     res <- res$value
     print_fun <- fetch_print_fun(print_fun, res)
-    append_lines(c(paste0(ej$dots, capture.output(print_fun(res))), ej$dots))
+    append_lines(c(paste0(ej$dots, capture.output(print_fun(res))), ej$dots), path)
 
     res
   })))
 }
 
-append_lines <- function(x) {
-  writeLines(x)
+append_lines <- function(x, path) {
+  if (is.null(path)) {
+    writeLines(x)
+  } else {
+    con <- withr::local_connection(file(path, "at"))
+    writeLines(x, con = con)
+  }
 }
 
 set_emojis <- function(safe_print, n_indent) {
@@ -162,7 +168,14 @@ update_globals_on_exit <- function(clock) {
   invisible(NULL)
 }
 
-signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rigged_fun_exec_env) {
+signal_rigged_function_and_args <- function(
+    rigged_nm,
+    mask,
+    ej,
+    print_args,
+    rigged_fun_exec_env,
+    path
+) {
   # is the wrapped function called by a rigged function?
   if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
@@ -170,11 +183,11 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
       # load pryr early to print early "Registered S3 method overwritten..."
       if(print_args) loadNamespace("pryr")
 
-      append_lines(paste0(ej$dots, ej$rig_open, crayon::yellow(rigged_nm)))
+      append_lines(paste0(ej$dots, ej$rig_open, crayon::yellow(rigged_nm)), path)
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
-        append_lines(paste0(ej$dots, ej$rig_close, crayon::yellow(rigged_nm)))
+        append_lines(paste0(ej$dots, ej$rig_close, crayon::yellow(rigged_nm)), path)
         mask$..FIRST_CALL.. <- TRUE
         mask$..EVALED_ARGS..[] <- FALSE
       }, envir = rigged_fun_exec_env)
@@ -255,7 +268,15 @@ eval_wrapped_call <- function(sc, fun_val, clock, rigged_fun_exec_env) {
   res
 }
 
-print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env) {
+print_arguments <- function(
+    print_args,
+    rigged_nm,
+    mask,
+    print_fun,
+    ej,
+    rigged_fun_exec_env,
+    path
+) {
   rigged <- !is.null(rigged_nm)
   if(!print_args || ! rigged) return(invisible(NULL))
   for (arg in names(mask$..EVALED_ARGS..)) {
@@ -266,8 +287,10 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
         arg_val <- get(arg, envir = rigged_fun_exec_env)
         print_fun <- fetch_print_fun(print_fun, arg_val)
         output <- capture.output(print_fun(arg_val))
-        append_lines(paste0(
-          ej$dots, c(crayon::green(arg, ":"), output)))
+        append_lines(
+          paste0(ej$dots, c(crayon::green(arg, ":"), output)),
+          path
+        )
       }
     }
   }
