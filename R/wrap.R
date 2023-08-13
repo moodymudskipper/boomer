@@ -89,7 +89,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
-      writeLines(deparsed_calls$open)
+      append_lines(deparsed_calls$open)
     }
 
     # evaluate call with original wrapped function
@@ -100,12 +100,12 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env)
 
     # display wrapped call at the bottom
-    writeLines(deparsed_calls$close)
+    append_lines(deparsed_calls$close)
 
     # rethrow error on failure
     if (!success) {
       error <- attr(res, "condition")
-      writeLines(crayon::magenta("Error:", paste0(class(error), collapse = "/")))
+      append_lines(crayon::magenta("Error:", paste0(class(error), collapse = "/")))
       stop(error)
     }
 
@@ -118,16 +118,20 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     if(clock) {
       true_time_msg <- update_times_df_and_get_true_time(
         call, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
-      writeLines(crayon::blue(true_time_msg))
+      append_lines(crayon::blue(true_time_msg))
     }
 
     # print output with appropriate print fun and indentation
     res <- res$value
     print_fun <- fetch_print_fun(print_fun, res)
-    writeLines(c(paste0(ej$dots, capture.output(print_fun(res))), ej$dots))
+    append_lines(c(paste0(ej$dots, capture.output(print_fun(res))), ej$dots))
 
     res
   })))
+}
+
+append_lines <- function(x) {
+  writeLines(x)
 }
 
 set_emojis <- function(safe_print, n_indent) {
@@ -166,11 +170,11 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
       # load pryr early to print early "Registered S3 method overwritten..."
       if(print_args) loadNamespace("pryr")
 
-      writeLines(paste0(ej$dots, ej$rig_open, crayon::yellow(rigged_nm)))
+      append_lines(paste0(ej$dots, ej$rig_open, crayon::yellow(rigged_nm)))
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
-        writeLines(paste0(ej$dots, ej$rig_close, crayon::yellow(rigged_nm)))
+        append_lines(paste0(ej$dots, ej$rig_close, crayon::yellow(rigged_nm)))
         mask$..FIRST_CALL.. <- TRUE
         mask$..EVALED_ARGS..[] <- FALSE
       }, envir = rigged_fun_exec_env)
@@ -262,7 +266,7 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
         arg_val <- get(arg, envir = rigged_fun_exec_env)
         print_fun <- fetch_print_fun(print_fun, arg_val)
         output <- capture.output(print_fun(arg_val))
-        writeLines(paste0(
+        append_lines(paste0(
           ej$dots, c(crayon::green(arg, ":"), output)))
       }
     }
