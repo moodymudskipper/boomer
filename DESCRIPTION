@@ -18,6 +18,7 @@ Imports:
     styler,
     withr
 Suggests: 
+    fansi,
     flow,
     knitr,
     lobstr,

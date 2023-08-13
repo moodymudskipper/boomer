@@ -136,7 +136,7 @@ append_lines <- function(x, path) {
     writeLines(x)
   } else {
     con <- withr::local_connection(file(path, "at"))
-    writeLines(x, con = con)
+    writeLines(fansi::strip_sgr(x), con = con)
   }
 }
 
