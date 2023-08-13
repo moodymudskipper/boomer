@@ -129,14 +129,13 @@ test_that("assignments work", {
       v = quote(a)
     })
 
-    options(boomer.ignore = NULL)
+    withr::local_options(boomer.ignore = NULL)
     boom({
       x <- 1 + 2
       y <- quote(a)
       u = 1 + 2
       v = quote(a)
     })
-    options(boomer.ignore = c("~", "{", "(", "<-", "<<-", "="))
   })
 })
 
