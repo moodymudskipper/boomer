@@ -200,7 +200,7 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
     } else {
       deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr))
       if(getOption("boomer.abbreviate")) {
-        call_chr <- deparse1(sc[[1]])
+        call_chr <- deparse_line(sc[[1]])
       }
       deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
 
@@ -219,7 +219,7 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
       other_lines <-  paste0(ej$dots, "   ", crayon::cyan(call_chr[-1]))
       deparsed_calls$close <-  paste(c(line1, other_lines), collapse = "\n")
       if(getOption("boomer.abbreviate")) {
-        call_chr <- deparse1(sc[[1]])
+        call_chr <- deparse_line(sc[[1]])
       }
       if(length(call_chr) > 1) {
         call_chr <- paste0(call_chr[1], "...")
@@ -307,7 +307,7 @@ update_times_df_and_get_true_time <- function(
 
   # assemble everything in a row and bind it to the global times data.frame
   times_row <- data.frame(
-    call = deparse1(call),
+    call = deparse_line(call),
     total_time_start,
     evaluation_time_start,
     evaluation_time_end,
@@ -354,3 +354,6 @@ fetch_print_fun <- function(print_fun, res) {
   print_fun
 }
 
+deparse_line <- function(expr) {
+  paste(deparse(expr, width.cutoff = 500), collapse = " ")
+}

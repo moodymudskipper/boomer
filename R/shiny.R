@@ -15,17 +15,17 @@ rig_shiny_fun <- function(shiny_fun_nm) {
       call <- scs[[i]]
       found_callModule <- "callModule" %in% all.names(call)
       if(found_callModule) {
-        called_by_moduleServed <- deparse1(scs[[i-1]][[1]]) == "moduleServer"
+        called_by_moduleServed <- deparse_line(scs[[i-1]][[1]]) == "moduleServer"
         if(called_by_moduleServed) {
-          module_server_fun_nm <- deparse1(scs[[i-2]][[1]])
+          module_server_fun_nm <- deparse_line(scs[[i-2]][[1]])
         } else {
-          module_server_fun_nm <- deparse1(call[[2]])
+          module_server_fun_nm <- deparse_line(call[[2]])
         }
         break
       }
     }
     if(!found_callModule) {
-      module_server_fun_nm <- deparse1(scs[[length(scs)-1]][[1]])
+      module_server_fun_nm <- deparse_line(scs[[length(scs)-1]][[1]])
     }
 
     sc <- sys.call()
@@ -34,12 +34,12 @@ rig_shiny_fun <- function(shiny_fun_nm) {
     call <- parse(text=capture.output(sc))[[1]]
     if(identical(call[[1]], quote(`<-`))) {
       # the var name is the lhs, which is the 2nd term
-      var_nm <- deparse1(call[[2]])
-      reactive_fun_nm <- deparse1(call[[c(3, 1)]])
+      var_nm <- deparse_line(call[[2]])
+      reactive_fun_nm <- deparse_line(call[[c(3, 1)]])
     } else {
       call <- sc # to avoid corner cases like `return(reactive(...))`
       var_nm <- "<return value>"
-      reactive_fun_nm <- deparse1(call[[1]])
+      reactive_fun_nm <- deparse_line(call[[1]])
     }
     rigged_nm <- paste0(module_server_fun_nm, "/", var_nm, " <- ", reactive_fun_nm, "(...)")
 
@@ -80,16 +80,16 @@ extract_shiny_reactives <- function() {
     code_is_assigning_a_reactive <-
       identical(code[[1]], quote(`<-`)) &&
       is.call(code[[3]]) &&
-      deparse1(code[[c(3, 1)]]) %in% reactive_funs
+      deparse_line(code[[c(3, 1)]]) %in% reactive_funs
     code_is_a_call_to_a_reactive <-
-      deparse1(code[[1]]) %in% reactive_funs
+      deparse_line(code[[1]]) %in% reactive_funs
     if(code_is_assigning_a_reactive) {
-      res <- paste0(deparse1(code[[2]]), " <- ", deparse1(code[[c(3, 1)]]), "(...)")
+      res <- paste0(deparse_line(code[[2]]), " <- ", deparse_line(code[[c(3, 1)]]), "(...)")
       return(res)
     } else if (code_is_a_call_to_a_reactive) {
       # we're not testing that it's the last call but it wouldn't make sense otherwise
       # and is not trivial to test
-      res <- paste0("<return value> <- ", deparse1(code[[1]]), "(...)")
+      res <- paste0("<return value> <- ", deparse_line(code[[1]]), "(...)")
       return(res)
     }
 
@@ -103,7 +103,7 @@ extract_shiny_reactives <- function() {
        is.call(code[[3]]) &&
        identical(code[[c(3, 1)]], quote(`function`))) {
       # extract reactive calls
-      mod_nm <- deparse1(code[[2]])
+      mod_nm <- deparse_line(code[[2]])
       fun_code <- code[[3]]
       body <- fun_code[[3]]
 
