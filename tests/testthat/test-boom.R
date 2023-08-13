@@ -127,6 +127,8 @@ test_that("functions created at runtime are boomed", {
 })
 
 test_that("assignments work", {
+  skip_if(getRversion() < "4.0")
+
   expect_snapshot({
     boom({
       x <- 1 + 2
