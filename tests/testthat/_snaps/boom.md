@@ -263,8 +263,9 @@
            missing_function() %>%
            I() 
       Error: simpleError/error/condition
-    Error <simpleError>
-      could not find function "missing_function"
+    Condition
+      Error in `missing_function()`:
+      ! could not find function "missing_function"
     Code
       eagerly_failing_function <- (function(x) {
         stop("oops")
@@ -283,8 +284,9 @@
            eagerly_failing_function() %>%
            I() 
       Error: simpleError/error/condition
-    Error <simpleError>
-      oops
+    Condition
+      Error:
+      ! oops
     Code
       failing_function <- (function(x) {
         force(x)
@@ -308,8 +310,9 @@
            failing_function() %>%
            I() 
       Error: simpleError/error/condition
-    Error <simpleError>
-      oops
+    Condition
+      Error:
+      ! oops
 
 # functions created at runtime are boomed
 
