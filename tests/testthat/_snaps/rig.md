@@ -90,7 +90,7 @@
 
     Code
       rig(foo2)(2)
-    Message <simpleMessage>
+    Message
       `SQRT()` is undefined outside of `foo2()` and its output might not be shown.
     Output
       { foo2
