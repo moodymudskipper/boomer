@@ -42,7 +42,7 @@ invisibly. Defaults to \code{FALSE}.
 printed (usually because it's redundant). Defaults to
 \code{c("~", "{", "(", "<-", "<<-", "=")}
 \item \code{boomer.safe_print}: Whether to replace emoticons by characters compatible
-with all systems. This is useful for reprexes (see {reprex} package) and
+with all systems. This is useful for reprexes (see \pkg{reprex} package) and
 for knitted report in case the output of those doesn't look good on your system.
 \item \code{boomer.abbreviate}: Whether to show only the function's name rather than the
 call when it's entered.
