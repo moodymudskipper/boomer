@@ -3,7 +3,6 @@
 \docType{package}
 \name{boomer-package}
 \alias{boomer-package}
-\alias{_PACKAGE}
 \alias{boomer}
 \title{boomer: Debugging Tools to Inspect the Intermediate Steps of a Call}
 \description{
