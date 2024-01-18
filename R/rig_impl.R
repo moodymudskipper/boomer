@@ -17,8 +17,8 @@ rig_impl <- function(
     # `wrapped_nms` will include functions yet to be defined when calling `rig()`
     # these might or might nor be sorted out by shim_assign, but we can't know
     # yet so we don't want to fail here if the object doesn't exist
-    if(!exists(wrapped_nm, rigged_fun_env)) {
-      if(!is.null(rigged_nm))
+    if (!exists(wrapped_nm, rigged_fun_env)) {
+      if (!is.null(rigged_nm))
         message("`", wrapped_nm, "()` is undefined outside of `", rigged_nm, "()` and its output might not be shown.")
       next
     }
@@ -26,7 +26,7 @@ rig_impl <- function(
     # fetch the env, primitives don't have one, but they're in the base package
     fun_val <- get(wrapped_nm, envir = rigged_fun_env)
     fun_env <- environment(fun_val)
-    if(is.null(fun_env)) {
+    if (is.null(fun_env)) {
       fun_env <- asNamespace("base")
     }
 
@@ -65,9 +65,9 @@ fetch_functions <- function(expr, ignore) {
   parse_data <- getParseData(parse(text = deparse(expr), keep.source = TRUE))
   # remove rows which follow `:::` or `::`
   to_remove <- which(parse_data$token %in% c("NS_GET", "NS_GET_INT")) + 1
-  if(length(to_remove)) parse_data <- parse_data[- to_remove,]
+  if (length(to_remove)) parse_data <- parse_data[-to_remove, ]
   # keep only eligible token types
-  wrapped_nms <- parse_data$text[! parse_data$token %in% dismissed_token_types]
+  wrapped_nms <- parse_data$text[!parse_data$token %in% dismissed_token_types]
   # remove tokens that are not functions
   wrapped_nms <- setdiff(unique(wrapped_nms), c(")", "}", ",", "]")) # ignore,
   wrapped_nms
@@ -117,4 +117,3 @@ triple_colon <- function(clock, print_fun, rigged_nm, mask) {
     wrap(fun_val, clock, print_fun, rigged_nm, "::", mask)
   }
 }
-
