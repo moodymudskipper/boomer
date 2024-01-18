@@ -1,6 +1,7 @@
 reactive_funs <- c(
   "reactive", "renderCachedPlot", "renderDataTable", "renderImage", "renderPlot",
-  "renderPrint", "renderTable", "renderText", "renderUI")
+  "renderPrint", "renderTable", "renderText", "renderUI"
+)
 
 # returns a rigged shiny reactive function
 # rig() would rig the function's body while `rig_shiny_fun` rigs the `expr` argument of
@@ -14,25 +15,25 @@ rig_shiny_fun <- function(shiny_fun_nm) {
     for (i in rev(seq_along(scs))) {
       call <- scs[[i]]
       found_callModule <- "callModule" %in% all.names(call)
-      if(found_callModule) {
-        called_by_moduleServed <- deparse_line(scs[[i-1]][[1]]) == "moduleServer"
-        if(called_by_moduleServed) {
-          module_server_fun_nm <- deparse_line(scs[[i-2]][[1]])
+      if (found_callModule) {
+        called_by_moduleServed <- deparse_line(scs[[i - 1]][[1]]) == "moduleServer"
+        if  (called_by_moduleServed) {
+          module_server_fun_nm <- deparse_line(scs[[i - 2]][[1]])
         } else {
           module_server_fun_nm <- deparse_line(call[[2]])
         }
         break
       }
     }
-    if(!found_callModule) {
-      module_server_fun_nm <- deparse_line(scs[[length(scs)-1]][[1]])
+    if (!found_callModule) {
+      module_server_fun_nm <- deparse_line(scs[[length(scs) - 1]][[1]])
     }
 
     sc <- sys.call()
     # sc prints as `{var_nm} <- {shiny_fun_nm}(...)` but is not really this
     # expression, so we need to cheat to build it as an expression
-    call <- parse(text=capture.output(sc))[[1]]
-    if(identical(call[[1]], quote(`<-`))) {
+    call <- parse(text = capture.output(sc))[[1]]
+    if (identical(call[[1]], quote(`<-`))) {
       # the var name is the lhs, which is the 2nd term
       var_nm <- deparse_line(call[[2]])
       reactive_fun_nm <- deparse_line(call[[c(3, 1)]])
@@ -54,7 +55,7 @@ rig_shiny_fun <- function(shiny_fun_nm) {
       # ignoring namespaces
       selected_boomer_checkboxes <-
         .subset2(input, "impl")$.values$get("boomer_checkboxes")
-      if(RIGGED_NM_1 %in% selected_boomer_checkboxes) {
+      if (RIGGED_NM_1 %in% selected_boomer_checkboxes) {
         rig_impl <- getFromNamespace("rig_impl", "boomer")
         rig_impl(FUN, rigged_nm = RIGGED_NM_2)()
       } else {
@@ -63,7 +64,7 @@ rig_shiny_fun <- function(shiny_fun_nm) {
     }, list(
       FUN = fun,
       RIGGED_NM_1 = rigged_nm,
-      RIGGED_NM_2 = rigged_nm, #paste(rigged_nm, .(sprintf("<- %s(...)", shiny_fun_nm))),
+      RIGGED_NM_2 = rigged_nm,
       SC_2 = sc[[2]]))
     eval.parent(sc)
   })
@@ -74,16 +75,14 @@ extract_shiny_reactives <- function() {
 
   rec_react <- function(code) {
     # is applied on the body of a funcion to fetch reactive calls
-    # message("rec_react")
-    # print(code)
-    if(!is.call(code)) return(invisible(NULL))
+    if (!is.call(code)) return(invisible(NULL))
     code_is_assigning_a_reactive <-
       identical(code[[1]], quote(`<-`)) &&
       is.call(code[[3]]) &&
       deparse_line(code[[c(3, 1)]]) %in% reactive_funs
     code_is_a_call_to_a_reactive <-
       deparse_line(code[[1]]) %in% reactive_funs
-    if(code_is_assigning_a_reactive) {
+    if (code_is_assigning_a_reactive) {
       res <- paste0(deparse_line(code[[2]]), " <- ", deparse_line(code[[c(3, 1)]]), "(...)")
       return(res)
     } else if (code_is_a_call_to_a_reactive) {
@@ -97,9 +96,9 @@ extract_shiny_reactives <- function() {
   }
 
   rec_mods <- function(code) {
-    if(!is.call(code)) return(invisible(NULL))
+    if (!is.call(code)) return(invisible(NULL))
 
-    if(identical(code[[1]], quote(`<-`)) &&
+    if (identical(code[[1]], quote(`<-`)) &&
        is.call(code[[3]]) &&
        identical(code[[c(3, 1)]], quote(`function`))) {
       # extract reactive calls
@@ -108,7 +107,7 @@ extract_shiny_reactives <- function() {
       body <- fun_code[[3]]
 
       react_nms <- rec_react(body)
-      full_nms <- if(length(react_nms)) paste0(mod_nm, "/", react_nms)
+      full_nms <- if (length(react_nms)) paste0(mod_nm, "/", react_nms)
 
       return(full_nms)
     }
@@ -153,7 +152,7 @@ boom_shinyApp <- function (
   options = list(),
   uiPattern = "/",
   enableBookmarking = NULL) {
-  if(!requireNamespace("shiny", quietly = TRUE)) {
+  if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("`boomApp` requires the 'shiny' package to be installed")
   }
   reactives <- getFromNamespace("extract_shiny_reactives", "boomer")()
@@ -208,7 +207,7 @@ boom_runApp <- function (
   quiet = FALSE,
   display.mode = c("auto", "normal", "showcase"),
   test.mode = getOption("shiny.testmode", FALSE)) {
-  if(!requireNamespace("shiny", quietly = TRUE)) {
+  if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("`boomApp` requires the 'shiny' package to be installed")
   }
 

@@ -35,4 +35,3 @@ test_that("functions created at runtime are boomed", {
   }
   expect_snapshot(rig(foo2)(2))
 })
-

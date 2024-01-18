@@ -57,19 +57,19 @@
 #' fun2 <- rigger(TRUE, typeof) + function(x) x + 1 + 2
 #' fun2(1)
 boom <- function(
-  expr,
-  clock = NULL,
-  print = NULL) {
+    expr,
+    clock = NULL,
+    print = NULL) {
 
   # if we are in a pipe chain, explode the chain above
   scs <- sys.calls()
   l <- length(scs)
   call_is_piped <-
     identical(scs[[l]][[2]], quote(.)) &&
-    identical(scs[[l-1]][[1]], quote(`%>%`))
-  if(call_is_piped) {
+    identical(scs[[l - 1]][[1]], quote(`%>%`))
+  if (call_is_piped) {
     # change `code %>% boom(., ...)` into `boom(code, ...)`
-    call <- do.call(substitute, list(scs[[l]], list(. = scs[[l-1]][[2]])))
+    call <- do.call(substitute, list(scs[[l]], list(. = scs[[l - 1]][[2]])))
     # call modified expression
     eval.parent(call)
   }
@@ -89,7 +89,7 @@ rig <- function(
   fun_lng <- substitute(fun)
   if (!is.function(fun)) stop("`fun` should evaluate to a function")
   if (is.symbol(fun_lng) || rlang::is_call(fun_lng, "::") || rlang::is_call(fun_lng, "::"))  {
-    fun_chr <- paste(deparse(fun_lng), collapse="")
+    fun_chr <- paste(deparse(fun_lng), collapse = "")
   } else {
     stop("`fun` should be provided in one of these forms : `f`, `pkg::f` or `pkg:::f`")
   }
@@ -155,14 +155,13 @@ rig_in_namespace <- function(
   wrapped_funs <- mapply(
     wrap,
     rigged_funs,
-    MoreArgs = list(clock = clock, print_fun = print))
+    MoreArgs = list(clock = clock, print_fun = print)
+  )
 
   # add all modified functions to each function's environment
-  for(fun in vals) {
+  for (fun in vals) {
     list2env(wrapped_funs, environment(fun))
   }
 
   invisible(NULL)
 }
-
-
