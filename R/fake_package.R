@@ -25,7 +25,7 @@ fake_package <- function(name, exported = NULL, unexported = NULL, attach = TRUE
   list2env(unexported, ns)
   # export relevant functions
   namespaceExport(ns, names(exported))
-  if(attach) {
+  if (attach) {
     # copy exported funs to "package:pkg" envir of the search path
     match.fun("attach")(exported, name = paste0("package:", name))
   }

@@ -4,7 +4,7 @@ boom_addin <- function() {
   ## fetch context and selection
   context <- rstudioapi::getSourceEditorContext()
   selection <- rstudioapi::primary_selection(context)[["text"]]
-  eval.parent(str2lang(paste0("boomer::boom(",selection, ")")))
+  eval.parent(str2lang(paste0("boomer::boom(", selection, ")")))
   invisible()
   # nocov end
 }
