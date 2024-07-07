@@ -30,7 +30,7 @@
 #' - `boomer.ignore`: Vector of function names for which we don't want the result
 #'   printed (usually because it's redundant). Defaults to
 #'   `c("~", "{", "(", "<-", "<<-", "=")`.
-#' - `boomer.ignore.inside`: list of functions (values, not names) for which we
+#' - `boomer.ignore_args`: list of functions (values, not names) for which we
 #'   don't want the arguments boomed, this might be useful when calling a
 #'   function that loops too many times.
 #' - `boomer.safe_print`: Whether to replace emoticons by characters compatible
