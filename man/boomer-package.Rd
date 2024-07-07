@@ -37,11 +37,11 @@ replace it at run time. Defaults to \code{FALSE}.
 and their values when they are evaluated. Defaults to \code{TRUE}.
 \item \code{boomer.visible_only}: Whether to hide the output of functions which return
 invisibly. Defaults to \code{FALSE}.
-\item \code{boomer.ignore}: Vector of function names for which we don't want the result
-printed (usually because it's redundant). Defaults to
+\item \code{boomer.ignore}: Vector of function names or named list of functions for
+which we don't want the result printed (usually because it's redundant). Defaults to
 \code{c("~", "{", "(", "<-", "<<-", "=")}.
-\item \code{boomer.ignore.inside}: list of functions (values, not names) for which we
-don't want the arguments boomed, this might be useful when calling a
+\item \code{boomer.ignore_args}: Vector of function names or named list of functions
+for which we don't want the arguments boomed, this might be useful when calling a
 function that loops too many times.
 \item \code{boomer.safe_print}: Whether to replace emoticons by characters compatible
 with all systems. This is useful for reprexes (see \pkg{reprex} package) and
