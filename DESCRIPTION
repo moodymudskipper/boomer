@@ -25,8 +25,6 @@ Suggests:
     rmarkdown,
     shiny,
     testthat (>= 3.0.0)
- Depends:
-    R (>= 4.0.0)
 VignetteBuilder: 
     knitr
 Remotes:
