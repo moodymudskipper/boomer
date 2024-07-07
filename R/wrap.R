@@ -84,7 +84,11 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     signal_rigged_function_and_args(rigged_nm, mask, ej, print_args, rigged_fun_exec_env)
 
     # build calls to be displayed on top and bottom of wrapped call
-    deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent)
+
+    ignore.inside <-
+      !is.null(mask) &&
+      any(vapply(getOption("boomer.ignore.inside"), identical, logical(1), fun_val))
+    deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent, force_single_line = ignore.inside)
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
@@ -92,7 +96,16 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     }
 
     # evaluate call with original wrapped function
-    res <- try(eval_wrapped_call(sc, fun_val, clock, wrapped_fun_caller_env), silent = TRUE)
+    if (ignore.inside) {
+      # remove the mask
+      parent.env(wrapped_fun_caller_env) <- parent.env(mask)
+      res <- try(eval_wrapped_call(sc, fun_val, clock, wrapped_fun_caller_env), silent = TRUE)
+      # put back the mask
+      parent.env(wrapped_fun_caller_env) <- mask
+    } else {
+      res <- try(eval_wrapped_call(sc, fun_val, clock, wrapped_fun_caller_env), silent = TRUE)
+    }
+
     success <- !inherits(res, "try-error")
 
     # if rigged fun args have been evaled, print them
