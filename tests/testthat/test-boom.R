@@ -4,7 +4,7 @@ test_that("boom() works", {
   expect_snapshot({
     boom(1 + 2 * 3)
     boom(sum(base::nchar(utils:::head(letters, -3))))
-    boom(for (i in 1:10) i)
+    boom(for(i in 1:10) i)
   })
 })
 
@@ -43,15 +43,15 @@ test_that("boom() works with README examples", {
 
 test_that("print arg works", {
   expect_snapshot({
-    boom(data.frame(a = 1, b = 2), print = str)
+    boom(data.frame(a=1, b=2), print = str)
   })
 })
 
 test_that("print arg works with list", {
   expect_snapshot({
-    boom(data.frame(a = 1, b = 2), print = list(data.frame = str))
-    boom(data.frame(a = 1, b = 2), print = list(data.frame = str, print))
-    boom(data.frame(a = 1, b = 2), print = list(str))
+    boom(data.frame(a=1, b=2), print = list(data.frame = str))
+    boom(data.frame(a=1, b=2), print = list(data.frame = str, print))
+    boom(data.frame(a=1, b=2), print = list(str))
   })
 })
 
@@ -149,8 +149,8 @@ test_that("assignments work", {
 
 test_that("multi-line calls are collapsed properly", {
   expect_snapshot({
-    boom(c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0))
-    boom(c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, c(0, 1)))
+    boom(c(0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9,0))
+    boom(c(0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9,c(0, 1)))
   })
 })
 
@@ -166,8 +166,8 @@ test_that("`boomer.abbreviate` option works", {
   expect_snapshot({
     options(boomer.abbreviate = TRUE)
     boom(1 + 2 * 3)
-    boom(c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0))
-    boom(c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, c(0, 1)))
+    boom(c(0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9,0))
+    boom(c(0,1,2,3,4,5,6,7,8,9, 0,1,2,3,4,5,6,7,8,9,c(0, 1)))
     aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa <- 1
     bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb <- 2
     boom(aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa * 2 + bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
