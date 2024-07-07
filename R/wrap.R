@@ -40,9 +40,30 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     # return early if function is to be ignored
     wrapped_nm <- .(wrapped_nm)
     fun_val   <- .(fun_val)
-    ignore <- getOption("boomer.ignore")
     sc  <- sys.call()
-    if(wrapped_nm %in% ignore) {
+
+    wrapped_fun_caller_env <- parent.frame()
+    # fetch rigged function's execution env, it's the wrapped_fun_caller_env
+    # only at the top level
+    rigged_fun_exec_env <- wrapped_fun_caller_env
+    mask <- .(mask)
+    while (!identical(parent <- parent.env(rigged_fun_exec_env), mask)) {
+      rigged_fun_exec_env <- parent
+    }
+
+    ignore <- getOption("boomer.ignore")
+    if (is.character(ignore)) {
+      ignore <- mget(
+        ignore,
+        envir = parent.env(mask),
+        inherits = TRUE)
+    }
+
+    ignore_bool <-
+      !is.na(wrapped_nm) &&
+      any(vapply(ignore, identical, logical(1), get(wrapped_nm, parent.env(mask))))
+
+    if(ignore_bool) {
       res <- rlang::eval_bare(as.call(c(fun_val, as.list(sc[-1]))), parent.frame())
       return(res)
     }
@@ -55,21 +76,12 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     # fetch other args
     print_fun <- .(print_fun)
     rigged_nm <- .(rigged_nm)
-    mask      <- .(mask)
 
     # gather other options at run time
     if(is.null(print_fun)) print_fun <- getOption("boomer.print")
     visible_only <- getOption("boomer.visible_only")
     print_args <- getOption("boomer.print_args")
     safe_print <- getOption("boomer.safe_print")
-
-    wrapped_fun_caller_env <- parent.frame()
-    # fetch rigged function's execution env, it's the wrapped_fun_caller_env
-    # only at the top level
-    rigged_fun_exec_env <- wrapped_fun_caller_env
-    while (!identical(parent <- parent.env(rigged_fun_exec_env), mask)) {
-      rigged_fun_exec_env <- parent
-    }
 
     # set indentation
     globals$n_indent <- globals$n_indent + 1
@@ -84,11 +96,18 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     signal_rigged_function_and_args(rigged_nm, mask, ej, print_args, rigged_fun_exec_env)
 
     # build calls to be displayed on top and bottom of wrapped call
+   ignore.inside <- getOption("boomer.ignore.inside")
+    if (is.character(ignore.inside)) {
+      ignore.inside <- mget(
+        ignore.inside,
+        envir = parent.env(mask),
+        inherits = TRUE)
+    }
 
-    ignore.inside <-
+    ignore.inside.bool <-
       !is.null(mask) &&
-      any(vapply(getOption("boomer.ignore.inside"), identical, logical(1), fun_val))
-    deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent, force_single_line = ignore.inside)
+      any(vapply(ignore.inside, identical, logical(1), fun_val))
+    deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent, force_single_line = ignore.inside.bool)
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
@@ -96,7 +115,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     }
 
     # evaluate call with original wrapped function
-    if (ignore.inside) {
+    if (ignore.inside.bool) {
       # remove the mask
       parent.env(wrapped_fun_caller_env) <- parent.env(mask)
       res <- try(eval_wrapped_call(sc, fun_val, clock, wrapped_fun_caller_env), silent = TRUE)
