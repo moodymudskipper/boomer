@@ -9,7 +9,7 @@ Provides debugging tools that let you inspect the intermediate results of a call
 
     <a class="navbar-brand me-2" href="../index.html">boomer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,9 +72,12 @@ replace it at run time. Defaults to <code>FALSE</code>.</p></li>
 and their values when they are evaluated. Defaults to <code>TRUE</code>.</p></li>
 <li><p><code>boomer.visible_only</code>: Whether to hide the output of functions which return
 invisibly. Defaults to <code>FALSE</code>.</p></li>
-<li><p><code>boomer.ignore</code>: Vector of functions for which we don't want the result
-printed (usually because it's redundant). Defaults to
-<code>c("~", "{", "(", "&lt;-", "&lt;&lt;-", "=")</code></p></li>
+<li><p><code>boomer.ignore</code>: Vector of function names or named list of functions for
+which we don't want the result printed (usually because it's redundant). Defaults to
+<code>c("~", "{", "(", "&lt;-", "&lt;&lt;-", "=")</code>.</p></li>
+<li><p><code>boomer.ignore_args</code>: Vector of function names or named list of functions
+for which we don't want the arguments boomed, this might be useful when calling a
+function that loops too many times.</p></li>
 <li><p><code>boomer.safe_print</code>: Whether to replace emoticons by characters compatible
 with all systems. This is useful for reprexes (see <span class="pkg">reprex</span> package) and
 for knitted report in case the output of those doesn't look good on your system.</p></li>
@@ -101,7 +104,7 @@ call when it's entered.</p></li>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
 </div>
 
     </footer></div>

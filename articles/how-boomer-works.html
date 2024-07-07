@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">boomer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -36,7 +36,7 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
+<li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/how-boomer-works.html">How boomer works</a></li>
@@ -85,7 +85,7 @@ of the function we rig.</p>
 <span><span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span></span>
 <span><span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x5574407deca0&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x560cd6facac0&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:tools&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rigged_file_ext</span></span>
@@ -94,7 +94,7 @@ of the function we rig.</p>
 <span><span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span></span>
 <span><span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x557440919020&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x560cd70e57b0&gt;</span></span></code></pre></div>
 <p>Instead we copy the original function but give it a new environment.
 This new environment is a child of the original environment, and is
 populated with shims of the functions called by the original function.
@@ -108,7 +108,7 @@ We call this environment the mask.</p>
 <span><span class="co"># our new environment</span></span>
 <span><span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="va">rigged_file_ext</span><span class="op">)</span></span>
 <span><span class="va">env</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x557440919020&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x560cd70e57b0&gt;</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># its parent</span></span>
@@ -145,7 +145,7 @@ needed for the base pipe)</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">flow</span><span class="fu">::</span><span class="fu"><a href="https://moodymudskipper.github.io/flow/reference/flow_view_deps.html" class="external-link">flow_view_deps</a></span><span class="op">(</span><span class="fu">boomer</span><span class="fu">:::</span><span class="va">rig_impl</span>, show_imports <span class="op">=</span> <span class="st">"packages"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.</span></span>
-<span><span class="co">#&gt; Error in knitr::include_graphics(png): Cannot find the file(s): "/tmp/Rtmp3ho1fi/flow_120026ad994f.png"</span></span></code></pre></div>
+<span><span class="co">#&gt; Error in knitr::include_graphics(png): Cannot find the file(s): "/tmp/Rtmpg69bWZ/flow_102c227d0be7.png"</span></span></code></pre></div>
 <p><code>rig_impl()</code> :</p>
 <ul>
 <li>Creates a new environment (the mask) as a child of the original
@@ -213,7 +213,7 @@ include wrapped versions of our rigged functions in all the masks.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.9000.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.0.9000.</p>
 </div>
 
     </footer>
