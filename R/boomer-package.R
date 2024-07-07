@@ -27,9 +27,12 @@
 #'   and their values when they are evaluated. Defaults to `TRUE`.
 #' - `boomer.visible_only`: Whether to hide the output of functions which return
 #'   invisibly. Defaults to `FALSE`.
-#' - `boomer.ignore`: Vector of functions for which we don't want the result
-#'   printed (usually because it's redundant). Defaults to
-#'   `c("~", "{", "(", "<-", "<<-", "=")`
+#' - `boomer.ignore`: Vector of function names or named list of functions for
+#'   which we don't want the result printed (usually because it's redundant). Defaults to
+#'   `c("~", "{", "(", "<-", "<<-", "=")`.
+#' - `boomer.ignore_args`: Vector of function names or named list of functions
+#'   for which we don't want the arguments boomed, this might be useful when calling a
+#'   function that loops too many times.
 #' - `boomer.safe_print`: Whether to replace emoticons by characters compatible
 #'   with all systems. This is useful for reprexes (see \pkg{reprex} package) and
 #'   for knitted report in case the output of those doesn't look good on your system.

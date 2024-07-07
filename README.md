@@ -10,12 +10,12 @@ The *{boomer}* package provides debugging tools that let you inspect the
 intermediate results of a call. The output looks as if we explode a call
 into its parts hence the name.
 
--   `boom()` prints the intermediate results of a call or a code chunk.
--   `rig()` creates a copy of a function which will display the
-    intermediate results of all the calls of it body.
--   `rig_in_namespace()` rigs a namespaced function in place, so its
-    always verbose even when called by other existing functions. It is
-    especially handy for package development.
+- `boom()` prints the intermediate results of a call or a code chunk.
+- `rig()` creates a copy of a function which will display the
+  intermediate results of all the calls of it body.
+- `rig_in_namespace()` rigs a namespaced function in place, so its
+  always verbose even when called by other existing functions. It is
+  especially handy for package development.
 
 ## Installation
 
@@ -74,13 +74,13 @@ occurrence of the error, it can help with debugging:
 
 `boom()` features optional arguments :
 
--   `clock`: set to `TRUE` to see how long each step (in isolation!)
-    took to run.
+- `clock`: set to `TRUE` to see how long each step (in isolation!) took
+  to run.
 
--   `print`: set to a function such as `str` to change what is printed
-    (see `?boom` to see how to print differently depending on class).
-    Useful alternatives would be `dplyr::glimpse` of `invisible` (to
-    print nothing).
+- `print`: set to a function such as `str` to change what is printed
+  (see `?boom` to see how to print differently depending on class).
+  Useful alternatives would be `dplyr::glimpse` of `invisible` (to print
+  nothing).
 
 One use case is when the output is too long.
 

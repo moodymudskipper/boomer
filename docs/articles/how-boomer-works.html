@@ -4,7 +4,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="boomer">
 <title>How boomer works • boomer</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -12,88 +13,77 @@
 <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
 <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
-<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="How boomer works">
+<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="How boomer works">
 <meta property="og:description" content="boomer">
-<meta property="og:image" content="/logo.png">
+<meta property="og:image" content="https://moodymudskipper.github.io/boomer/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 </head>
-<body data-spy="scroll" data-target="#toc">
+<body>
+    <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <div class="container template-article">
-      <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
-  <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <span class="navbar-brand">
-        <a class="navbar-link" href="../index.html">boomer</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
-      </span>
-    </div>
+    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
+    
+    <a class="navbar-brand me-2" href="../index.html">boomer</a>
 
-    <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-<li>
-  <a href="../reference/index.html">Reference</a>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+
+    
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div id="navbar" class="collapse navbar-collapse ms-3">
+      <ul class="navbar-nav me-auto">
+<li class="nav-item">
+  <a class="nav-link" href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu">
-<li>
-      <a href="../articles/how-boomer-works.html">How boomer works</a>
-    </li>
-    <li>
-      <a href="../articles/shiny.html">Debug a shiny app with {boomer}</a>
-    </li>
-  </ul>
-</li>
-<li>
-  <a href="../news/index.html">Changelog</a>
-</li>
-      </ul>
-<ul class="nav navbar-nav navbar-right">
-<li>
-  <a href="https://github.com/moodymudskipper/boomer/" class="external-link">
-    <span class="fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
-      </ul>
-</div>
-<!--/.nav-collapse -->
+<li class="active nav-item dropdown">
+  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
+  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
+    <a class="dropdown-item" href="../articles/how-boomer-works.html">How boomer works</a>
+    <a class="dropdown-item" href="../articles/shiny.html">Debug a shiny app with {boomer}</a>
   </div>
-<!--/.container -->
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="../news/index.html">Changelog</a>
+</li>
+      </ul>
+<form class="form-inline my-2 my-lg-0" role="search">
+        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
+</form>
+
+      <ul class="navbar-nav">
+<li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/moodymudskipper/boomer/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
 </div>
-<!--/.navbar -->
 
-      
+    
+  </div>
+</nav><div class="container template-article">
 
-      </header><script src="how-boomer-works_files/htmlwidgets-1.5.4/htmlwidgets.js"></script><script src="how-boomer-works_files/es6shim-0.35.6/es6shim.js"></script><script src="how-boomer-works_files/es7shim-6.0.0/es7shim.js"></script><script src="how-boomer-works_files/graphre-0.1.3/graphre.js"></script><script src="how-boomer-works_files/nomnoml-1.4.0/nomnoml.js"></script><script src="how-boomer-works_files/nomnoml-binding-0.2.5/nomnoml.js"></script><div class="row">
-  <div class="col-md-9 contents">
-    <div class="page-header toc-ignore">
-      <h1 data-toc-skip>How boomer works</h1>
+
+
+
+<div class="row">
+  <main id="main" class="col-md-9"><div class="page-header">
+      <img src="../logo.png" class="logo" alt=""><h1>How boomer works</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/moodymudskipper/boomer/blob/HEAD/vignettes/how-boomer-works.Rmd" class="external-link"><code>vignettes/how-boomer-works.Rmd</code></a></small>
-      <div class="hidden name"><code>how-boomer-works.Rmd</code></div>
-
+      <div class="d-none name"><code>how-boomer-works.Rmd</code></div>
     </div>
 
     
@@ -105,44 +95,48 @@
 <p>An important principle of {boomer} is that we don’t modify the body
 of the function we rig.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">rigged_file_ext</span> <span class="op">&lt;-</span> <span class="fu">boomer</span><span class="fu">::</span><span class="fu"><a href="../reference/boom.html">rig</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span><span class="op">)</span>
-<span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span>
-<span class="co">#&gt; function (x) </span>
-<span class="co">#&gt; {</span>
-<span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span>
-<span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;bytecode: 0x14b26f770&gt;</span>
-<span class="co">#&gt; &lt;environment: namespace:tools&gt;</span>
-<span class="va">rigged_file_ext</span>
-<span class="co">#&gt; function (x) </span>
-<span class="co">#&gt; {</span>
-<span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span>
-<span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span>
-<span class="co">#&gt; }</span>
-<span class="co">#&gt; &lt;environment: 0x14b33dda8&gt;</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">rigged_file_ext</span> <span class="op">&lt;-</span> <span class="fu">boomer</span><span class="fu">::</span><span class="fu"><a href="../reference/boom.html">rig</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span><span class="op">)</span></span>
+<span><span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span></span>
+<span><span class="co">#&gt; function (x) </span></span>
+<span><span class="co">#&gt; {</span></span>
+<span><span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span></span>
+<span><span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x107c8ec40&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: namespace:tools&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rigged_file_ext</span></span>
+<span><span class="co">#&gt; function (x) </span></span>
+<span><span class="co">#&gt; {</span></span>
+<span><span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span></span>
+<span><span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span></span>
+<span><span class="co">#&gt; }</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x107d66d80&gt;</span></span></code></pre></div>
 <p>Instead we copy the original function but give it a new environment.
 This new environment is a child of the original environment, and is
 populated with shims of the functions called by the original function.
 We call this environment the mask.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># the original environment</span>
-<span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span><span class="op">)</span>
-<span class="co">#&gt; &lt;environment: namespace:tools&gt;</span>
-
-<span class="co"># our new environment</span>
-<span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="va">rigged_file_ext</span><span class="op">)</span>
-<span class="va">env</span>
-<span class="co">#&gt; &lt;environment: 0x14b33dda8&gt;</span>
-
-<span class="co"># its parent</span>
-<span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">parent.env</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span>
-<span class="co">#&gt; &lt;environment: namespace:tools&gt;</span>
-
-<span class="co"># its content</span>
-<span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span>
-<span class="co">#&gt;  [1] "-"         "::"        ":::"       "("         "{"         "+"        </span>
-<span class="co">#&gt;  [7] "&lt;-"        "="         "&gt;"         "ifelse"    "regexpr"   "substring"</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># the original environment</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/tools/fileutils.html" class="external-link">file_ext</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;environment: namespace:tools&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># our new environment</span></span>
+<span><span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="va">rigged_file_ext</span><span class="op">)</span></span>
+<span><span class="va">env</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x107d66d80&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># its parent</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">parent.env</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;environment: namespace:tools&gt;</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># its content</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/ls.html" class="external-link">ls</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "-"         "::"        ":::"       "("         "{"         "+"        </span></span>
+<span><span class="co">#&gt;  [7] "&lt;-"        "="         "&gt;"         "ifelse"    "regexpr"   "substring"</span></span></code></pre></div>
 <p><code>rig_impl()</code> does this job and is the main function of the
 package. It calls <code>wrap()</code>, the other important function,
 whose mission is to build verbose shims of functions used in the rigged
@@ -165,10 +159,10 @@ needed for the base pipe)</p>
 <code>rig_impl()</code><a class="anchor" aria-label="anchor" href="#rig_impl"></a>
 </h3>
 <p>Here’s the diagram of dependencies of <code>rig_impl()</code></p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">flow</span><span class="fu">::</span><span class="fu"><a href="https://moodymudskipper.github.io/flow/reference/flow_view_deps.html" class="external-link">flow_view_deps</a></span><span class="op">(</span><span class="fu">boomer</span><span class="fu">:::</span><span class="va">rig_impl</span>, show_imports <span class="op">=</span> <span class="st">"packages"</span><span class="op">)</span></code></pre></div>
-<div id="htmlwidget-363102c831d49f422558" style="width:700px;height:432.632880098888px;" class="nomnoml html-widget"></div>
-<script type="application/json" data-for="htmlwidget-363102c831d49f422558">{"x":{"code":"# direction: right\n#.expfun: visual=roundrect fill=#ddebf7 title=bold\n#.unexpfun: visual=roundrect fill=#fff2cc title=bold\n#.trimmed: visual=roundrect fill=#fce4d6 dashed title=bold\n#.expdata: visual=database fill=#e2efda title=bold\n#.unexpdata: visual=database fill=#fff2cc title=bold\n#.callroutine: visual=transceiver fill=#ededed\n[<unexpfun> rig_impl (33)|{methods}|{stats}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> build_shimmed_assign (16)]\n[<unexpfun> build_shimmed_assign (16)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> build_deparsed_calls (53)|{crayon}|{styler}]\n[<unexpfun> wrap (65)] -> [<unexpfun> eval_wrapped_call (11)|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> print_arguments (16)|{crayon}|{utils}]\n[<unexpfun> print_arguments (16)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> print_arguments (16)] -> [<unexpfun> promise_evaled_fixed (6)]\n[<unexpfun> promise_evaled_fixed (6)] -> [<unexpfun> promise_evaled (1)]\n[<unexpfun> wrap (65)] -> [<unexpfun> set_emojis (16)|{crayon}]\n[<unexpfun> wrap (65)] -> [<unexpfun> signal_rigged_function_and_args (15)|{crayon}|{withr}]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_globals_on_exit (4)]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_times_df_and_get_true_time (31)]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> double_colon (9)]\n[<unexpfun> double_colon (9)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> fetch_functions (14)|{graphics}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> reset_globals (6)]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> triple_colon (9)]\n[<unexpfun> triple_colon (9)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> rig_impl (33)] -> [<unexpfun> wrap (65)|{crayon}|{rlang}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> build_deparsed_calls (53)|{crayon}|{styler}]\n[<unexpfun> wrap (65)] -> [<unexpfun> eval_wrapped_call (11)|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> fetch_print_fun (21)|{methods}|{rlang}]\n[<unexpfun> wrap (65)] -> [<unexpfun> print_arguments (16)|{crayon}|{utils}]\n[<unexpfun> wrap (65)] -> [<unexpfun> set_emojis (16)|{crayon}]\n[<unexpfun> wrap (65)] -> [<unexpfun> signal_rigged_function_and_args (15)|{crayon}|{withr}]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_globals_on_exit (4)]\n[<unexpfun> wrap (65)] -> [<unexpfun> update_times_df_and_get_true_time (31)]","svg":true},"evals":[],"jsHooks":[]}</script><p><code>rig_impl()</code> :</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">flow</span><span class="fu">::</span><span class="fu"><a href="https://moodymudskipper.github.io/flow/reference/flow_view_deps.html" class="external-link">flow_view_deps</a></span><span class="op">(</span><span class="fu">boomer</span><span class="fu">:::</span><span class="va">rig_impl</span>, show_imports <span class="op">=</span> <span class="st">"packages"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="../../../../../private/var/folders/mp/qvg2y_jx63bgk_s0xxh2zr140000gp/T/Rtmp2YdgP0/flow_123ea486cb26c.png" width="150"></p>
+<p><code>rig_impl()</code> :</p>
 <ul>
 <li>Creates a new environment (the mask) as a child of the original
 environment</li>
@@ -224,34 +218,24 @@ arguments, and that they might call each other, we also make sure we
 include wrapped versions of our rigged functions in all the masks.</p>
 </div>
 </div>
-  </div>
-
-  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-
-        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
-    </nav>
-</div>
-
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 
 
-      <footer><div class="copyright">
-  <p></p>
-<p>Developed by Antoine Fabri.</p>
+    <footer><div class="pkgdown-footer-left">
+  <p>Developed by Antoine Fabri.</p>
 </div>
 
-<div class="pkgdown">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
-2.0.1.</p>
+<div class="pkgdown-footer-right">
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
-      </footer>
+    </footer>
 </div>
 
   
-
 
   
 

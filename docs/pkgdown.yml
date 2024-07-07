@@ -1,8 +1,11 @@
-pandoc: 2.17.1.1
-pkgdown: 2.0.1
+pandoc: 3.1.11
+pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   how-boomer-works: how-boomer-works.html
   shiny: shiny.html
-last_built: 2022-09-16T08:11Z
+last_built: 2024-07-07T13:25Z
+urls:
+  reference: https://moodymudskipper.github.io/boomer/reference
+  article: https://moodymudskipper.github.io/boomer/articles
 

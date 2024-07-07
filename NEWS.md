@@ -1,3 +1,10 @@
+# boomer 0.2.0
+
+Just a small release with a minor feature. The previous version got kicked from CRAN
+because the Suggests dependency {flow} had been kicked from CRAN at the time. 
+
+- New `boomer.ignore_args` experimental option used not to boom a function's argument
+
 # boomer 0.1.1
 
 * Call `boom_on()` and `boom_off()` when browsing to toggle "boom debugging" on and off
