@@ -9,7 +9,7 @@ test_that("boom.ignore", {
   })
 })
 
-test_that("boom.ignore.inside", {
+test_that("boom.ignore_args", {
   expect_snapshot({
     options("boomer.ignore_args" = NULL)
     data.frame(a = 1:3) %>%

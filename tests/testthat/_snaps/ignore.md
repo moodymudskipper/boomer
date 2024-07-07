@@ -30,7 +30,7 @@
     Code
       options(boomer.ignore = opts$boomer.ignore)
 
-# boom.ignore.inside
+# boom.ignore_args
 
     Code
       options(boomer.ignore_args = NULL)
