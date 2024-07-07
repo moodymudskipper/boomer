@@ -1,6 +1,6 @@
 Package: boomer
 Title: Debugging Tools to Inspect the Intermediate Steps of a Call
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: 
     person("Antoine", "Fabri", , "antoine.fabri@gmail.com", role = c("aut", "cre"))
 Description: Provides debugging tools that let you inspect the
@@ -25,6 +25,8 @@ Suggests:
     rmarkdown,
     shiny,
     testthat (>= 3.0.0)
+ Depends:
+    R (>= 4.0.0)
 VignetteBuilder: 
     knitr
 Remotes:
