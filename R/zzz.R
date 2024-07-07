@@ -18,6 +18,6 @@ op.boom <- list(
   #nocov start
   op <- options()
   toset <- !(names(op.boom) %in% names(op))
-  if (any(toset)) options(op.boom[toset])
+  if(any(toset)) options(op.boom[toset])
   #nocov end
 }

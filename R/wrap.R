@@ -33,7 +33,7 @@
 wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, mask = NULL) {
   # for CRAN notes
   . <- NULL
-  as.function(envir = asNamespace("boomer"), c(alist(... = ), bquote({
+  as.function(envir = asNamespace("boomer"), c(alist(...=), bquote({
     # Since we set the enclosing env to {boomer}'s namespace
     # we use `bquote()` to get `wrap()`'s arguments in
 
@@ -42,15 +42,15 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     fun_val   <- .(fun_val)
     ignore <- getOption("boomer.ignore")
     sc  <- sys.call()
-    if (wrapped_nm %in% ignore) {
+    if(wrapped_nm %in% ignore) {
       res <- rlang::eval_bare(as.call(c(fun_val, as.list(sc[-1]))), parent.frame())
       return(res)
     }
 
     # start the clock
     clock <- .(clock)
-    if (is.null(clock)) clock <- getOption("boomer.clock")
-    total_time_start <- if (clock) Sys.time()
+    if(is.null(clock)) clock <- getOption("boomer.clock")
+    total_time_start <- if(clock) Sys.time()
 
     # fetch other args
     print_fun <- .(print_fun)
@@ -58,11 +58,10 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     mask      <- .(mask)
 
     # gather other options at run time
-    if (is.null(print_fun)) print_fun <- getOption("boomer.print")
+    if(is.null(print_fun)) print_fun <- getOption("boomer.print")
     visible_only <- getOption("boomer.visible_only")
     print_args <- getOption("boomer.print_args")
     safe_print <- getOption("boomer.safe_print")
-
 
     wrapped_fun_caller_env <- parent.frame()
     # fetch rigged function's execution env, it's the wrapped_fun_caller_env
@@ -88,7 +87,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent)
 
     # display wrapped call at the top if relevant
-    if (!is.null(deparsed_calls$open)) {
+    if(!is.null(deparsed_calls$open)) {
       cat(deparsed_calls$open, "\n")
     }
 
@@ -110,12 +109,12 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     }
 
     # return invisible result early
-    if (!res$visible && visible_only) {
+    if(!res$visible && visible_only) {
       return(invisible(res$value))
     }
 
     # update the global `times` data frame and compute the true time
-    if (clock) {
+    if(clock) {
       true_time_msg <- update_times_df_and_get_true_time(
         call, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
       writeLines(crayon::blue(true_time_msg))
@@ -154,23 +153,23 @@ update_globals_on_exit <- function(clock) {
   globals$n_indent <- globals$n_indent - 1
   # update last_total_time_end on exit, we do it this way so our total
   # time doesn't leave out the updating of the times df with this value
-  if (clock) globals$last_total_time_end <- Sys.time()
+  if(clock) globals$last_total_time_end <- Sys.time()
   invisible(NULL)
 }
 
 signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rigged_fun_exec_env) {
   # is the wrapped function called by a rigged function?
-  if (!is.null(rigged_nm)) {
+  if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
-    if (mask$..FIRST_CALL..) {
+    if(mask$..FIRST_CALL..) {
       # load pryr early to print early "Registered S3 method overwritten..."
-      if (print_args) loadNamespace("pryr")
+      if(print_args) loadNamespace("pryr")
 
-      cat(ej$dots, ej$rig_open, crayon::yellow(rigged_nm), "\n", sep = "")
+      cat(ej$dots, ej$rig_open, crayon::yellow(rigged_nm),"\n", sep = "")
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
-        cat(ej$dots, ej$rig_close, crayon::yellow(rigged_nm), "\n", sep = "")
+        cat(ej$dots, ej$rig_close, crayon::yellow(rigged_nm),"\n", sep = "")
         mask$..FIRST_CALL.. <- TRUE
         mask$..EVALED_ARGS..[] <- FALSE
       }, envir = rigged_fun_exec_env)
@@ -180,7 +179,7 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
   }
 }
 
-build_deparsed_calls <- function(sc, ej, n_indent) {
+build_deparsed_calls <- function(sc, ej, n_indent, force_single_line = FALSE) {
   # manipulate call to use original function
   sc <- sc
 
@@ -190,27 +189,27 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
   call_chr <- styler::style_text(call_chr)
 
   # if all args are "atomic" (symbols or numbers) we can print open and close in one go
-  all_args_are_atomic <- all(lengths(as.list(sc[-1])) == 1)
+  all_args_are_atomic <- force_single_line || all(lengths(as.list(sc[-1])) == 1)
   # we need a workaround for magrittr here
-  no_dot_in_args <- !any(sapply(sc[-1], identical, quote(.)))
-  if (length(call_chr) == 1) {
-    if (all_args_are_atomic && no_dot_in_args) {
+  no_dot_in_args <- force_single_line || !any(sapply(sc[-1], identical, quote(.)))
+  if(length(call_chr) == 1) {
+    if(all_args_are_atomic && no_dot_in_args) {
       deparsed_calls$close <-
         paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::cyan(call_chr))
     } else {
       deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr))
-      if (getOption("boomer.abbreviate")) {
+      if(getOption("boomer.abbreviate")) {
         call_chr <- deparse_line(sc[[1]])
       }
       deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
 
-      if (crayon::col_nchar(deparsed_calls$open) > 80) {
+      if(crayon::col_nchar(deparsed_calls$open) > 80) {
         deparsed_calls$open <- paste0(
           crayon::col_substr(deparsed_calls$open, 1, 77), crayon::cyan("..."))
       }
     }
   } else {
-    if (all_args_are_atomic && no_dot_in_args) {
+    if(all_args_are_atomic && no_dot_in_args) {
       line1 <- paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::cyan(call_chr[1]))
       other_lines <-  paste0(ej$dots, "      ", crayon::cyan(call_chr[-1]))
       deparsed_calls$close <- paste(c(line1, other_lines), collapse = "\n")
@@ -218,15 +217,15 @@ build_deparsed_calls <- function(sc, ej, n_indent) {
       line1 <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr[1]))
       other_lines <-  paste0(ej$dots, "   ", crayon::cyan(call_chr[-1]))
       deparsed_calls$close <-  paste(c(line1, other_lines), collapse = "\n")
-      if (getOption("boomer.abbreviate")) {
+      if(getOption("boomer.abbreviate")) {
         call_chr <- deparse_line(sc[[1]])
       }
-      if (length(call_chr) > 1) {
+      if(length(call_chr) > 1) {
         call_chr <- paste0(call_chr[1], "...")
       }
       deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
 
-      if (crayon::col_nchar(deparsed_calls$open) > 80) {
+      if(crayon::col_nchar(deparsed_calls$open) > 80) {
         # couldn' find example to test this so using nocov, but it's he same as above
         # nocov start
         deparsed_calls$open <- paste0(
@@ -253,11 +252,11 @@ eval_wrapped_call <- function(sc, fun_val, clock, rigged_fun_exec_env) {
 
 print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env) {
   rigged <- !is.null(rigged_nm)
-  if (!print_args || !rigged) return(invisible(NULL))
+  if(!print_args || ! rigged) return(invisible(NULL))
   for (arg in names(mask$..EVALED_ARGS..)) {
-    if (!mask$..EVALED_ARGS..[[arg]]) {
+    if(!mask$..EVALED_ARGS..[[arg]]) {
       evaled <- promise_evaled_fixed(arg, rigged_fun_exec_env)
-      if (evaled) {
+      if(evaled) {
         mask$..EVALED_ARGS..[[arg]] <- TRUE
         arg_val <- get(arg, envir = rigged_fun_exec_env)
         print_fun <- fetch_print_fun(print_fun, arg_val)
@@ -271,7 +270,7 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
 
 promise_evaled <- getFromNamespace("promise_evaled", "pryr")
 # fixed so it returns FALSE if arg is missing
-promise_evaled_fixed <- function(name, env) {
+promise_evaled_fixed <- function (name, env) {
   expr <- substitute(missing(ARG), list(ARG = as.symbol(name)))
   expr[[1]] <- missing # so it does not collide with a local definition of `missing()`
   arg_is_missing <- eval(expr, env)
@@ -288,8 +287,8 @@ update_times_df_and_get_true_time <- function(
   # and aren't marked as counted yet
   ind <-
     globals$times$total_time_start >=  evaluation_time_start &
-    !globals$times$counted
-  if (n) {
+    ! globals$times$counted
+  if(n) {
     # update last value of total time end
     globals$times$total_time_end[n] <- globals$last_total_time_end
     # deduce total last time
@@ -321,10 +320,10 @@ update_times_df_and_get_true_time <- function(
 
   # build message with appropriate unit
   #nocov start
-  if (true_time < 1e-6) {
-    true_time_msg <- paste("time:", round(true_time * 1e6, 3), "us")
-  } else if (true_time < 1e-3) {
-    true_time_msg <- paste("time:", round(true_time * 1e3, 3), "ms")
+  if(true_time < 1e-6) {
+    true_time_msg <- paste("time:", round(true_time*1e6, 3), "us")
+  } else if(true_time < 1e-3) {
+    true_time_msg <- paste("time:", round(true_time*1e3, 3), "ms")
   } else {
     true_time_msg <- paste("time:", round(true_time, 3), "s")
   }
@@ -333,23 +332,23 @@ update_times_df_and_get_true_time <- function(
 }
 
 fetch_print_fun <- function(print_fun, res) {
-  if (is.list(print_fun)) {
+  if(is.list(print_fun)) {
     use_default <- TRUE
     nms <- allNames(print_fun)
     default <- print_fun[nms == ""]
-    if (length(default)) {
+    if(length(default)) {
       default <- rlang::as_function(default[[1]])
     } else {
       default <- print
     }
-    for (cl in setdiff(nms, "")) {
-      if (inherits(res, cl)) {
+    for(cl in setdiff(nms, "")) {
+      if(inherits(res, cl)) {
         print_fun <- rlang::as_function(print_fun[[cl]])
         use_default <- FALSE
         break
       }
     }
-    if (use_default) print_fun <- default
+    if(use_default) print_fun <- default
   }
   print_fun
 }
