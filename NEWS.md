@@ -1,3 +1,7 @@
+# boomer 0.2.0
+
+- New `boomer.ignore_args` experimental option used not to boom a function's argument
+
 # boomer 0.1.1
 
 * Call `boom_on()` and `boom_off()` when browsing to toggle "boom debugging" on and off
