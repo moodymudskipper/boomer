@@ -136,7 +136,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     # rethrow error on failure
     if (!success) {
       error <- attr(res, "condition")
-      writeLines(crayon::magenta("Error:", paste0(class(error), collapse = "/")))
+      writeLines(cli::col_magenta("Error: ", paste0(class(error), collapse = "/")))
       stop(error)
     }
 
@@ -149,7 +149,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     if(clock) {
       true_time_msg <- update_times_df_and_get_true_time(
         call, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
-      writeLines(crayon::blue(true_time_msg))
+      writeLines(cli::col_blue(true_time_msg))
     }
 
     # print output with appropriate print fun and indentation
@@ -164,18 +164,18 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
 set_emojis <- function(safe_print, n_indent) {
   ej <- list()
   if (safe_print) {
-    ej$rig_open   <- crayon::bold(crayon::yellow("{ "))
-    ej$rig_close  <- crayon::bold(crayon::yellow("} "))
-    ej$wrap_open  <- crayon::bold(crayon::yellow("<  "))
-    ej$wrap_close <- crayon::bold(crayon::yellow(">  "))
-    ej$dots       <- crayon::yellow(strrep(". ", n_indent))
+    ej$rig_open   <- cli::style_bold(cli::col_yellow("{ "))
+    ej$rig_close  <- cli::style_bold(cli::col_yellow("} "))
+    ej$wrap_open  <- cli::style_bold(cli::col_yellow("<  "))
+    ej$wrap_close <- cli::style_bold(cli::col_yellow(">  "))
+    ej$dots       <- cli::col_yellow(strrep(". ", n_indent))
   } else {
     # nocov start
     ej$rig_open   <- "\U0001f447 "
     ej$rig_close  <- "\U0001f446 "
     ej$wrap_open  <- "\U0001f4a3 "
     ej$wrap_close <- "\U0001f4a5 "
-    ej$dots       <- crayon::yellow(strrep("\ub7 ", n_indent))
+    ej$dots       <- cli::col_yellow(strrep("\ub7 ", n_indent))
     # nocov end
   }
   ej
@@ -197,11 +197,11 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
       # load pryr early to print early "Registered S3 method overwritten..."
       if(print_args) loadNamespace("pryr")
 
-      cat(ej$dots, ej$rig_open, crayon::yellow(rigged_nm),"\n", sep = "")
+      cat(ej$dots, ej$rig_open, cli::col_yellow(rigged_nm),"\n", sep = "")
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
-        cat(ej$dots, ej$rig_close, crayon::yellow(rigged_nm),"\n", sep = "")
+        cat(ej$dots, ej$rig_close, cli::col_yellow(rigged_nm),"\n", sep = "")
         mask$..FIRST_CALL.. <- TRUE
         mask$..EVALED_ARGS..[] <- FALSE
       }, envir = rigged_fun_exec_env)
@@ -227,27 +227,27 @@ build_deparsed_calls <- function(sc, ej, n_indent, force_single_line = FALSE) {
   if(length(call_chr) == 1) {
     if(all_args_are_atomic && no_dot_in_args) {
       deparsed_calls$close <-
-        paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::cyan(call_chr))
+        paste0(ej$dots, ej$wrap_open, ej$wrap_close, cli::col_cyan(call_chr))
     } else {
-      deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr))
+      deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, cli::col_cyan(call_chr))
       if(getOption("boomer.abbreviate")) {
         call_chr <- deparse_line(sc[[1]])
       }
-      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
+      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, cli::col_cyan(call_chr))
 
-      if(crayon::col_nchar(deparsed_calls$open) > 80) {
+      if(cli::ansi_nchar(deparsed_calls$open) > 80) {
         deparsed_calls$open <- paste0(
-          crayon::col_substr(deparsed_calls$open, 1, 77), crayon::cyan("..."))
+          cli::ansi_substr(deparsed_calls$open, 1, 77), cli::col_cyan("..."))
       }
     }
   } else {
     if(all_args_are_atomic && no_dot_in_args) {
-      line1 <- paste0(ej$dots, ej$wrap_open, ej$wrap_close, crayon::cyan(call_chr[1]))
-      other_lines <-  paste0(ej$dots, "      ", crayon::cyan(call_chr[-1]))
+      line1 <- paste0(ej$dots, ej$wrap_open, ej$wrap_close, cli::col_cyan(call_chr[1]))
+      other_lines <-  paste0(ej$dots, "      ", cli::col_cyan(call_chr[-1]))
       deparsed_calls$close <- paste(c(line1, other_lines), collapse = "\n")
     } else {
-      line1 <- paste0(ej$dots, ej$wrap_close, crayon::cyan(call_chr[1]))
-      other_lines <-  paste0(ej$dots, "   ", crayon::cyan(call_chr[-1]))
+      line1 <- paste0(ej$dots, ej$wrap_close, cli::col_cyan(call_chr[1]))
+      other_lines <-  paste0(ej$dots, "   ", cli::col_cyan(call_chr[-1]))
       deparsed_calls$close <-  paste(c(line1, other_lines), collapse = "\n")
       if(getOption("boomer.abbreviate")) {
         call_chr <- deparse_line(sc[[1]])
@@ -255,13 +255,13 @@ build_deparsed_calls <- function(sc, ej, n_indent, force_single_line = FALSE) {
       if(length(call_chr) > 1) {
         call_chr <- paste0(call_chr[1], "...")
       }
-      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, crayon::cyan(call_chr))
+      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, cli::col_cyan(call_chr))
 
-      if(crayon::col_nchar(deparsed_calls$open) > 80) {
+      if(cli::ansi_nchar(deparsed_calls$open) > 80) {
         # couldn' find example to test this so using nocov, but it's he same as above
         # nocov start
         deparsed_calls$open <- paste0(
-          crayon::col_substr(deparsed_calls$open, 1, 77), crayon::cyan("..."))
+          cli::ansi_substr(deparsed_calls$open, 1, 77), cli::col_cyan("..."))
         # nocov end
       }
     }
@@ -294,7 +294,7 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
         print_fun <- fetch_print_fun(print_fun, arg_val)
         output <- capture.output(print_fun(arg_val))
         writeLines(paste0(
-          ej$dots, c(crayon::green(arg, ":"), output)))
+          ej$dots, c(cli::col_green(arg, " ", ":"), output)))
       }
     }
   }
