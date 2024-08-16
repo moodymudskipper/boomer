@@ -1,10 +1,10 @@
 pandoc: 3.1.11
 pkgdown: 2.1.0.9000
-pkgdown_sha: 1d40a80e6b3564a6d7da0ce467b0a4570aa5665e
+pkgdown_sha: 6ecf7666c05a728e6fea07301a07c33a6ffed784
 articles:
   how-boomer-works: how-boomer-works.html
   shiny: shiny.html
-last_built: 2024-08-09T22:54Z
+last_built: 2024-08-16T19:58Z
 urls:
   reference: https://moodymudskipper.github.io/boomer/reference
   article: https://moodymudskipper.github.io/boomer/articles
