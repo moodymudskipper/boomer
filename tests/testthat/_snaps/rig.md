@@ -9,29 +9,29 @@
       rigged(letters)
     Output
       { fun
-      <  1 + 2 * 3 
-      . <  >  2 * 3 
+      <  1 + 2 * 3
+      . <  >  2 * 3
       . [1] 6
       . 
-      >  1 + 2 * 3 
+      >  1 + 2 * 3
       [1] 7
       
-      <  sum(base::nchar(utils:::head(x, -n))) 
-      . <  base::nchar(utils:::head(x, -n)) 
-      . . <  utils:::head(x, -n) 
+      <  sum(base::nchar(utils:::head(x, -n)))
+      . <  base::nchar(utils:::head(x, -n))
+      . . <  utils:::head(x, -n)
       . . . x :
       . . .  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
       . . . [20] "t" "u" "v" "w" "x" "y" "z"
-      . . . <  >  -n 
+      . . . <  >  -n
       . . . [1] -7
       . . . 
-      . . >  utils:::head(x, -n) 
+      . . >  utils:::head(x, -n)
       . .  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
       . . 
-      . >  base::nchar(utils:::head(x, -n)) 
+      . >  base::nchar(utils:::head(x, -n))
       .  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
       . 
-      >  sum(base::nchar(utils:::head(x, -n))) 
+      >  sum(base::nchar(utils:::head(x, -n)))
       [1] 19
       
       } fun
@@ -58,29 +58,29 @@
       rigged(letters)
     Output
       { e2
-      <  1 + 2 * 3 
-      . <  >  2 * 3 
+      <  1 + 2 * 3
+      . <  >  2 * 3
       . [1] 6
       . 
-      >  1 + 2 * 3 
+      >  1 + 2 * 3
       [1] 7
       
-      <  sum(base::nchar(utils:::head(x, -n))) 
-      . <  base::nchar(utils:::head(x, -n)) 
-      . . <  utils:::head(x, -n) 
+      <  sum(base::nchar(utils:::head(x, -n)))
+      . <  base::nchar(utils:::head(x, -n))
+      . . <  utils:::head(x, -n)
       . . . x :
       . . .  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
       . . . [20] "t" "u" "v" "w" "x" "y" "z"
-      . . . <  >  -n 
+      . . . <  >  -n
       . . . [1] -7
       . . . 
-      . . >  utils:::head(x, -n) 
+      . . >  utils:::head(x, -n)
       . .  [1] "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s"
       . . 
-      . >  base::nchar(utils:::head(x, -n)) 
+      . >  base::nchar(utils:::head(x, -n))
       .  [1] 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
       . 
-      >  sum(base::nchar(utils:::head(x, -n))) 
+      >  sum(base::nchar(utils:::head(x, -n)))
       [1] 19
       
       } e2
@@ -96,10 +96,10 @@
       { foo2
       x :
       [1] 2
-      <  >  x * 2 
+      <  >  x * 2
       [1] 4
       
-      <  >  SQRT(x) 
+      <  >  SQRT(x)
       [1] 2
       
       } foo2

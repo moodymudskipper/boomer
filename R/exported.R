@@ -139,14 +139,25 @@ rig_in_namespace <- function(
   for (i in seq_along(vals)) {
 
     nm <- nms[[i]]
-    ns <- environment(vals[[i]])
+    env <- environment(vals[[i]])
+    name <- base::environmentName(env)
+    if (grepl("^package:", name)) {
+      pkg <- env
+      ns <- asNamespace(gsub("^package:", "", name))
+    } else if (name != "") {
+      ns <- env
+      pkg <- as.environment(paste0("package:", base::getNamespaceName(ns)))
+    } else {
+      stop("Function ", nm, " doesn't appear to be part of a package.")
+    }
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, rigged_nm = nms[[i]])
     val <- vals[[i]]
     ub <- unlockBinding
-    ub(nm, ns)
-    assign(nm, val, ns)
-    pkg <- paste0("package:", base::getNamespaceName(ns))
-    ub(nm, as.environment(pkg))
+    if (exists(nm, ns, mode = "function", inherits = FALSE)) {
+      ub(nm, ns)
+      assign(nm, val, ns)
+    }
+    ub(nm, pkg)
     assign(nm, val, pkg)
   }
 
