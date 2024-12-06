@@ -151,7 +151,7 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 <span class="r-in"><span><span class="fu">boom</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="fl">2</span><span class="op">)</span>, <span class="va">qsec</span> <span class="op">&gt;</span> <span class="fl">17</span><span class="op">)</span>, clock <span class="op">=</span> <span class="cn">TRUE</span>, print <span class="op">=</span> <span class="va">str</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 💣 <span style="color: #00BBBB;">subset(head(mtcars, 2), qsec &gt; 17)</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>💣 💥 <span style="color: #00BBBB;">head(mtcars, 2)</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.159 ms</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.178 ms</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>'data.frame':	2 obs. of  11 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span> $ mpg : num  21 21</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span> $ cyl : num  6 6</span>
@@ -170,7 +170,7 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span> logi [1:2] FALSE TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 💥 <span style="color: #00BBBB;">subset(head(mtcars, 2), qsec &gt; 17)</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.263 ms</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.319 ms</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'data.frame':	1 obs. of  11 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ mpg : num 21</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ cyl : num 6</span>
@@ -306,11 +306,11 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span><span style="color: #00BB00;">x :</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>[1] "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>💣 💥 <span style="color: #00BBBB;">x + 1</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.018 ms</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.012 ms</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>[1] "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 💥 <span style="color: #00BBBB;">x + 1 + 2</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.029 s</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.03 s</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 👆 <span style="color: #BBBB00;">e2</span></span>
