@@ -10,7 +10,7 @@ License: GPL-3
 URL: https://github.com/moodymudskipper/boomer
 BugReports: https://github.com/moodymudskipper/boomer/issues
 Imports: 
-    crayon,
+    cli,
     methods,
     pryr,
     rlang,
