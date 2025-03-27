@@ -7,7 +7,7 @@ Description: Provides debugging tools that let you inspect the
     intermediate results of a call. The output looks as if we explode a
     call into its parts hence the package name.
 License: GPL-3
-URL: https://github.com/moodymudskipper/boomer
+URL: https://moodymudskipper.github.io/boomer/, https://github.com/moodymudskipper/boomer
 BugReports: https://github.com/moodymudskipper/boomer/issues
 Imports: 
     cli,
