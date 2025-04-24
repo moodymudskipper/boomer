@@ -4,7 +4,7 @@ pkgdown_sha: 62d5c5a0fc12899aae97f6ce14018d2784bf308b
 articles:
   how-boomer-works: how-boomer-works.html
   shiny: shiny.html
-last_built: 2025-04-24T12:10Z
+last_built: 2025-04-24T12:26Z
 urls:
   reference: https://moodymudskipper.github.io/boomer/reference
   article: https://moodymudskipper.github.io/boomer/articles
