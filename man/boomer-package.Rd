@@ -54,6 +54,7 @@ call when it's entered.
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://moodymudskipper.github.io/boomer/}
   \item \url{https://github.com/moodymudskipper/boomer}
   \item Report bugs at \url{https://github.com/moodymudskipper/boomer/issues}
 }
