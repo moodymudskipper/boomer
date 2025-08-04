@@ -84,7 +84,7 @@ of the function we rig.</p>
 <span><span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span></span>
 <span><span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55983808d338&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x55e736d2dd68&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:tools&gt;</span></span>
 <span><span class="va">rigged_file_ext</span></span>
 <span><span class="co">#&gt; function (x) </span></span>
@@ -92,7 +92,7 @@ of the function we rig.</p>
 <span><span class="co">#&gt;     pos &lt;- regexpr("\\.([[:alnum:]]+)$", x)</span></span>
 <span><span class="co">#&gt;     ifelse(pos &gt; -1L, substring(x, pos + 1L), "")</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5598381cf318&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;environment: 0x55e736e6fd48&gt;</span></span></code></pre></div>
 <p>Instead we copy the original function but give it a new environment.
 This new environment is a child of the original environment, and is
 populated with shims of the functions called by the original function.
@@ -105,7 +105,7 @@ We call this environment the mask.</p>
 <span><span class="co"># our new environment</span></span>
 <span><span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="va">rigged_file_ext</span><span class="op">)</span></span>
 <span><span class="va">env</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x5598381cf318&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x55e736e6fd48&gt;</span></span>
 <span></span>
 <span><span class="co"># its parent</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">parent.env</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span></span>
@@ -140,7 +140,7 @@ needed for the base pipe)</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">flow</span><span class="fu">::</span><span class="fu"><a href="https://moodymudskipper.github.io/flow/reference/flow_view_deps.html" class="external-link">flow_view_deps</a></span><span class="op">(</span><span class="fu">boomer</span><span class="fu">:::</span><span class="va">rig_impl</span>, show_imports <span class="op">=</span> <span class="st">"packages"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.</span></span>
-<span><span class="co">#&gt; Error in knitr::include_graphics(png): Cannot find the file(s): "/tmp/RtmpkiADAU/flow_37584f1fc102.png"</span></span></code></pre></div>
+<span><span class="co">#&gt; Error in knitr::include_graphics(png): Cannot find the file(s): "/tmp/Rtmp6Xf5a9/flow_37365b8629ba.png"</span></span></code></pre></div>
 <p><code>rig_impl()</code> :</p>
 <ul>
 <li>Creates a new environment (the mask) as a child of the original
