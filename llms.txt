@@ -1,0 +1,266 @@
+# boomer
+
+The *{boomer}* package provides debugging tools that let you inspect the
+intermediate results of a call. The output looks as if we explode a call
+into its parts hence the name.
+
+- [`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  prints the intermediate results of a call or a code chunk.
+- [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  creates a copy of a function which will display the intermediate
+  results of all the calls of it body.
+- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  rigs a namespaced function in place, so its always verbose even when
+  called by other existing functions. It is especially handy for package
+  development.
+
+## Installation
+
+Install CRAN version with:
+
+``` r
+install.packages("boomer")
+```
+
+Or development version with:
+
+``` r
+remotes::install_github("moodymudskipper/boomer")
+```
+
+## `boom()`
+
+``` r
+library(boomer)
+boom(1 + !1 * 2)
+```
+
+![](reference/figures/README-1.png)
+
+``` r
+boom(subset(head(mtcars, 2), qsec > 17))
+```
+
+![](reference/figures/README-2.png)
+
+You can use
+[`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+with *{magrittr}* pipes or base R pipes: just pipe to
+[`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+at the end of a pipe chain.
+
+``` r
+library(magrittr)
+mtcars %>%
+  head(2) %>%
+  subset(qsec > 17) %>%
+  boom()
+```
+
+![](reference/figures/README-3.png)
+
+If a call fails, *{boomer}* will print intermediate outputs up to the
+occurrence of the error, it can help with debugging:
+
+``` r
+"tomato" %>%
+  substr(1, 3) %>%
+  toupper() %>%
+  sqrt() %>%
+  boom()
+```
+
+![](reference/figures/README-4.png)
+
+[`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+features optional arguments :
+
+- `clock`: set to `TRUE` to see how long each step (in isolation!) took
+  to run.
+
+- `print`: set to a function such as `str` to change what is printed
+  (see
+  [`?boom`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  to see how to print differently depending on class). Useful
+  alternatives would be
+  [`dplyr::glimpse`](https://pillar.r-lib.org/reference/glimpse.html) of
+  `invisible` (to print nothing).
+
+One use case is when the output is too long.
+
+``` r
+boom(lapply(head(cars), sqrt), clock = TRUE, print = str)
+```
+
+![](reference/figures/README-5.png)
+
+[`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+also works works on loops and multi-line expression.
+
+``` r
+ boom(for(i in 1:3) paste0(i, "!"))
+```
+
+![](reference/figures/README-6.png)
+
+## `rig()`
+
+[`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md) a
+function in order to
+[`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+its body, its arguments are printed by default when they’re evaluated.
+
+``` r
+hello <- function(x) {
+  if(!is.character(x) | length(x) != 1) {
+    stop("`x` should be a string")
+  }
+  paste0("Hello ", x, "!")
+}
+rig(hello)("world")
+```
+
+![](reference/figures/README-7.png)
+
+## `rig_in_namespace()`
+
+[`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+creates a copy of a function, but when developing a package we might
+want to rig a function in place so it has a verbose output when called
+by other functions. For this we can use
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md).
+
+For instance you might have these functions in a package :
+
+``` r
+cylinder_vol <- function(r, h) {
+  h * disk_area(r)
+}
+
+disk_area <- function(r) {
+  pi * r^2
+}
+```
+
+`cylinder_vol` depends on `disk_area`, call `devtools::load_all()` then
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+on both and enjoy the detailed output:
+
+``` r
+devtools::load_all()
+rig_in_namespace(cylinder_vol, disk_area)
+cylinder_vol(3,10)
+```
+
+![](reference/figures/README-9.png)
+
+## `boom_on()` and `boom_off()`
+
+While debugging a function, call
+[`boom_on()`](https://moodymudskipper.github.io/boomer/reference/boom_on.md)
+and all subsequent calls will be boomed, call
+[`boom_off()`](https://moodymudskipper.github.io/boomer/reference/boom_on.md)
+to return to standard debugging.
+
+![](reference/figures/README-10.gif)
+
+## `boom_shinyApp()`
+
+A very experimental feature that allows you to rig the reactives of a
+shiny app. See
+[`vignette("shiny", "boomer")`](https://moodymudskipper.github.io/boomer/articles/shiny.md)
+for more information.
+
+For the following app, saved in a proper project/package:
+
+``` r
+histogramUI <- function(id) {
+  tagList(
+    selectInput(NS(id, "var"), "Variable", choices = names(mtcars)),
+    numericInput(NS(id, "bins"), "bins", value = 10, min = 1),
+    plotOutput(NS(id, "hist"))
+  )
+}
+
+histogramServer <- function(id) {
+  moduleServer(id, function(input, output, session) {
+    data <- reactive(mtcars[[input$var]])
+    output$hist <- renderPlot({
+      hist(data(), breaks = input$bins, main = input$var)
+    }, res = 96)
+  })
+}
+
+ui <- fluidPage(
+  histogramUI("hist1")
+)
+server <- function(input, output, session) {
+  histogramServer("hist1")
+}
+```
+
+The output of `boom_shinyApp(ui, server)` will look like:
+
+![](reference/figures/README-11.gif)
+
+There will be issues, please report!
+
+## Addin
+
+To avoid typing
+[`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+all the time you can use the provided addin named *“Explode a call with
+[`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)”*:
+just attribute a key combination to it (I use ctrl+shift+alt+B on
+windows), select the call you’d like to explode and fire away!
+
+## Options
+
+Several options are proposed to weak he printed output of {boomer}’s
+functions and addin, see
+[`?boomer`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+to learn about them.
+
+In particular on some operating systems *{boomer}*’s functions’ output
+might not always look good in markdown report or reprexes. It’s due to
+how he system handles UTF-8 characters. In this case one can use
+`options(boomer.safe_print = TRUE)` for a more satisfactory input.
+
+## Notes
+
+*{boomer}* prints the output of intermediate steps as they are executed,
+and thus doesn’t say anything about what isn’t executed, it is in
+contrast with functions like
+[`lobstr::ast()`](https://lobstr.r-lib.org/reference/ast.html) which
+return the parse tree.
+
+Thanks to @data_question for suggesting the name *{boomer}* on
+[twitter](https://twitter.com/data_question/status/1356615026988179464).
+
+# Package index
+
+## All functions
+
+- [`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  [`rigger()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  : Print the Output of Intermediate Steps of a Call
+- [`boom_on()`](https://moodymudskipper.github.io/boomer/reference/boom_on.md)
+  [`boom_off()`](https://moodymudskipper.github.io/boomer/reference/boom_on.md)
+  : Switch "boom" debugging on and off
+- [`boom_shinyApp()`](https://moodymudskipper.github.io/boomer/reference/boom_shinyApp.md)
+  [`boom_runApp()`](https://moodymudskipper.github.io/boomer/reference/boom_shinyApp.md)
+  : boom the reactive calls of a shiny app
+- [`boomer-package`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  : boomer: Debugging Tools to Inspect the Intermediate Steps of a Call
+
+# Articles
+
+### All vignettes
+
+- [How boomer
+  works](https://moodymudskipper.github.io/boomer/articles/how-boomer-works.md):
+- [Debug a shiny app with
+  {boomer}](https://moodymudskipper.github.io/boomer/articles/shiny.md):
