@@ -15,7 +15,7 @@ tools::file_ext
 #>     pos <- regexpr("\\.([[:alnum:]]+)$", x)
 #>     ifelse(pos > -1L, substring(x, pos + 1L), "")
 #> }
-#> <bytecode: 0x55afec3637c0>
+#> <bytecode: 0x558875dab330>
 #> <environment: namespace:tools>
 rigged_file_ext
 #> function (x) 
@@ -23,7 +23,7 @@ rigged_file_ext
 #>     pos <- regexpr("\\.([[:alnum:]]+)$", x)
 #>     ifelse(pos > -1L, substring(x, pos + 1L), "")
 #> }
-#> <environment: 0x55afec4a1ba0>
+#> <environment: 0x558875ee9710>
 ```
 
 Instead we copy the original function but give it a new environment.
@@ -39,7 +39,7 @@ environment(tools::file_ext)
 # our new environment
 env <- environment(rigged_file_ext)
 env
-#> <environment: 0x55afec4a1ba0>
+#> <environment: 0x558875ee9710>
 
 # its parent
 parent.env(env)
@@ -73,7 +73,7 @@ Here’s the diagram of dependencies of `rig_impl()`
 ``` r
 flow::flow_view_deps(boomer:::rig_impl, show_imports = "packages")
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
-#> Error in knitr::include_graphics(png): Cannot find the file(s): "/tmp/RtmpDzktZ6/flow_37ef73e6da48.png"
+#> Error in knitr::include_graphics(png): Cannot find the file(s): "/tmp/RtmpXgDCPz/flow_37db6cf8a199.png"
 ```
 
 `rig_impl()` :
