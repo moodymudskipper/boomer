@@ -11,8 +11,8 @@ URL: https://moodymudskipper.github.io/boomer/, https://github.com/moodymudskipp
 BugReports: https://github.com/moodymudskipper/boomer/issues
 Imports: 
     cli,
+    lobstr,
     methods,
-    pryr,
     rlang,
     rstudioapi,
     styler,
@@ -20,7 +20,6 @@ Imports:
 Suggests: 
     flow,
     knitr,
-    lobstr,
     magrittr,
     rmarkdown,
     shiny,

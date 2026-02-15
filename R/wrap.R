@@ -194,8 +194,8 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
   if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
     if(mask$..FIRST_CALL..) {
-      # load pryr early to print early "Registered S3 method overwritten..."
-      if(print_args) loadNamespace("pryr")
+      # load lobstr early to print early "Registered S3 method overwritten..."
+      if(print_args) loadNamespace("lobstr")
 
       cat(ej$dots, ej$rig_open, cli::col_yellow(rigged_nm),"\n", sep = "")
 
@@ -300,7 +300,9 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
   }
 }
 
-promise_evaled <- getFromNamespace("promise_evaled", "pryr")
+promise_evaled <- function(name, env) {
+  .Call(boomer_promise_evaled, as.symbol(name), env)
+}
 # fixed so it returns FALSE if arg is missing
 promise_evaled_fixed <- function (name, env) {
   expr <- substitute(missing(ARG), list(ARG = as.symbol(name)))

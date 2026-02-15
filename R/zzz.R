@@ -1,7 +1,8 @@
 #' @importFrom stats setNames
 #' @importFrom utils getParseData head capture.output
 #' @importFrom methods allNames formalArgs
-#' @importFrom pryr address
+#' @importFrom lobstr obj_addr
+#' @useDynLib boomer, .registration = TRUE
 NULL
 
 op.boom <- list(
