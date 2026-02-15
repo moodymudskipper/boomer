@@ -5,7 +5,7 @@
 SEXP boomer_promise_evaled(SEXP name, SEXP env) {
   SEXP object = Rf_findVar(name, env);
   if (TYPEOF(object) != PROMSXP) {
-    return ScalarLogical(FALSE);
+    return ScalarLogical(TRUE);
   }
   return ScalarLogical(PRVALUE(object) != R_UnboundValue);
 }
