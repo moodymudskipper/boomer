@@ -107,7 +107,17 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     ignore_args.bool <-
       !is.null(mask) &&
       any(vapply(ignore_args, identical, logical(1), fun_val))
-    deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent, force_single_line = ignore_args.bool)
+
+    deparsed_calls <- (
+      sc, 
+      ej, 
+      globals$n_indent, 
+      force_single_line = ignore_args.bool,
+      rigged = isTRUE(attr(fun_val, "boomer.rigged"))
+    )
+
+    # for S3 methods the first arg is evaled right away
+    print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env)
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
@@ -210,7 +220,7 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
   }
 }
 
-build_deparsed_calls <- function(sc, ej, n_indent, force_single_line = FALSE) {
+build_deparsed_calls <- function(sc, ej, n_indent, force_single_line, rigged) {
   # manipulate call to use original function
   sc <- sc
 
@@ -220,7 +230,8 @@ build_deparsed_calls <- function(sc, ej, n_indent, force_single_line = FALSE) {
   call_chr <- styler::style_text(call_chr)
 
   # if all args are "atomic" (symbols or numbers) we can print open and close in one go
-  all_args_are_atomic <- force_single_line || all(lengths(as.list(sc[-1])) == 1)
+  all_args_are_atomic <- !rigged && (force_single_line || all(lengths(as.list(sc[-1])) == 1))
+ 
   # we need a workaround for magrittr here
   no_dot_in_args <- force_single_line || !any(sapply(sc[-1], identical, quote(.)))
   if(length(call_chr) == 1) {
