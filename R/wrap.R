@@ -108,7 +108,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
       !is.null(mask) &&
       any(vapply(ignore_args, identical, logical(1), fun_val))
 
-    deparsed_calls <- (
+    deparsed_calls <- build_deparsed_calls(
       sc, 
       ej, 
       globals$n_indent, 
