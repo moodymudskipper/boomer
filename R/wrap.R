@@ -158,8 +158,8 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     # update the global `times` data frame and compute the true time
     if(clock) {
       true_time_msg <- update_times_df_and_get_true_time(
-        call, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
-      writeLines(cli::col_blue(true_time_msg))
+        sc, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
+      writeLines(crayon::blue(true_time_msg))
     }
 
     # print output with appropriate print fun and indentation
