@@ -33,7 +33,7 @@
 wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, mask = NULL) {
   # for CRAN notes
   . <- NULL
-  as.function(envir = asNamespace("boomer"), c(alist(...=), bquote({
+  out <- as.function(envir = asNamespace("boomer"), c(alist(...=), bquote({
     # Since we set the enclosing env to {boomer}'s namespace
     # we use `bquote()` to get `wrap()`'s arguments in
 
@@ -159,6 +159,8 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
 
     res
   })))
+  attributes(out) <- attributes(fun_val)
+  structure(out, boomer.wrapped = TRUE)
 }
 
 set_emojis <- function(safe_print, n_indent) {
