@@ -164,8 +164,8 @@ rig_in_namespace <- function(
     # we need to update the copy in the package env
     pkg <- paste0("package:", base::getNamespaceName(ns))
     if (pkg %in% search() && nm %in% getNamespaceExports(ns)) {
-    ub(nm, as.environment(pkg))
-    assign(nm, val, pkg)
+      ub(nm, as.environment(pkg))
+      assign(nm, val, pkg)
     }
 
     # if the function is a s3 method we need to update the copy in the S3 table
@@ -177,17 +177,24 @@ rig_in_namespace <- function(
 
   # list of modified functions
   rigged_funs <- setNames(vals, nms)
-  wrapped_funs <- mapply(
-    wrap,
-    rigged_funs,
-    MoreArgs = list(clock = clock, print_fun = print))
-
+  
   # add all modified functions to each function's environment
-  for(fun in vals) {
-    list2env(wrapped_funs, environment(fun))
+  for(nm in nms) {
+    mask <- environment(rigged_funs[[nm]])
+    wrapped_funs <- mapply(
+      wrap,
+      fun_val = rigged_funs,
+      wrapped_nm = nms,
+      MoreArgs = list(
+        clock = clock, 
+        print_fun = print, 
+        rigged_nm = nm,
+        mask = mask
+      ) 
+    )
+    list2env(wrapped_funs, mask)
   }
 
   invisible(NULL)
 }
-
 
