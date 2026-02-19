@@ -6,7 +6,9 @@
 #' results of all the calls of it body.
 #' - `rig_in_namespace()` rigs a namespaced function in place, so its always
 #' verbose even when called by other existing functions. It is especially handy
-#' for package development.
+#' for package development. To undo, call `load_all()` for the development package or
+#' `pkgload::unload()` on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
+#' on S3 methods.
 #' - `rigger()` provides a convenient way to rig an
 #' anonymous function by using the `rigger(...) + function(...) {...}` syntax.
 #'
