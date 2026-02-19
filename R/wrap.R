@@ -194,9 +194,6 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
   if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
     if(mask$..FIRST_CALL..) {
-      # load pryr early to print early "Registered S3 method overwritten..."
-      if(print_args) loadNamespace("pryr")
-
       cat(ej$dots, ej$rig_open, crayon::yellow(rigged_nm),"\n", sep = "")
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
@@ -287,7 +284,7 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
   if(!print_args || ! rigged) return(invisible(NULL))
   for (arg in names(mask$..EVALED_ARGS..)) {
     if(!mask$..EVALED_ARGS..[[arg]]) {
-      evaled <- promise_evaled_fixed(arg, rigged_fun_exec_env)
+      evaled <- binding_is_evaled(rigged_fun_exec_env, arg)
       if(evaled) {
         mask$..EVALED_ARGS..[[arg]] <- TRUE
         arg_val <- get(arg, envir = rigged_fun_exec_env)
@@ -300,14 +297,10 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
   }
 }
 
-promise_evaled <- getFromNamespace("promise_evaled", "pryr")
-# fixed so it returns FALSE if arg is missing
-promise_evaled_fixed <- function (name, env) {
-  expr <- substitute(missing(ARG), list(ARG = as.symbol(name)))
-  expr[[1]] <- missing # so it does not collide with a local definition of `missing()`
-  arg_is_missing <- eval(expr, env)
-  if (arg_is_missing) return(FALSE)
-  promise_evaled(name, env)
+binding_is_evaled <- function(env, name) {
+  # `!rlang::env_binding_are_lazy()` returns `TRUE` on missing args but missing args are not "evaled"
+  arg_is_missing <- do.call(base::missing, list(as.symbol(name)), envir = env)
+  !arg_is_missing && !rlang::env_binding_are_lazy(env, name)
 }
 
 update_times_df_and_get_true_time <- function(

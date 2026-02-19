@@ -105,3 +105,22 @@
       } foo2
       [1] 2
 
+# missing arguments don't break rig()
+
+    Code
+      rig(fun)(1, 2)
+    Output
+      { fun
+      a :
+      [1] 1
+      b :
+      [1] 2
+      <  >  a + b 
+      [1] 3
+      
+      <  >  missing(c) 
+      [1] TRUE
+      
+      } fun
+      [1] TRUE
+
