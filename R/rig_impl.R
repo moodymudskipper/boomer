@@ -40,6 +40,7 @@ rig_impl <- function(
   mask$..EVALED_ARGS.. <- setNames(rep(FALSE, length(arg_nms)), arg_nms)
   environment(fun) <- mask
   fun
+  structure(fun, boomer.rigged = TRUE)
 }
 
 fetch_functions <- function(expr, ignore) {
