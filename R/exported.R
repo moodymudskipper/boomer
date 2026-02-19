@@ -132,8 +132,18 @@ rig_in_namespace <- function(
   clock = NULL,
   print = NULL) {
 
-  nms <- as.character(substitute(alist(...))[-1])
+  expr <- substitute(alist(...))[-1]
+  expr <- lapply(
+    expr,
+    function(x) {
+      if (length(x) > 1 && list(x[[1]]) %in% c(as.symbol("::"), as.symbol(":::"))) {
+        x <- x[[3]]
+      }
+      x
+    }
+  )
   vals <- list(...)
+  nms <- as.character(expr)
 
   # rig all functions in their own namespace
   # i.e. keep their binding in the namespace but insert a parent on top
@@ -141,15 +151,28 @@ rig_in_namespace <- function(
   for (i in seq_along(vals)) {
 
     nm <- nms[[i]]
-    ns <- environment(vals[[i]])
+    env <- environment(vals[[i]])
+    ns <- topenv(env)
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, rigged_nm = nms[[i]])
     val <- vals[[i]]
+
     ub <- unlockBinding
     ub(nm, ns)
     assign(nm, val, ns)
+
+    # if the library is attached and the function is exported 
+    # we need to update the copy in the package env
     pkg <- paste0("package:", base::getNamespaceName(ns))
+    if (pkg %in% search() && nm %in% getNamespaceExports(ns)) {
     ub(nm, as.environment(pkg))
     assign(nm, val, pkg)
+    }
+
+    # if the function is a s3 method we need to update the copy in the S3 table
+    if (nm %in% names(ns$.__S3MethodsTable__.)) {
+      ub(".__S3MethodsTable__.", ns)
+      assign(nm, val, ns$.__S3MethodsTable__.)
+    }
   }
 
   # list of modified functions
