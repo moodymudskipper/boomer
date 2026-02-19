@@ -35,3 +35,11 @@ test_that("functions created at runtime are boomed", {
   }
   expect_snapshot(rig(foo2)(2))
 })
+
+test_that("missing arguments don't break rig()", {
+  fun <- function(a, b, c) {
+    a + b
+    missing(c)
+  } 
+  expect_snapshot(rig(fun) (1, 2))
+})

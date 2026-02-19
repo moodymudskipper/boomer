@@ -12,7 +12,6 @@ BugReports: https://github.com/moodymudskipper/boomer/issues
 Imports: 
     cli,
     methods,
-    pryr,
     rlang,
     rstudioapi,
     styler,

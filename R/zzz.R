@@ -1,7 +1,6 @@
 #' @importFrom stats setNames
 #' @importFrom utils getParseData head capture.output
 #' @importFrom methods allNames formalArgs
-#' @importFrom pryr address
 NULL
 
 op.boom <- list(
