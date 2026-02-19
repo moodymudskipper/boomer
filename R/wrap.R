@@ -30,7 +30,7 @@
 #' @param wrapped_nm The name of the wrapped function
 #' @param mask The enclosing environment of the rigged function, where wrapper functions are stored
 #' @noRd
-wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, mask = NULL) {
+wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, mask) {
   # for CRAN notes
   . <- NULL
   out <- as.function(envir = asNamespace("boomer"), c(alist(...=), bquote({
