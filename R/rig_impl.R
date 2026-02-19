@@ -36,7 +36,7 @@ rig_impl <- function(
   mask$`::` <- double_colon(clock, print, rigged_nm, mask)
   mask$`:::` <- triple_colon(clock, print, rigged_nm, mask)
   mask$..FIRST_CALL.. <- TRUE
-  arg_nms <- formalArgs(fun)
+  arg_nms <- setdiff(formalArgs(fun), "...")
   mask$..EVALED_ARGS.. <- setNames(rep(FALSE, length(arg_nms)), arg_nms)
   environment(fun) <- mask
   fun
