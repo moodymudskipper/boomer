@@ -3,6 +3,8 @@
 - boomer doesn't use the 'pryr' package anymore.
 - `rig_in_namespace()` works better when provided several functions.
 - `rig_in_namespace()` can be used on functions from any package.
+- A new option `boomer.max_indent` helps keeping the indentation under control, 
+  useful for long pipe sequences or deeply nested calls.
 
 # boomer 0.2.0
 
