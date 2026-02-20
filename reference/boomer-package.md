@@ -58,7 +58,11 @@ Several options impact the display of exploded calls :
   look good on your system.
 
 - `boomer.abbreviate`: Whether to show only the function's name rather
-  than the call when it's entered.
+  than the call when it's entered. Defaults to `FALSE`
+
+- `boomer.max_indent`: The maximum indention, once reached a number is
+  printed at the start of the line and deeper nested calls are not
+  indented further. Defaults to `10L`.
 
 ## See also
 

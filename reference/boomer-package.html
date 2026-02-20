@@ -82,7 +82,10 @@ function that loops too many times.</p></li>
 with all systems. This is useful for reprexes (see <span class="pkg">reprex</span> package) and
 for knitted report in case the output of those doesn't look good on your system.</p></li>
 <li><p><code>boomer.abbreviate</code>: Whether to show only the function's name rather than the
-call when it's entered.</p></li>
+call when it's entered. Defaults to <code>FALSE</code></p></li>
+<li><p><code>boomer.max_indent</code>: The maximum indention, once reached a number is printed at
+the start of the line and deeper nested calls are not indented further.
+Defaults to <code>10L</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
