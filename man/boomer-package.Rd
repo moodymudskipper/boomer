@@ -4,6 +4,13 @@
 \name{boomer-package}
 \alias{boomer-package}
 \alias{boomer}
+\alias{boomer.print}
+\alias{boomer.clock}
+\alias{boomer.print_args}
+\alias{boomer.visible_only}
+\alias{boomer.ignore}
+\alias{boomer.ignore_args}
+\alias{boomer.safe_print}
 \title{boomer: Debugging Tools to Inspect the Intermediate Steps of a Call}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
@@ -47,7 +54,10 @@ function that loops too many times.
 with all systems. This is useful for reprexes (see \pkg{reprex} package) and
 for knitted report in case the output of those doesn't look good on your system.
 \item \code{boomer.abbreviate}: Whether to show only the function's name rather than the
-call when it's entered.
+call when it's entered. Defaults to \code{FALSE}
+\item \code{boomer.max_indent}: The maximum indention, once reached a number is printed at
+the start of the line and deeper nested calls are not indented further.
+Defaults to \code{10L}.
 }
 }
 
