@@ -159,7 +159,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     if(clock) {
       true_time_msg <- update_times_df_and_get_true_time(
         sc, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
-      writeLines(crayon::blue(true_time_msg))
+      writeLines(cli::col_blue(true_time_msg))
     }
 
     # print output with appropriate print fun and indentation
@@ -206,7 +206,7 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
   if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
     if(mask$..FIRST_CALL..) {
-      cat(ej$dots, ej$rig_open, crayon::yellow(rigged_nm),"\n", sep = "")
+      cat(ej$dots, ej$rig_open, cli::col_yellow(rigged_nm),"\n", sep = "")
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
