@@ -175,19 +175,28 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
 
 set_emojis <- function(safe_print, n_indent) {
   ej <- list()
+  max_indent <- getOption("boomer.max_indent", Inf)
+  if (n_indent > max_indent) {
+    prefix <- as.character(n_indent)
+    prefix <- format(prefix, width = ceiling(nchar(prefix)/2) * 2)
+    n_indent <- max_indent - nchar(prefix)/2
+  } else {
+    prefix <- ""
+  }
+
   if (safe_print) {
     ej$rig_open   <- cli::style_bold(cli::col_yellow("{ "))
     ej$rig_close  <- cli::style_bold(cli::col_yellow("} "))
     ej$wrap_open  <- cli::style_bold(cli::col_yellow("<  "))
     ej$wrap_close <- cli::style_bold(cli::col_yellow(">  "))
-    ej$dots       <- cli::col_yellow(strrep(". ", n_indent))
+    ej$dots       <- cli::col_yellow(prefix, strrep(". ", n_indent))
   } else {
     # nocov start
     ej$rig_open   <- "\U0001f447 "
     ej$rig_close  <- "\U0001f446 "
     ej$wrap_open  <- "\U0001f4a3 "
     ej$wrap_close <- "\U0001f4a5 "
-    ej$dots       <- cli::col_yellow(strrep("\ub7 ", n_indent))
+    ej$dots       <- cli::col_yellow(prefix, strrep("\ub7 ", n_indent))
     # nocov end
   }
   ej

@@ -1,7 +1,8 @@
 #' @importFrom stats setNames
 #' @importFrom utils getParseData head capture.output getFromNamespace
 #' @importFrom methods allNames formalArgs
-#' @aliases boomer boomer-package
+#' @aliases boomer boomer-package boomer.print boomer.clock boomer.print_args 
+#'   boomer.visible_only boomer.ignore boomer.ignore_args boomer.safe_print
 #' @details
 #'
 #' * [boom()] displays the intermediate results of a call or a code chunk.
@@ -37,6 +38,9 @@
 #'   with all systems. This is useful for reprexes (see \pkg{reprex} package) and
 #'   for knitted report in case the output of those doesn't look good on your system.
 #' - `boomer.abbreviate`: Whether to show only the function's name rather than the
-#'   call when it's entered.
+#'   call when it's entered. Defaults to `FALSE`
+#' - `boomer.max_indent`: The maximum indention, once reached a number is printed at 
+#'   the start of the line and deeper nested calls are not indented further. 
+#'   Defaults to `10L`.
 #'
 "_PACKAGE"

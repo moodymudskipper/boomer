@@ -10,7 +10,8 @@ op.boom <- list(
   boomer.visible_only = FALSE,
   boomer.print_args = TRUE,
   boomer.safe_print = FALSE,
-  boomer.abbreviate = FALSE
+  boomer.abbreviate = FALSE,
+  boomer.max_indent = 10L
 )
 
 .onLoad <- function(libname, pkgname) {
