@@ -36,21 +36,25 @@ rig_impl <- function(
   mask$`::` <- double_colon(clock, print, rigged_nm, mask)
   mask$`:::` <- triple_colon(clock, print, rigged_nm, mask)
   mask$..FIRST_CALL.. <- TRUE
-  arg_nms <- formalArgs(fun)
+  arg_nms <- setdiff(formalArgs(fun), "...")
   mask$..EVALED_ARGS.. <- setNames(rep(FALSE, length(arg_nms)), arg_nms)
   environment(fun) <- mask
   fun
+  structure(fun, boomer.rigged = TRUE)
 }
 
 fetch_functions <- function(expr, ignore) {
   dismissed_token_types <-
     c("EQ_ASSIGN",      # dealt with through shim_assign() so ignored here
+      "EQ_FORMALS",     # not a function
+      "NULL_CONST",     # not a function
       "LEFT_ASSIGN",    # dealt with through shim_assign() so ignored here
       "expr",           #
       "expr_or_assign_or_help",
       "forcond",        # ignore token after `for`
       "SYMBOL",         # regular symbols not used before `(`
-      "SYMBOL_SUB",     # argument names
+      "SYMBOL_FORMALS", # argument names in a function definition
+      "SYMBOL_SUB",     # argument names in a function call
       "NUM_CONST",      # numbers
       "STR_CONST",      # strings
       "EQ_SUB",         # `=` in argument definition

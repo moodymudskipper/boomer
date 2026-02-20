@@ -30,10 +30,10 @@
 #' @param wrapped_nm The name of the wrapped function
 #' @param mask The enclosing environment of the rigged function, where wrapper functions are stored
 #' @noRd
-wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, mask = NULL) {
+wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, mask) {
   # for CRAN notes
   . <- NULL
-  as.function(envir = asNamespace("boomer"), c(alist(...=), bquote({
+  out <- as.function(envir = asNamespace("boomer"), c(alist(...=), bquote({
     # Since we set the enclosing env to {boomer}'s namespace
     # we use `bquote()` to get `wrap()`'s arguments in
 
@@ -107,7 +107,17 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     ignore_args.bool <-
       !is.null(mask) &&
       any(vapply(ignore_args, identical, logical(1), fun_val))
-    deparsed_calls <- build_deparsed_calls(sc, ej, globals$n_indent, force_single_line = ignore_args.bool)
+
+    deparsed_calls <- build_deparsed_calls(
+      sc, 
+      ej, 
+      globals$n_indent, 
+      force_single_line = ignore_args.bool,
+      rigged = isTRUE(attr(fun_val, "boomer.rigged"))
+    )
+
+    # for S3 methods the first arg is evaled right away
+    print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env)
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
@@ -148,7 +158,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     # update the global `times` data frame and compute the true time
     if(clock) {
       true_time_msg <- update_times_df_and_get_true_time(
-        call, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
+        sc, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
       writeLines(cli::col_blue(true_time_msg))
     }
 
@@ -159,6 +169,8 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
 
     res
   })))
+  attributes(out) <- attributes(fun_val)
+  structure(out, boomer.wrapped = TRUE)
 }
 
 set_emojis <- function(safe_print, n_indent) {
@@ -194,7 +206,7 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
   if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
     if(mask$..FIRST_CALL..) {
-      cat(ej$dots, ej$rig_open, crayon::yellow(rigged_nm),"\n", sep = "")
+      cat(ej$dots, ej$rig_open, cli::col_yellow(rigged_nm),"\n", sep = "")
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
@@ -208,7 +220,7 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
   }
 }
 
-build_deparsed_calls <- function(sc, ej, n_indent, force_single_line = FALSE) {
+build_deparsed_calls <- function(sc, ej, n_indent, force_single_line, rigged) {
   # manipulate call to use original function
   sc <- sc
 
@@ -218,7 +230,8 @@ build_deparsed_calls <- function(sc, ej, n_indent, force_single_line = FALSE) {
   call_chr <- styler::style_text(call_chr)
 
   # if all args are "atomic" (symbols or numbers) we can print open and close in one go
-  all_args_are_atomic <- force_single_line || all(lengths(as.list(sc[-1])) == 1)
+  all_args_are_atomic <- !rigged && (force_single_line || all(lengths(as.list(sc[-1])) == 1))
+ 
   # we need a workaround for magrittr here
   no_dot_in_args <- force_single_line || !any(sapply(sc[-1], identical, quote(.)))
   if(length(call_chr) == 1) {

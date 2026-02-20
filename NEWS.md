@@ -1,3 +1,9 @@
+# boomer 0.3.0
+
+- boomer doesn't use the 'pryr' package anymore.
+- `rig_in_namespace()` works better when provided several functions.
+- `rig_in_namespace()` can be used on functions from any package.
+
 # boomer 0.2.0
 
 Just a small release with a minor feature. The previous version got kicked from CRAN

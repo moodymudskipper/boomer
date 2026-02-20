@@ -6,7 +6,9 @@
 #' results of all the calls of it body.
 #' - `rig_in_namespace()` rigs a namespaced function in place, so its always
 #' verbose even when called by other existing functions. It is especially handy
-#' for package development.
+#' for package development. To undo, call `load_all()` for the development package or
+#' `pkgload::unload()` on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
+#' on S3 methods.
 #' - `rigger()` provides a convenient way to rig an
 #' anonymous function by using the `rigger(...) + function(...) {...}` syntax.
 #'
@@ -130,8 +132,18 @@ rig_in_namespace <- function(
   clock = NULL,
   print = NULL) {
 
-  nms <- as.character(substitute(alist(...))[-1])
+  expr <- substitute(alist(...))[-1]
+  expr <- lapply(
+    expr,
+    function(x) {
+      if (length(x) > 1 && list(x[[1]]) %in% c(as.symbol("::"), as.symbol(":::"))) {
+        x <- x[[3]]
+      }
+      x
+    }
+  )
   vals <- list(...)
+  nms <- as.character(expr)
 
   # rig all functions in their own namespace
   # i.e. keep their binding in the namespace but insert a parent on top
@@ -139,30 +151,50 @@ rig_in_namespace <- function(
   for (i in seq_along(vals)) {
 
     nm <- nms[[i]]
-    ns <- environment(vals[[i]])
+    env <- environment(vals[[i]])
+    ns <- topenv(env)
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, rigged_nm = nms[[i]])
     val <- vals[[i]]
+
     ub <- unlockBinding
     ub(nm, ns)
     assign(nm, val, ns)
+
+    # if the library is attached and the function is exported 
+    # we need to update the copy in the package env
     pkg <- paste0("package:", base::getNamespaceName(ns))
-    ub(nm, as.environment(pkg))
-    assign(nm, val, pkg)
+    if (pkg %in% search() && nm %in% getNamespaceExports(ns)) {
+      ub(nm, as.environment(pkg))
+      assign(nm, val, pkg)
+    }
+
+    # if the function is a s3 method we need to update the copy in the S3 table
+    if (nm %in% names(ns$.__S3MethodsTable__.)) {
+      ub(".__S3MethodsTable__.", ns)
+      assign(nm, val, ns$.__S3MethodsTable__.)
+    }
   }
 
   # list of modified functions
   rigged_funs <- setNames(vals, nms)
-  wrapped_funs <- mapply(
-    wrap,
-    rigged_funs,
-    MoreArgs = list(clock = clock, print_fun = print))
-
+  
   # add all modified functions to each function's environment
-  for(fun in vals) {
-    list2env(wrapped_funs, environment(fun))
+  for(nm in nms) {
+    mask <- environment(rigged_funs[[nm]])
+    wrapped_funs <- mapply(
+      wrap,
+      fun_val = rigged_funs,
+      wrapped_nm = nms,
+      MoreArgs = list(
+        clock = clock, 
+        print_fun = print, 
+        rigged_nm = nm,
+        mask = mask
+      ) 
+    )
+    list2env(wrapped_funs, mask)
   }
 
   invisible(NULL)
 }
-
 
