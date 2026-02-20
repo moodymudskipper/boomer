@@ -6,7 +6,9 @@ rig() creates a copy of a function which will display the intermediate
 results of all the calls of it body.
 rig_in_namespace() rigs a namespaced function in place, so its always
 verbose even when called by other existing functions. It is especially handy
-for package development.
+for package development. To undo, call load_all() for the development package or
+pkgload::unload() on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
+on S3 methods.
 rigger() provides a convenient way to rig an
 anonymous function by using the rigger(...) + function(...) {...} syntax.
 
@@ -17,7 +19,9 @@ rig() creates a copy of a function which will display the intermediate
 results of all the calls of it body.
 rig_in_namespace() rigs a namespaced function in place, so its always
 verbose even when called by other existing functions. It is especially handy
-for package development.
+for package development. To undo, call load_all() for the development package or
+pkgload::unload() on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
+on S3 methods.
 rigger() provides a convenient way to rig an
 anonymous function by using the rigger(...) + function(...) {...} syntax.
 
@@ -66,7 +70,9 @@ anonymous function by using the rigger(...) + function(...) {...} syntax.
 results of all the calls of it body.</p></li>
 <li><p><code>rig_in_namespace()</code> rigs a namespaced function in place, so its always
 verbose even when called by other existing functions. It is especially handy
-for package development.</p></li>
+for package development. To undo, call <code>load_all()</code> for the development package or
+<code><a href="https://pkgload.r-lib.org/reference/unload.html" class="external-link">pkgload::unload()</a></code> on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
+on S3 methods.</p></li>
 <li><p><code>rigger()</code> provides a convenient way to rig an
 anonymous function by using the <code>rigger(...) + function(...) {...}</code> syntax.</p></li>
 </ul></div>
@@ -151,7 +157,7 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 <span class="r-in"><span><span class="fu">boom</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">mtcars</span>, <span class="fl">2</span><span class="op">)</span>, <span class="va">qsec</span> <span class="op">&gt;</span> <span class="fl">17</span><span class="op">)</span>, clock <span class="op">=</span> <span class="cn">TRUE</span>, print <span class="op">=</span> <span class="va">str</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 💣 <span style="color: #00BBBB;">subset(head(mtcars, 2), qsec &gt; 17)</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>💣 💥 <span style="color: #00BBBB;">head(mtcars, 2)</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.162 ms</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.195 ms</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>'data.frame':	2 obs. of  11 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span> $ mpg : num  21 21</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span> $ cyl : num  6 6</span>
@@ -166,11 +172,11 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span> $ carb: num  4 4</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>💣 💥 <span style="color: #00BBBB;">qsec &gt; 17</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.008 ms</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.011 ms</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span> logi [1:2] FALSE TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 💥 <span style="color: #00BBBB;">subset(head(mtcars, 2), qsec &gt; 17)</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.26 ms</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.288 ms</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'data.frame':	1 obs. of  11 variables:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ mpg : num 21</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  $ cyl : num 6</span>
@@ -229,8 +235,6 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `FUN()` is undefined outside of `ave()` and its output might not be shown.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 👇 <span style="color: #BBBB00;">ave</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 💣 <span style="color: #00BBBB;">if (missing(...)) {...</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span><span style="color: #00BB00;">... :</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>&lt;...&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>💣 💥 <span style="color: #00BBBB;">missing(...)</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>[1] FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span></span>
@@ -310,7 +314,7 @@ the class "rigger" to enable <code>+.rigger</code> and <code>print.rigger</code>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span>[1] "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">· </span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 💥 <span style="color: #00BBBB;">x + 1 + 2</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.03 s</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">time: 0.034 s</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "double"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 👆 <span style="color: #BBBB00;">e2</span></span>

@@ -1,5 +1,13 @@
 # Changelog
 
+## boomer 0.3.0
+
+- boomer doesn’t use the ‘pryr’ package anymore.
+- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  works better when provided several functions.
+- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  can be used on functions from any package.
+
 ## boomer 0.2.0
 
 CRAN release: 2024-07-09

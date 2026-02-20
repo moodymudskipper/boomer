@@ -7,7 +7,11 @@
 
 - `rig_in_namespace()` rigs a namespaced function in place, so its
   always verbose even when called by other existing functions. It is
-  especially handy for package development.
+  especially handy for package development. To undo, call `load_all()`
+  for the development package or
+  [`pkgload::unload()`](https://pkgload.r-lib.org/reference/unload.html)
+  on other packages, or restart the session if your rigged a base
+  package. Shouldn't be used on S3 generics, but works on S3 methods.
 
 - `rigger()` provides a convenient way to rig an anonymous function by
   using the `rigger(...) + function(...) {...}` syntax.
@@ -100,7 +104,7 @@ boom(subset(head(mtcars, 2), qsec > 17))
 boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE, print = str)
 #> 💣 subset(head(mtcars, 2), qsec > 17) 
 #> · 💣 💥 head(mtcars, 2) 
-#> time: 0.162 ms
+#> time: 0.195 ms
 #> · 'data.frame': 2 obs. of  11 variables:
 #> ·  $ mpg : num  21 21
 #> ·  $ cyl : num  6 6
@@ -115,11 +119,11 @@ boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE, print = str)
 #> ·  $ carb: num  4 4
 #> · 
 #> · 💣 💥 qsec > 17 
-#> time: 0.008 ms
+#> time: 0.011 ms
 #> ·  logi [1:2] FALSE TRUE
 #> · 
 #> 💥 subset(head(mtcars, 2), qsec > 17) 
-#> time: 0.26 ms
+#> time: 0.288 ms
 #> 'data.frame':    1 obs. of  11 variables:
 #>  $ mpg : num 21
 #>  $ cyl : num 6
@@ -178,8 +182,6 @@ rig(ave)(warpbreaks$breaks, warpbreaks$wool)
 #> `FUN()` is undefined outside of `ave()` and its output might not be shown.
 #> 👇 ave
 #> 💣 if (missing(...)) {... 
-#> · ... :
-#> · <...>
 #> · 💣 💥 missing(...) 
 #> · [1] FALSE
 #> · 
@@ -259,7 +261,7 @@ fun2(1)
 #> · [1] "double"
 #> · 
 #> 💥 x + 1 + 2 
-#> time: 0.03 s
+#> time: 0.034 s
 #> [1] "double"
 #> 
 #> 👆 e2
