@@ -144,6 +144,7 @@ rig_in_namespace <- function(
   )
   vals <- list(...)
   nms <- as.character(expr)
+  ub <- unlockBinding
 
   # rig all functions in their own namespace
   # i.e. keep their binding in the namespace but insert a parent on top
@@ -156,10 +157,7 @@ rig_in_namespace <- function(
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, rigged_nm = nms[[i]])
     val <- vals[[i]]
 
-    ub <- unlockBinding
-    ub(nm, ns)
-    assign(nm, val, ns)
-
+    if (isNamespace(ns)) {  
     # if the library is attached and the function is exported 
     # we need to update the copy in the package env
     pkg <- paste0("package:", base::getNamespaceName(ns))
@@ -173,6 +171,11 @@ rig_in_namespace <- function(
       ub(".__S3MethodsTable__.", ns)
       assign(nm, val, ns$.__S3MethodsTable__.)
     }
+
+      # The main function in the namespace
+      ub(nm, ns)
+    }
+    assign(nm, val, ns)
   }
 
   # list of modified functions
