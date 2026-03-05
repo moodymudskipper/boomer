@@ -93,7 +93,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     on.exit(update_globals_on_exit(clock))
 
     # !!! this adds calls on.exit of caller (rigged) function !!!
-    signal_rigged_function_and_args(rigged_nm, mask, ej, print_args, rigged_fun_exec_env)
+    signal_rigged_function_and_args(rigged_nm, fun_val, ej, print_args, rigged_fun_exec_env)
 
     # build calls to be displayed on top and bottom of wrapped call
    ignore_args <- getOption("boomer.ignore_args")
@@ -231,21 +231,23 @@ update_globals_on_exit <- function(clock) {
   invisible(NULL)
 }
 
-signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rigged_fun_exec_env) {
+signal_rigged_function_and_args <- function(rigged_nm, fun_val, ej, print_args, rigged_fun_exec_env) {
   # is the wrapped function called by a rigged function?
   if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
-    if(mask$..FIRST_CALL..) {
+    first_call <- !exists("..EVALED_ARGS..", rigged_fun_exec_env)
+    if(first_call) {
       cat(ej$dots, ej$rig_open, col_rigged_fun(rigged_nm),"\n", sep = "")
+      arg_nms <- setdiff(formalArgs(fun_val), "...")
+      rigged_fun_exec_env$..EVALED_ARGS.. <- 
+        setNames(rep(FALSE, length(arg_nms)), arg_nms)
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
+        rm("..EVALED_ARGS..", envir =  rigged_fun_exec_env)
         cat(ej$dots, ej$rig_close, col_rigged_fun(rigged_nm),"\n", sep = "")
-        mask$..FIRST_CALL.. <- TRUE
-        mask$..EVALED_ARGS..[] <- FALSE
       }, envir = rigged_fun_exec_env)
 
-      mask$..FIRST_CALL.. <- FALSE
     }
   }
 }
@@ -325,14 +327,15 @@ eval_wrapped_call <- function(sc, fun_val, clock, rigged_fun_exec_env) {
   res
 }
 
+#FIXME: mask arg not needed ?
 print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env) {
   rigged <- !is.null(rigged_nm)
   if(!print_args || ! rigged) return(invisible(NULL))
-  for (arg in names(mask$..EVALED_ARGS..)) {
-    if(!mask$..EVALED_ARGS..[[arg]]) {
+  for (arg in names(rigged_fun_exec_env$..EVALED_ARGS..)) {
+    if(!rigged_fun_exec_env$..EVALED_ARGS..[[arg]]) {
       evaled <- binding_is_evaled(rigged_fun_exec_env, arg)
       if(evaled) {
-        mask$..EVALED_ARGS..[[arg]] <- TRUE
+        rigged_fun_exec_env$..EVALED_ARGS..[[arg]] <- TRUE
         arg_val <- get(arg, envir = rigged_fun_exec_env)
         print_fun <- fetch_print_fun(print_fun, arg_val)
         output <- capture.output(print_fun(arg_val))
