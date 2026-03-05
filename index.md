@@ -9,7 +9,7 @@ into its parts hence the name.
 - [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   creates a copy of a function which will display the intermediate
   results of all the calls of it body.
-- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
   rigs a namespaced function in place, so its always verbose even when
   called by other existing functions. It is especially handy for package
   development.
@@ -128,7 +128,7 @@ rig(hello)("world")
 creates a copy of a function, but when developing a package we might
 want to rig a function in place so it has a verbose output when called
 by other functions. For this we can use
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md).
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md).
 
 For instance you might have these functions in a package :
 
@@ -143,7 +143,7 @@ disk_area <- function(r) {
 ```
 
 `cylinder_vol` depends on `disk_area`, call `devtools::load_all()` then
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
 on both and enjoy the detailed output:
 
 ``` r

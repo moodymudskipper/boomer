@@ -9,7 +9,7 @@ into its parts hence the name.
 - [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   creates a copy of a function which will display the intermediate
   results of all the calls of it body.
-- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
   rigs a namespaced function in place, so its always verbose even when
   called by other existing functions. It is especially handy for package
   development.
@@ -128,7 +128,7 @@ rig(hello)("world")
 creates a copy of a function, but when developing a package we might
 want to rig a function in place so it has a verbose output when called
 by other functions. For this we can use
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md).
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md).
 
 For instance you might have these functions in a package :
 
@@ -143,7 +143,7 @@ disk_area <- function(r) {
 ```
 
 `cylinder_vol` depends on `disk_area`, call `devtools::load_all()` then
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
 on both and enjoy the detailed output:
 
 ``` r
@@ -244,7 +244,8 @@ Thanks to @data_question for suggesting the name *{boomer}* on
 - [`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   [`rigger()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
-  [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  [`rig_in_place()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  [`rig_on_load()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   : Print the Output of Intermediate Steps of a Call
 - [`boom_on()`](https://moodymudskipper.github.io/boomer/reference/boom_on.md)
   [`boom_off()`](https://moodymudskipper.github.io/boomer/reference/boom_on.md)
@@ -261,6 +262,9 @@ Thanks to @data_question for suggesting the name *{boomer}* on
   [`boomer.ignore`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.ignore_args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.safe_print`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.theme.args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.theme.rigged_fun`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.theme.code`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   : boomer: Debugging Tools to Inspect the Intermediate Steps of a Call
 
 # Articles

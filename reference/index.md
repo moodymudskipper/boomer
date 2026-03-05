@@ -5,7 +5,8 @@
 - [`boom()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   [`rigger()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
-  [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  [`rig_in_place()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  [`rig_on_load()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   : Print the Output of Intermediate Steps of a Call
 - [`boom_on()`](https://moodymudskipper.github.io/boomer/reference/boom_on.md)
   [`boom_off()`](https://moodymudskipper.github.io/boomer/reference/boom_on.md)
@@ -22,4 +23,7 @@
   [`boomer.ignore`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.ignore_args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.safe_print`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.theme.args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.theme.rigged_fun`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.theme.code`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   : boomer: Debugging Tools to Inspect the Intermediate Steps of a Call

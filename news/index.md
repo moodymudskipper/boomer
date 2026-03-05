@@ -3,9 +3,9 @@
 ## boomer 0.3.0
 
 - boomer doesn’t use the ‘pryr’ package anymore.
-- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
   works better when provided several functions.
-- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
   can be used on functions from any package.
 - A new option `boomer.max_indent` helps keeping the indentation under
   control, useful for long pipe sequences or deeply nested calls.
@@ -63,7 +63,7 @@ CRAN release: 2021-07-20
   [`rigger()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   to define an anonymous rigged function
 - Call
-  [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
   to rig a function in place in its package
 - Several options are implemented to customize the output
 - Output is made more readable, using indents and emoticons

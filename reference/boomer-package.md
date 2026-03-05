@@ -13,7 +13,7 @@ the package name.
   creates a copy of a function which will display the intermediate
   results of all the calls of it body.
 
-- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
   rigs a namespaced function in place, so its always verbose even when
   called by other existing functions. It is especially handy for package
   development.
@@ -33,6 +33,7 @@ Several options impact the display of exploded calls :
 - `boomer.print`: If the `print` argument is not provided, this option
   will replace it at run time. Defaults to the
   [`base::print`](https://rdrr.io/r/base/print.html) function.
+  `boomer.print = constructive::construct` is a useful alternative.ß
 
 - `boomer.clock`: If the `clock` argument is not provided, this option
   will replace it at run time. Defaults to `FALSE`.
@@ -63,6 +64,24 @@ Several options impact the display of exploded calls :
 - `boomer.max_indent`: The maximum indention, once reached a number is
   printed at the start of the line and deeper nested calls are not
   indented further. Defaults to `10L`.
+
+- `boomer.theme.args`: The color used to style argument names when they
+  are implemented, by default "green"
+
+- `boomer.theme.rigged_fun`: The color used to style the name of a
+  rigged function, by default "yellow"
+
+- `boomer.theme.code`: A color used to style the code printed by
+  "boomer" (defaults to "cyan"), can also be "cli" to use the defaults
+  of
+  [`cli::code_highlight()`](https://cli.r-lib.org/reference/code_highlight.html)
+  or any theme listed by
+  [`cli::code_theme_list()`](https://cli.r-lib.org/reference/code_theme_list.html).
+
+- `boomer.rig_on_load`: A list of functions, or a list or vector of
+  function names that will be rigged on load if
+  [`rig_on_load()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+  is used in `.onLoad()`.
 
 ## See also
 

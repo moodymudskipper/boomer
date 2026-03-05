@@ -51,7 +51,7 @@ Provides debugging tools that let you inspect the intermediate results of a call
 <ul><li><p><code><a href="boom.html">boom()</a></code> displays the intermediate results of a call or a code chunk.</p></li>
 <li><p><code><a href="boom.html">rig()</a></code> creates a copy of a function which will display the intermediate
 results of all the calls of it body.</p></li>
-<li><p><code><a href="boom.html">rig_in_namespace()</a></code> rigs a namespaced function in place, so its always
+<li><p><code><a href="rig_in_namespace.html">rig_in_namespace()</a></code> rigs a namespaced function in place, so its always
 verbose even when called by other existing functions. It is especially handy
 for package development.</p></li>
 <li><p><code><a href="boom.html">rigger()</a></code> provides a convenient way to rig an
@@ -65,7 +65,8 @@ with a keyboard shortcut.</p></li>
 
 
 <p>Several options impact the display of exploded calls :</p><ul><li><p><code>boomer.print</code>: If the <code>print</code> argument is not provided, this option will
-replace it at run time. Defaults to the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">base::print</a></code> function.</p></li>
+replace it at run time. Defaults to the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">base::print</a></code> function.
+<code>boomer.print = constructive::construct</code> is a useful alternative.ß</p></li>
 <li><p><code>boomer.clock</code>: If the <code>clock</code> argument is not provided, this option will
 replace it at run time. Defaults to <code>FALSE</code>.</p></li>
 <li><p><code>boomer.print_args</code>: Whether to print the arguments of rigged functions
@@ -86,6 +87,12 @@ call when it's entered. Defaults to <code>FALSE</code></p></li>
 <li><p><code>boomer.max_indent</code>: The maximum indention, once reached a number is printed at
 the start of the line and deeper nested calls are not indented further.
 Defaults to <code>10L</code>.</p></li>
+<li><p><code>boomer.theme.args</code>: The color used to style argument names when they are implemented, by default "green"</p></li>
+<li><p><code>boomer.theme.rigged_fun</code>: The color used to style the name of a rigged function, by default "yellow"</p></li>
+<li><p><code>boomer.theme.code</code>: A color used to style the code printed by "boomer" (defaults to "cyan"), can also be
+"cli" to use the defaults of <code><a href="https://cli.r-lib.org/reference/code_highlight.html" class="external-link">cli::code_highlight()</a></code> or any theme listed by <code><a href="https://cli.r-lib.org/reference/code_theme_list.html" class="external-link">cli::code_theme_list()</a></code>.</p></li>
+<li><p><code>boomer.rig_on_load</code>: A list of functions, or a list or vector of function names that will be rigged on load
+if <code><a href="boom.html">rig_on_load()</a></code> is used in <code>.onLoad()</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

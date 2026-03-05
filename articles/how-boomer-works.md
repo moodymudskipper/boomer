@@ -15,7 +15,7 @@ tools::file_ext
 #>     pos <- regexpr("\\.([[:alnum:]]+)$", x)
 #>     ifelse(pos > -1L, substring(x, pos + 1L), "")
 #> }
-#> <bytecode: 0x560bd33903a8>
+#> <bytecode: 0x559512a2f4b0>
 #> <environment: namespace:tools>
 rigged_file_ext
 #> function (x) 
@@ -23,7 +23,7 @@ rigged_file_ext
 #>     pos <- regexpr("\\.([[:alnum:]]+)$", x)
 #>     ifelse(pos > -1L, substring(x, pos + 1L), "")
 #> }
-#> <environment: 0x560bd3591d70>
+#> <environment: 0x559512e53c80>
 #> attr(,"boomer.rigged")
 #> [1] TRUE
 ```
@@ -41,7 +41,7 @@ environment(tools::file_ext)
 # our new environment
 env <- environment(rigged_file_ext)
 env
-#> <environment: 0x560bd3591d70>
+#> <environment: 0x559512e53c80>
 
 # its parent
 parent.env(env)
@@ -76,7 +76,7 @@ Here’s the diagram of dependencies of `rig_impl()`
 flow::flow_view_deps(boomer:::rig_impl, show_imports = "packages")
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
 #> Error in `knitr::include_graphics()`:
-#> ! Cannot find the file(s): "/tmp/Rtmpc8Mhxs/flow_32055dc1401e.png"
+#> ! Cannot find the file(s): "/tmp/RtmpnARLDd/flow_310e236d1e10.png"
 ```
 
 `rig_impl()` :
@@ -117,7 +117,7 @@ However it does a couple more things:
 
 ### `rig_in_namespace()`
 
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
 calls `rig_impl()` on its inputs but unlike
 [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md) we
 want the rigged functions to be bound in the namespace instead of the
@@ -126,7 +126,7 @@ original functions.
 To do this we unlock the namespace and assigned rigged functions there.
 
 Since
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
 accepts several functions as arguments, and that they might call each
 other, we also make sure we include wrapped versions of our rigged
 functions in all the masks.

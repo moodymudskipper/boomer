@@ -5,13 +5,16 @@
 - `rig()` creates a copy of a function which will display the
   intermediate results of all the calls of it body.
 
-- `rig_in_namespace()` rigs a namespaced function in place, so its
-  always verbose even when called by other existing functions. It is
-  especially handy for package development. To undo, call `load_all()`
-  for the development package or
+- `rig_in_place()` rigs a function in place, so its always verbose even
+  when called by other existing functions. It works on functions from
+  packages as well as on functions defined in a session. To undo, call
+  `load_all()` for the development package or
   [`pkgload::unload()`](https://pkgload.r-lib.org/reference/unload.html)
   on other packages, or restart the session if your rigged a base
   package. Shouldn't be used on S3 generics, but works on S3 methods.
+
+- `rig_on_load()` can be used in `.onLoad()` to rig functions (values or
+  names) stored in `getOption("boomer.rig_on_load")`
 
 - `rigger()` provides a convenient way to rig an anonymous function by
   using the `rigger(...) + function(...) {...}` syntax.
@@ -25,7 +28,9 @@ rig(fun, clock = NULL, print = NULL)
 
 rigger(clock = NULL, print = NULL)
 
-rig_in_namespace(..., clock = NULL, print = NULL)
+rig_in_place(..., clock = NULL, print = NULL)
+
+rig_on_load()
 ```
 
 ## Arguments
@@ -51,7 +56,8 @@ rig_in_namespace(..., clock = NULL, print = NULL)
 
 - fun:
 
-  function ro `rig()`
+  function ro `rig()`, can be a symbol, an expression returning a
+  function, or a string
 
 - ...:
 
@@ -59,7 +65,7 @@ rig_in_namespace(..., clock = NULL, print = NULL)
 
   If the `print` argument is a function, it will be used to print, or to
   transform the output before it's printed. Use `invisible` to display
-  nothing, useful possibilities are `str` or
+  nothing, useful possibilities are `constructive::construct`, `str` or
   [`dplyr::glimpse`](https://pillar.r-lib.org/reference/glimpse.html).
 
   *rlang*'s formula notation is supported, so for instance you can type:
@@ -74,10 +80,28 @@ rig_in_namespace(..., clock = NULL, print = NULL)
 ## Value
 
 `boom()` returns the output of the call. `rig()` returns the modified
-input function. `rig_in_namespace()` returns `invisible(NULL)` and is
-called for side effects. `rigger()` returns a list containing the
-arguments, with the class "rigger" to enable `+.rigger` and
-`print.rigger`
+input function.
+[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
+returns `invisible(NULL)` and is called for side effects. `rigger()`
+returns a list containing the arguments, with the class "rigger" to
+enable `+.rigger` and `print.rigger`
+
+## Side effects of `rig_in_place()`
+
+When called on a packaged function `rig_in_place()` replaces the target
+function in the namespace but to behave as expected it does a bit more:
+
+- Replace the copy of the function in the package environment, where the
+  functions called without `::` or `:::` are fetched from after calling
+  [`library()`](https://rdrr.io/r/base/library.html).
+
+- Replace the copy of the function in the S3 methods table if relevant.
+  S3 dispatch calls copies of functions, not the function in the
+  namespace directly, so those need to be replaced as well.
+
+- Replace the copy of the function in the "imports" environments of
+  already loaded packages. Indeed packages that import function load
+  copies of those in an environment, these need to be replaced as well.
 
 ## Examples
 
@@ -104,7 +128,7 @@ boom(subset(head(mtcars, 2), qsec > 17))
 boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE, print = str)
 #> 💣 subset(head(mtcars, 2), qsec > 17) 
 #> · 💣 💥 head(mtcars, 2) 
-#> time: 0.188 ms
+#> time: 0.212 ms
 #> · 'data.frame': 2 obs. of  11 variables:
 #> ·  $ mpg : num  21 21
 #> ·  $ cyl : num  6 6
@@ -119,11 +143,11 @@ boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE, print = str)
 #> ·  $ carb: num  4 4
 #> · 
 #> · 💣 💥 qsec > 17 
-#> time: 0.01 ms
+#> time: 0.014 ms
 #> ·  logi [1:2] FALSE TRUE
 #> · 
 #> 💥 subset(head(mtcars, 2), qsec > 17) 
-#> time: 0.285 ms
+#> time: 0.378 ms
 #> 'data.frame':    1 obs. of  11 variables:
 #>  $ mpg : num 21
 #>  $ cyl : num 6
@@ -257,11 +281,11 @@ fun2(1)
 #> · x :
 #> · [1] "double"
 #> · 💣 💥 x + 1 
-#> time: 0.009 ms
+#> time: 0.017 ms
 #> · [1] "double"
 #> · 
 #> 💥 x + 1 + 2 
-#> time: 0.034 s
+#> time: 0.037 s
 #> [1] "double"
 #> 
 #> 👆 e2

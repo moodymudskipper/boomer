@@ -72,7 +72,7 @@
 <li>
 <code><a href="reference/boom.html">rig()</a></code> creates a copy of a function which will display the intermediate results of all the calls of it body.</li>
 <li>
-<code><a href="reference/boom.html">rig_in_namespace()</a></code> rigs a namespaced function in place, so its always verbose even when called by other existing functions. It is especially handy for package development.</li>
+<code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code> rigs a namespaced function in place, so its always verbose even when called by other existing functions. It is especially handy for package development.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -144,7 +144,7 @@
 <h2 id="rig_in_namespace">
 <code>rig_in_namespace()</code><a class="anchor" aria-label="anchor" href="#rig_in_namespace"></a>
 </h2>
-<p><code><a href="reference/boom.html">rig()</a></code> creates a copy of a function, but when developing a package we might want to rig a function in place so it has a verbose output when called by other functions. For this we can use <code><a href="reference/boom.html">rig_in_namespace()</a></code>.</p>
+<p><code><a href="reference/boom.html">rig()</a></code> creates a copy of a function, but when developing a package we might want to rig a function in place so it has a verbose output when called by other functions. For this we can use <code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code>.</p>
 <p>For instance you might have these functions in a package :</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cylinder_vol</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">r</span>, <span class="va">h</span><span class="op">)</span> <span class="op">{</span></span>
@@ -154,10 +154,10 @@
 <span><span class="va">disk_area</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">pi</span> <span class="op">*</span> <span class="va">r</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><code>cylinder_vol</code> depends on <code>disk_area</code>, call <code>devtools::load_all()</code> then <code><a href="reference/boom.html">rig_in_namespace()</a></code> on both and enjoy the detailed output:</p>
+<p><code>cylinder_vol</code> depends on <code>disk_area</code>, call <code>devtools::load_all()</code> then <code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code> on both and enjoy the detailed output:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/boom.html">rig_in_namespace</a></span><span class="op">(</span><span class="va">cylinder_vol</span>, <span class="va">disk_area</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/rig_in_namespace.html">rig_in_namespace</a></span><span class="op">(</span><span class="va">cylinder_vol</span>, <span class="va">disk_area</span><span class="op">)</span></span>
 <span><span class="fu">cylinder_vol</span><span class="op">(</span><span class="fl">3</span>,<span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-9.png"></p>
 </div>
