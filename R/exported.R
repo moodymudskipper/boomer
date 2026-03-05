@@ -99,6 +99,10 @@ rig <- function(
     print = NULL
 ) {
   fun_lng <- substitute(fun)
+  if (is.character(fun)) {
+    fun_lng <- str2lang(fun)
+    fun <- eval.parent(fun_lng)
+  }
   if (!is.function(fun)) stop("`fun` should evaluate to a function")
   if (is.symbol(fun_lng) || rlang::is_call(fun_lng, "::") || rlang::is_call(fun_lng, "::"))  {
     fun_chr <- paste(deparse(fun_lng), collapse="")
@@ -142,6 +146,11 @@ rig_in_place <- function(
   print = NULL) {
 
   expr <- substitute(alist(...))[-1]
+  vals <- rlang::list2(...)
+  char_lgl <- sapply(vals, is.character)
+  expr[char_lgl] <- lapply(vals[char_lgl], str2lang)
+  pf <- parent.frame()
+  vals[char_lgl] <- lapply(expr[char_lgl], eval, pf)
   expr <- lapply(
     expr,
     function(x) {
@@ -151,7 +160,7 @@ rig_in_place <- function(
       x
     }
   )
-  vals <- list(...)
+  
   nms <- as.character(expr)
   ub <- unlockBinding
 
