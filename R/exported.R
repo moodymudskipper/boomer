@@ -241,3 +241,8 @@ rig_in_place <- function(
 #' @export
 #' @keywords internal
 rig_in_namespace <- rig_in_place
+
+#' @rdname boom
+rig_on_load <- function() {
+  rig_in_place(!!!getOption("boomer.rig_on_load"))
+}
