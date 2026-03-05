@@ -93,7 +93,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     on.exit(update_globals_on_exit(clock))
 
     # !!! this adds calls on.exit of caller (rigged) function !!!
-    signal_rigged_function_and_args(rigged_nm, fun_val, ej, print_args, rigged_fun_exec_env)
+    signal_rigged_function_and_args(rigged_nm, ej, print_args, rigged_fun_exec_env)
 
     # build calls to be displayed on top and bottom of wrapped call
    ignore_args <- getOption("boomer.ignore_args")
@@ -231,13 +231,14 @@ update_globals_on_exit <- function(clock) {
   invisible(NULL)
 }
 
-signal_rigged_function_and_args <- function(rigged_nm, fun_val, ej, print_args, rigged_fun_exec_env) {
+signal_rigged_function_and_args <- function(rigged_nm, ej, print_args, rigged_fun_exec_env) {
   # is the wrapped function called by a rigged function?
   if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
     first_call <- !exists("..EVALED_ARGS..", rigged_fun_exec_env)
     if(first_call) {
       cat(ej$dots, ej$rig_open, col_rigged_fun(rigged_nm),"\n", sep = "")
+      fun_val <- rlang::eval_bare(quote(sys.function()), rigged_fun_exec_env)
       arg_nms <- setdiff(formalArgs(fun_val), "...")
       rigged_fun_exec_env$..EVALED_ARGS.. <- 
         setNames(rep(FALSE, length(arg_nms)), arg_nms)
