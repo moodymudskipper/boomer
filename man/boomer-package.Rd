@@ -11,6 +11,9 @@
 \alias{boomer.ignore}
 \alias{boomer.ignore_args}
 \alias{boomer.safe_print}
+\alias{boomer.theme.args}
+\alias{boomer.theme.rigged_fun}
+\alias{boomer.theme.code}
 \title{boomer: Debugging Tools to Inspect the Intermediate Steps of a Call}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
@@ -58,6 +61,10 @@ call when it's entered. Defaults to \code{FALSE}
 \item \code{boomer.max_indent}: The maximum indention, once reached a number is printed at
 the start of the line and deeper nested calls are not indented further.
 Defaults to \code{10L}.
+\item \code{boomer.theme.args}: The color used to style argument names when they are implemented, by default "green"
+\item \code{boomer.theme.rigged_fun}: The color used to style the name of a rigged function, by default "yellow"
+\item \code{boomer.theme.code}: A color used to style the code printed by "boomer" (defaults to "cyan"), can also be
+"cli" to use the defaults of \code{cli::code_highlight()} or any theme listed by \code{cli::code_theme_list()}.
 }
 }
 

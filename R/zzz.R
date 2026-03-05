@@ -11,7 +11,10 @@ op.boom <- list(
   boomer.print_args = TRUE,
   boomer.safe_print = FALSE,
   boomer.abbreviate = FALSE,
-  boomer.max_indent = 10L
+  boomer.max_indent = 10L,
+  boomer.theme.args = "green",
+  boomer.theme.rigged_fun = "yellow",
+  boomer.theme.code = "cyan"
 )
 
 .onLoad <- function(libname, pkgname) {
