@@ -5,6 +5,7 @@
 \alias{rig}
 \alias{rigger}
 \alias{rig_in_place}
+\alias{rig_on_load}
 \title{Print the Output of Intermediate Steps of a Call}
 \usage{
 boom(expr, clock = NULL, print = NULL)
@@ -14,6 +15,8 @@ rig(fun, clock = NULL, print = NULL)
 rigger(clock = NULL, print = NULL)
 
 rig_in_place(..., clock = NULL, print = NULL)
+
+rig_on_load()
 }
 \arguments{
 \item{expr}{call to explode}
@@ -26,13 +29,13 @@ a step doesn't include the execution time of its previously printed sub-steps.}
 modify the way the output is printed. Defaults to \code{getOption("boomer.print")}
 evaluated at run time (\code{base::print} unless you change it)'.}
 
-\item{fun}{function ro \code{rig()}}
+\item{fun}{function ro \code{rig()}, can be a symbol, an expression returning a function, or a string}
 
 \item{...}{Functions to rig in their namespace
 
 If the \code{print} argument is a function, it will be used to print, or to transform the output
 before it's printed. Use \code{invisible} to display nothing, useful possibilities are
-\code{str} or \code{dplyr::glimpse}.
+\code{constructive::construct}, \code{str} or \code{dplyr::glimpse}.
 
 \emph{{rlang}}'s formula notation is supported, so for instance you can type:
 \code{print = ~ dplyr::glimpse(., width = 50)}.
@@ -59,6 +62,7 @@ as well as on functions defined in a session.
 To undo, call \code{load_all()} for the development package or
 \code{pkgload::unload()} on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
 on S3 methods.
+\item \code{rig_on_load()} can be used in \code{.onLoad()} to rig functions (values or names) stored in \code{getOption("boomer.rig_on_load")}
 \item \code{rigger()} provides a convenient way to rig an
 anonymous function by using the \code{rigger(...) + function(...) {...}} syntax.
 }

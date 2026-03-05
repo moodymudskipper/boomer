@@ -41,6 +41,7 @@ Several options impact the display of exploded calls :
 \itemize{
 \item \code{boomer.print}: If the \code{print} argument is not provided, this option will
 replace it at run time. Defaults to the \code{base::print} function.
+\code{boomer.print = constructive::construct} is a useful alternative.ß
 \item \code{boomer.clock}: If the \code{clock} argument is not provided, this option will
 replace it at run time. Defaults to \code{FALSE}.
 \item \code{boomer.print_args}: Whether to print the arguments of rigged functions
@@ -65,6 +66,8 @@ Defaults to \code{10L}.
 \item \code{boomer.theme.rigged_fun}: The color used to style the name of a rigged function, by default "yellow"
 \item \code{boomer.theme.code}: A color used to style the code printed by "boomer" (defaults to "cyan"), can also be
 "cli" to use the defaults of \code{cli::code_highlight()} or any theme listed by \code{cli::code_theme_list()}.
+\item \code{boomer.rig_on_load}: A list of functions, or a list or vector of function names that will be rigged on load
+if \code{rig_on_load()} is used in \code{.onLoad()}.
 }
 }
 

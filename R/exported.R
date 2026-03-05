@@ -10,6 +10,7 @@
 #' To undo, call `load_all()` for the development package or
 #' `pkgload::unload()` on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
 #' on S3 methods.
+#' - `rig_on_load()` can be used in `.onLoad()` to rig functions (values or names) stored in `getOption("boomer.rig_on_load")` 
 #' - `rigger()` provides a convenient way to rig an
 #' anonymous function by using the `rigger(...) + function(...) {...}` syntax.
 #' 
@@ -23,7 +24,7 @@
 #' * Replace the copy of the function in the "imports" environments of already loaded packages. Indeed packages that import function load copies of those in an environment, these need to be replaced as well.
 #' 
 #' @param expr call to explode
-#' @param fun function ro `rig()`
+#' @param fun function ro `rig()`, can be a symbol, an expression returning a function, or a string
 #' @param clock whether to time intermediate steps. Defaults to `getOption("boomer.clock")`
 #' evaluated at run time (`FALSE` unless you change it). The execution time of
 #' a step doesn't include the execution time of its previously printed sub-steps.
@@ -34,7 +35,7 @@
 #'
 #' If the `print` argument is a function, it will be used to print, or to transform the output
 #' before it's printed. Use `invisible` to display nothing, useful possibilities are
-#' `str` or `dplyr::glimpse`.
+#' `constructive::construct`, `str` or `dplyr::glimpse`.
 #'
 #' *{rlang}*'s formula notation is supported, so for instance you can type:
 #' `print = ~ dplyr::glimpse(., width = 50)`.
@@ -236,7 +237,7 @@ rig_in_place <- function(
 
 #' rig_in_namespace
 #' 
-#' `rig_in_namespace()` is a deprecated alias to \link{rig_in_place()}
+#' `rig_in_namespace()` is a deprecated alias to `rig_in_place()`
 #' 
 #' @export
 #' @keywords internal

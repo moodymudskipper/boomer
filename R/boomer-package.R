@@ -23,6 +23,7 @@
 #'
 #' - `boomer.print`: If the `print` argument is not provided, this option will
 #'   replace it at run time. Defaults to the `base::print` function.
+#'   `boomer.print = constructive::construct` is a useful alternative.ß
 #' - `boomer.clock`: If the `clock` argument is not provided, this option will
 #'   replace it at run time. Defaults to `FALSE`.
 #' - `boomer.print_args`: Whether to print the arguments of rigged functions
@@ -47,5 +48,7 @@
 #' - `boomer.theme.rigged_fun`: The color used to style the name of a rigged function, by default "yellow"
 #' - `boomer.theme.code`: A color used to style the code printed by "boomer" (defaults to "cyan"), can also be
 #'   "cli" to use the defaults of `cli::code_highlight()` or any theme listed by `cli::code_theme_list()`.
+#' - `boomer.rig_on_load`: A list of functions, or a list or vector of function names that will be rigged on load
+#' if `rig_on_load()` is used in `.onLoad()`.
 #'
 "_PACKAGE"

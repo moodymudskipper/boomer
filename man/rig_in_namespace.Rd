@@ -7,6 +7,6 @@
 rig_in_namespace(..., clock = NULL, print = NULL)
 }
 \description{
-\code{rig_in_namespace()} is a deprecated alias to \link{rig_in_place()}
+\code{rig_in_namespace()} is a deprecated alias to \code{rig_in_place()}
 }
 \keyword{internal}
