@@ -4,14 +4,24 @@
 #' - `boom()` prints the intermediate results of a call or a code chunk.
 #' - `rig()` creates a copy of a function which will display the intermediate
 #' results of all the calls of it body.
-#' - `rig_in_namespace()` rigs a namespaced function in place, so its always
-#' verbose even when called by other existing functions. It is especially handy
-#' for package development. To undo, call `load_all()` for the development package or
+#' - `rig_in_place()` rigs a function in place, so its always
+#' verbose even when called by other existing functions. It works on functions from packages
+#' as well as on functions defined in a session.
+#' To undo, call `load_all()` for the development package or
 #' `pkgload::unload()` on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
 #' on S3 methods.
 #' - `rigger()` provides a convenient way to rig an
 #' anonymous function by using the `rigger(...) + function(...) {...}` syntax.
-#'
+#' 
+#' @section Side effects of `rig_in_place()`:
+#' 
+#' When called on a packaged function `rig_in_place()` replaces the target function in the namespace but
+#' to behave as expected it does a bit more:
+#' 
+#' * Replace the copy of the function in the package environment, where the functions called without `::` or `:::` are fetched from after calling `library()`.
+#' * Replace the copy of the function in the S3 methods table if relevant. S3 dispatch calls copies of functions, not the function in the namespace directly, so those need to be replaced as well.
+#' * Replace the copy of the function in the "imports" environments of already loaded packages. Indeed packages that import function load copies of those in an environment, these need to be replaced as well.
+#' 
 #' @param expr call to explode
 #' @param fun function ro `rig()`
 #' @param clock whether to time intermediate steps. Defaults to `getOption("boomer.clock")`
@@ -124,10 +134,9 @@ print.rigger <- function(x, ...) {
       print = e1$print)
 }
 
-
 #' @export
 #' @rdname boom
-rig_in_namespace <- function(
+rig_in_place <- function(
   ...,
   clock = NULL,
   print = NULL) {
@@ -158,19 +167,19 @@ rig_in_namespace <- function(
     val <- vals[[i]]
 
     if (isNamespace(ns)) {  
-    # if the library is attached and the function is exported 
-    # we need to update the copy in the package env
-    pkg <- paste0("package:", base::getNamespaceName(ns))
-    if (pkg %in% search() && nm %in% getNamespaceExports(ns)) {
-      ub(nm, as.environment(pkg))
-      assign(nm, val, pkg)
-    }
-
-    # if the function is a s3 method we need to update the copy in the S3 table
-    if (nm %in% names(ns$.__S3MethodsTable__.)) {
-      ub(".__S3MethodsTable__.", ns)
-      assign(nm, val, ns$.__S3MethodsTable__.)
-    }
+      # if the library is attached and the function is exported 
+      # we need to update the copy in the package env
+      pkg <- paste0("package:", base::getNamespaceName(ns))
+      if (pkg %in% search() && nm %in% getNamespaceExports(ns)) {
+        ub(nm, as.environment(pkg))
+        assign(nm, val, pkg)
+      }
+  
+      # if the function is a s3 method we need to update the copy in the S3 table
+      if (nm %in% names(ns$.__S3MethodsTable__.)) {
+        ub(".__S3MethodsTable__.", ns)
+        assign(nm, val, ns$.__S3MethodsTable__.)
+      }
 
       # if the is imported by other packages priot to calling rig_in_place()
       # we need to rig the copies in the import environments
@@ -216,3 +225,10 @@ rig_in_namespace <- function(
   invisible(NULL)
 }
 
+#' rig_in_namespace
+#' 
+#' `rig_in_namespace()` is a deprecated alias to \link{rig_in_place()}
+#' 
+#' @export
+#' @keywords internal
+rig_in_namespace <- rig_in_place

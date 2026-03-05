@@ -4,7 +4,7 @@
 \alias{boom}
 \alias{rig}
 \alias{rigger}
-\alias{rig_in_namespace}
+\alias{rig_in_place}
 \title{Print the Output of Intermediate Steps of a Call}
 \usage{
 boom(expr, clock = NULL, print = NULL)
@@ -13,7 +13,7 @@ rig(fun, clock = NULL, print = NULL)
 
 rigger(clock = NULL, print = NULL)
 
-rig_in_namespace(..., clock = NULL, print = NULL)
+rig_in_place(..., clock = NULL, print = NULL)
 }
 \arguments{
 \item{expr}{call to explode}
@@ -53,15 +53,28 @@ the class "rigger" to enable \code{+.rigger} and \code{print.rigger}
 \item \code{boom()} prints the intermediate results of a call or a code chunk.
 \item \code{rig()} creates a copy of a function which will display the intermediate
 results of all the calls of it body.
-\item \code{rig_in_namespace()} rigs a namespaced function in place, so its always
-verbose even when called by other existing functions. It is especially handy
-for package development. To undo, call \code{load_all()} for the development package or
+\item \code{rig_in_place()} rigs a function in place, so its always
+verbose even when called by other existing functions. It works on functions from packages
+as well as on functions defined in a session.
+To undo, call \code{load_all()} for the development package or
 \code{pkgload::unload()} on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
 on S3 methods.
 \item \code{rigger()} provides a convenient way to rig an
 anonymous function by using the \code{rigger(...) + function(...) {...}} syntax.
 }
 }
+\section{Side effects of \code{rig_in_place()}}{
+
+
+When called on a packaged function \code{rig_in_place()} replaces the target function in the namespace but
+to behave as expected it does a bit more:
+\itemize{
+\item Replace the copy of the function in the package environment, where the functions called without \code{::} or \code{:::} are fetched from after calling \code{library()}.
+\item Replace the copy of the function in the S3 methods table if relevant. S3 dispatch calls copies of functions, not the function in the namespace directly, so those need to be replaced as well.
+\item Replace the copy of the function in the "imports" environments of already loaded packages. Indeed packages that import function load copies of those in an environment, these need to be replaced as well.
+}
+}
+
 \examples{
 # explode a simple call
 boom(subset(head(mtcars, 2), qsec > 17))
