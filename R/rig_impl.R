@@ -3,6 +3,10 @@ rig_impl <- function(
   clock = NULL,
   print = NULL,
   rigged_nm = NULL) {
+  
+  # if rigged we unrig so we can apply new args
+  # no-op if it's not rigged
+  fun <- unrig(fun) 
 
   expr <- body(fun)
   reset_globals()
@@ -41,6 +45,17 @@ rig_impl <- function(
   environment(fun) <- mask
   fun
   structure(fun, boomer.rigged = TRUE)
+}
+
+is_rigged <- function(fun) {
+  isTRUE(attr(fun, "boomer.rigged"))
+}
+
+unrig <- function(fun) {
+  if (is_rigged(fun)) {
+    environment(fun) <- parent.env(environment(fun))
+  }
+  fun
 }
 
 fetch_functions <- function(expr, ignore) {

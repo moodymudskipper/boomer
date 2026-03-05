@@ -4,16 +4,27 @@
 #' - `boom()` prints the intermediate results of a call or a code chunk.
 #' - `rig()` creates a copy of a function which will display the intermediate
 #' results of all the calls of it body.
-#' - `rig_in_namespace()` rigs a namespaced function in place, so its always
-#' verbose even when called by other existing functions. It is especially handy
-#' for package development. To undo, call `load_all()` for the development package or
+#' - `rig_in_place()` rigs a function in place, so its always
+#' verbose even when called by other existing functions. It works on functions from packages
+#' as well as on functions defined in a session.
+#' To undo, call `load_all()` for the development package or
 #' `pkgload::unload()` on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
 #' on S3 methods.
+#' - `rig_on_load()` can be used in `.onLoad()` to rig functions (values or names) stored in `getOption("boomer.rig_on_load")` 
 #' - `rigger()` provides a convenient way to rig an
 #' anonymous function by using the `rigger(...) + function(...) {...}` syntax.
-#'
+#' 
+#' @section Side effects of `rig_in_place()`:
+#' 
+#' When called on a packaged function `rig_in_place()` replaces the target function in the namespace but
+#' to behave as expected it does a bit more:
+#' 
+#' * Replace the copy of the function in the package environment, where the functions called without `::` or `:::` are fetched from after calling `library()`.
+#' * Replace the copy of the function in the S3 methods table if relevant. S3 dispatch calls copies of functions, not the function in the namespace directly, so those need to be replaced as well.
+#' * Replace the copy of the function in the "imports" environments of already loaded packages. Indeed packages that import function load copies of those in an environment, these need to be replaced as well.
+#' 
 #' @param expr call to explode
-#' @param fun function ro `rig()`
+#' @param fun function ro `rig()`, can be a symbol, an expression returning a function, or a string
 #' @param clock whether to time intermediate steps. Defaults to `getOption("boomer.clock")`
 #' evaluated at run time (`FALSE` unless you change it). The execution time of
 #' a step doesn't include the execution time of its previously printed sub-steps.
@@ -24,7 +35,7 @@
 #'
 #' If the `print` argument is a function, it will be used to print, or to transform the output
 #' before it's printed. Use `invisible` to display nothing, useful possibilities are
-#' `str` or `dplyr::glimpse`.
+#' `constructive::construct`, `str` or `dplyr::glimpse`.
 #'
 #' *{rlang}*'s formula notation is supported, so for instance you can type:
 #' `print = ~ dplyr::glimpse(., width = 50)`.
@@ -89,6 +100,10 @@ rig <- function(
     print = NULL
 ) {
   fun_lng <- substitute(fun)
+  if (is.character(fun)) {
+    fun_lng <- str2lang(fun)
+    fun <- eval.parent(fun_lng)
+  }
   if (!is.function(fun)) stop("`fun` should evaluate to a function")
   if (is.symbol(fun_lng) || rlang::is_call(fun_lng, "::") || rlang::is_call(fun_lng, "::"))  {
     fun_chr <- paste(deparse(fun_lng), collapse="")
@@ -124,15 +139,19 @@ print.rigger <- function(x, ...) {
       print = e1$print)
 }
 
-
 #' @export
 #' @rdname boom
-rig_in_namespace <- function(
+rig_in_place <- function(
   ...,
   clock = NULL,
   print = NULL) {
 
   expr <- substitute(alist(...))[-1]
+  vals <- rlang::list2(...)
+  char_lgl <- sapply(vals, is.character)
+  expr[char_lgl] <- lapply(vals[char_lgl], str2lang)
+  pf <- parent.frame()
+  vals[char_lgl] <- lapply(expr[char_lgl], eval, pf)
   expr <- lapply(
     expr,
     function(x) {
@@ -142,8 +161,9 @@ rig_in_namespace <- function(
       x
     }
   )
-  vals <- list(...)
+  
   nms <- as.character(expr)
+  ub <- unlockBinding
 
   # rig all functions in their own namespace
   # i.e. keep their binding in the namespace but insert a parent on top
@@ -156,23 +176,40 @@ rig_in_namespace <- function(
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, rigged_nm = nms[[i]])
     val <- vals[[i]]
 
-    ub <- unlockBinding
-    ub(nm, ns)
+    if (isNamespace(ns)) {  
+      # if the library is attached and the function is exported 
+      # we need to update the copy in the package env
+      pkg <- paste0("package:", base::getNamespaceName(ns))
+      if (pkg %in% search() && nm %in% getNamespaceExports(ns)) {
+        ub(nm, as.environment(pkg))
+        assign(nm, val, pkg)
+      }
+  
+      # if the function is a s3 method we need to update the copy in the S3 table
+      if (nm %in% names(ns$.__S3MethodsTable__.)) {
+        ub(".__S3MethodsTable__.", ns)
+        assign(nm, val, ns$.__S3MethodsTable__.)
+      }
+
+      # if the is imported by other packages priot to calling rig_in_place()
+      # we need to rig the copies in the import environments
+      # (Namespace loaded later will get the rigged functions right away)
+      for (loaded_ns in setdiff(loadedNamespaces(), "base")) {
+        imports_env <- parent.env(asNamespace(loaded_ns))
+        imported_funs <- as.list(imports_env)
+        ind <- match(list(val), imported_funs)
+        if (!is.na(ind)) {
+          # nm_imp is 99.9% of the time nm but let's be conservative
+          nm_imp <- names(imported_funs)[[ind]]
+          ub(nm_imp, imports_env)
+          assign(nm_imp, val, imports_env)
+        }
+      }
+
+      # The main function in the namespace
+      ub(nm, ns)
+    }
     assign(nm, val, ns)
-
-    # if the library is attached and the function is exported 
-    # we need to update the copy in the package env
-    pkg <- paste0("package:", base::getNamespaceName(ns))
-    if (pkg %in% search() && nm %in% getNamespaceExports(ns)) {
-      ub(nm, as.environment(pkg))
-      assign(nm, val, pkg)
-    }
-
-    # if the function is a s3 method we need to update the copy in the S3 table
-    if (nm %in% names(ns$.__S3MethodsTable__.)) {
-      ub(".__S3MethodsTable__.", ns)
-      assign(nm, val, ns$.__S3MethodsTable__.)
-    }
   }
 
   # list of modified functions
@@ -198,3 +235,15 @@ rig_in_namespace <- function(
   invisible(NULL)
 }
 
+#' rig_in_namespace
+#' 
+#' `rig_in_namespace()` is a deprecated alias to `rig_in_place()`
+#' 
+#' @export
+#' @keywords internal
+rig_in_namespace <- rig_in_place
+
+#' @rdname boom
+rig_on_load <- function() {
+  rig_in_place(!!!getOption("boomer.rig_on_load"))
+}

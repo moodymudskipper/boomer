@@ -1,8 +1,9 @@
 #' @importFrom stats setNames
 #' @importFrom utils getParseData head capture.output getFromNamespace
 #' @importFrom methods allNames formalArgs
-#' @aliases boomer boomer-package boomer.print boomer.clock boomer.print_args 
+#' @aliases boomer boomer-package boomer.print boomer.clock boomer.print_args
 #'   boomer.visible_only boomer.ignore boomer.ignore_args boomer.safe_print
+#'   boomer.theme.args boomer.theme.rigged_fun boomer.theme.code
 #' @details
 #'
 #' * [boom()] displays the intermediate results of a call or a code chunk.
@@ -22,6 +23,7 @@
 #'
 #' - `boomer.print`: If the `print` argument is not provided, this option will
 #'   replace it at run time. Defaults to the `base::print` function.
+#'   `boomer.print = constructive::construct` is a useful alternative.ß
 #' - `boomer.clock`: If the `clock` argument is not provided, this option will
 #'   replace it at run time. Defaults to `FALSE`.
 #' - `boomer.print_args`: Whether to print the arguments of rigged functions
@@ -42,5 +44,11 @@
 #' - `boomer.max_indent`: The maximum indention, once reached a number is printed at 
 #'   the start of the line and deeper nested calls are not indented further. 
 #'   Defaults to `10L`.
+#' - `boomer.theme.args`: The color used to style argument names when they are implemented, by default "green"
+#' - `boomer.theme.rigged_fun`: The color used to style the name of a rigged function, by default "yellow"
+#' - `boomer.theme.code`: A color used to style the code printed by "boomer" (defaults to "cyan"), can also be
+#'   "cli" to use the defaults of `cli::code_highlight()` or any theme listed by `cli::code_theme_list()`.
+#' - `boomer.rig_on_load`: A list of functions, or a list or vector of function names that will be rigged on load
+#' if `rig_on_load()` is used in `.onLoad()`.
 #'
 "_PACKAGE"

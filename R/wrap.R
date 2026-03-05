@@ -173,6 +173,27 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
   structure(out, boomer.wrapped = TRUE)
 }
 
+col_args <- function(...) {
+  cli::make_ansi_style(getOption("boomer.theme.args"))(...)
+}
+
+col_rigged_fun <- function(...) {
+  cli::make_ansi_style(getOption("boomer.theme.rigged_fun"))(...)
+}
+
+code_highlight_theme <- function(code) {
+  theme <- getOption("boomer.theme.code", default = "cyan")
+  if (theme == "cli") {
+    return(cli::code_highlight(code, theme = NULL))
+  }
+
+  if (theme %in% cli::code_theme_list()) {
+    return(cli::code_highlight(code, code_theme = theme))
+  }
+  
+  cli::make_ansi_style(theme)(code)
+}
+
 set_emojis <- function(safe_print, n_indent) {
   ej <- list()
   max_indent <- getOption("boomer.max_indent", Inf)
@@ -215,11 +236,11 @@ signal_rigged_function_and_args <- function(rigged_nm, mask, ej, print_args, rig
   if(!is.null(rigged_nm)) {
     # is this wrapped function call the first of the body?
     if(mask$..FIRST_CALL..) {
-      cat(ej$dots, ej$rig_open, cli::col_yellow(rigged_nm),"\n", sep = "")
+      cat(ej$dots, ej$rig_open, col_rigged_fun(rigged_nm),"\n", sep = "")
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
-        cat(ej$dots, ej$rig_close, cli::col_yellow(rigged_nm),"\n", sep = "")
+        cat(ej$dots, ej$rig_close, col_rigged_fun(rigged_nm),"\n", sep = "")
         mask$..FIRST_CALL.. <- TRUE
         mask$..EVALED_ARGS..[] <- FALSE
       }, envir = rigged_fun_exec_env)
@@ -246,41 +267,44 @@ build_deparsed_calls <- function(sc, ej, n_indent, force_single_line, rigged) {
   if(length(call_chr) == 1) {
     if(all_args_are_atomic && no_dot_in_args) {
       deparsed_calls$close <-
-        paste0(ej$dots, ej$wrap_open, ej$wrap_close, cli::col_cyan(call_chr))
+        paste0(ej$dots, ej$wrap_open, ej$wrap_close, code_highlight_theme(call_chr))
     } else {
-      deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, cli::col_cyan(call_chr))
+      deparsed_calls$close <- paste0(ej$dots, ej$wrap_close, code_highlight_theme(call_chr))
       if(getOption("boomer.abbreviate")) {
         call_chr <- deparse_line(sc[[1]])
       }
-      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, cli::col_cyan(call_chr))
+      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, code_highlight_theme(call_chr))
 
       if(cli::ansi_nchar(deparsed_calls$open) > 80) {
         deparsed_calls$open <- paste0(
-          cli::ansi_substr(deparsed_calls$open, 1, 77), cli::col_cyan("..."))
+          cli::ansi_substr(deparsed_calls$open, 1, 77), code_highlight_theme("..."))
       }
     }
   } else {
     if(all_args_are_atomic && no_dot_in_args) {
-      line1 <- paste0(ej$dots, ej$wrap_open, ej$wrap_close, cli::col_cyan(call_chr[1]))
-      other_lines <-  paste0(ej$dots, "      ", cli::col_cyan(call_chr[-1]))
+      code <- code_highlight_theme(call_chr)
+      line1 <- paste0(ej$dots, ej$wrap_open, ej$wrap_close, code[1])
+      other_lines <-  paste0(ej$dots, "      ", code[-1])
       deparsed_calls$close <- paste(c(line1, other_lines), collapse = "\n")
     } else {
-      line1 <- paste0(ej$dots, ej$wrap_close, cli::col_cyan(call_chr[1]))
-      other_lines <-  paste0(ej$dots, "   ", cli::col_cyan(call_chr[-1]))
+      code <- code_highlight_theme(call_chr)
+      line1 <- paste0(ej$dots, ej$wrap_close, code[1])
+      other_lines <-  paste0(ej$dots, "   ", code[-1])
       deparsed_calls$close <-  paste(c(line1, other_lines), collapse = "\n")
       if(getOption("boomer.abbreviate")) {
         call_chr <- deparse_line(sc[[1]])
       }
+      call_chr <- code_highlight_theme(call_chr)
       if(length(call_chr) > 1) {
-        call_chr <- paste0(call_chr[1], "...")
+        call_chr <- paste0(call_chr[1], code_highlight_theme("..."))
       }
-      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, cli::col_cyan(call_chr))
+      deparsed_calls$open <- paste0(ej$dots, ej$wrap_open, call_chr)
 
       if(cli::ansi_nchar(deparsed_calls$open) > 80) {
         # couldn' find example to test this so using nocov, but it's he same as above
         # nocov start
         deparsed_calls$open <- paste0(
-          cli::ansi_substr(deparsed_calls$open, 1, 77), cli::col_cyan("..."))
+          cli::ansi_substr(deparsed_calls$open, 1, 77), code_highlight_theme("..."))
         # nocov end
       }
     }
@@ -313,7 +337,7 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
         print_fun <- fetch_print_fun(print_fun, arg_val)
         output <- capture.output(print_fun(arg_val))
         writeLines(paste0(
-          ej$dots, c(cli::col_green(arg, " ", ":"), output)))
+          ej$dots, c(col_args(arg, " ", ":"), output)))
       }
     }
   }
