@@ -172,6 +172,21 @@ rig_in_namespace <- function(
       assign(nm, val, ns$.__S3MethodsTable__.)
     }
 
+      # if the is imported by other packages priot to calling rig_in_place()
+      # we need to rig the copies in the import environments
+      # (Namespace loaded later will get the rigged functions right away)
+      for (loaded_ns in setdiff(loadedNamespaces(), "base")) {
+        imports_env <- parent.env(asNamespace(loaded_ns))
+        imported_funs <- as.list(imports_env)
+        ind <- match(list(val), imported_funs)
+        if (!is.na(ind)) {
+          # nm_imp is 99.9% of the time nm but let's be conservative
+          nm_imp <- names(imported_funs)[[ind]]
+          ub(nm_imp, imports_env)
+          assign(nm_imp, val, imports_env)
+        }
+      }
+
       # The main function in the namespace
       ub(nm, ns)
     }
