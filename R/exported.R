@@ -176,7 +176,8 @@ rig_in_place <- function(
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, rigged_nm = nms[[i]])
     val <- vals[[i]]
 
-    if (isNamespace(ns)) {  
+
+    if (isNamespace(ns) && identical(get0(nm, ns, inherits = FALSE), val)) {  
       # if the library is attached and the function is exported 
       # we need to update the copy in the package env
       pkg <- paste0("package:", base::getNamespaceName(ns))
