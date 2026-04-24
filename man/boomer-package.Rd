@@ -2,8 +2,18 @@
 % Please edit documentation in R/boomer-package.R
 \docType{package}
 \name{boomer-package}
-\alias{boomer}
 \alias{boomer-package}
+\alias{boomer}
+\alias{boomer.print}
+\alias{boomer.clock}
+\alias{boomer.print_args}
+\alias{boomer.visible_only}
+\alias{boomer.ignore}
+\alias{boomer.ignore_args}
+\alias{boomer.safe_print}
+\alias{boomer.theme.args}
+\alias{boomer.theme.rigged_fun}
+\alias{boomer.theme.code}
 \title{boomer: Debugging Tools to Inspect the Intermediate Steps of a Call}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
