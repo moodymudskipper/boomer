@@ -96,3 +96,7 @@ Useful links:
 ## Author
 
 **Maintainer**: Antoine Fabri <antoine.fabri@gmail.com>
+
+Authors:
+
+- Antoine Fabri <antoine.fabri@gmail.com>

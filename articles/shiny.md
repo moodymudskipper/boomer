@@ -17,6 +17,7 @@ For instance taking an example from “Mastering Shiny”, we can create a
 file (it needs to be saved in the project!) and fill it with :
 
 ``` r
+
 histogramUI <- function(id) {
   tagList(
     selectInput(NS(id, "var"), "Variable", choices = names(mtcars)),

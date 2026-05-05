@@ -8,22 +8,29 @@ An important principle of {boomer} is that we don’t modify the body of
 the function we rig.
 
 ``` r
+
 rigged_file_ext <- boomer::rig(tools::file_ext)
 tools::file_ext
 #> function (x) 
 #> {
-#>     pos <- regexpr("\\.([[:alnum:]]+)$", x)
-#>     ifelse(pos > -1L, substring(x, pos + 1L), "")
+#>     x <- as.character(x)
+#>     if (!length(x)) 
+#>         return(character())
+#>     ifelse(grepl("^(.*[^.]+.*)[.]([[:alnum:]]+)$", basename(x)), 
+#>         sub(".*[.]([[:alnum:]]+)$", "\\1", x), "")
 #> }
-#> <bytecode: 0x5628255a93c0>
+#> <bytecode: 0x55aac836c2a0>
 #> <environment: namespace:tools>
 rigged_file_ext
 #> function (x) 
 #> {
-#>     pos <- regexpr("\\.([[:alnum:]]+)$", x)
-#>     ifelse(pos > -1L, substring(x, pos + 1L), "")
+#>     x <- as.character(x)
+#>     if (!length(x)) 
+#>         return(character())
+#>     ifelse(grepl("^(.*[^.]+.*)[.]([[:alnum:]]+)$", basename(x)), 
+#>         sub(".*[.]([[:alnum:]]+)$", "\\1", x), "")
 #> }
-#> <environment: 0x5628259bf720>
+#> <environment: 0x55aac8db2720>
 #> attr(,"boomer.rigged")
 #> [1] TRUE
 ```
@@ -34,6 +41,7 @@ populated with shims of the functions called by the original function.
 We call this environment the mask.
 
 ``` r
+
 # the original environment
 environment(tools::file_ext)
 #> <environment: namespace:tools>
@@ -41,7 +49,7 @@ environment(tools::file_ext)
 # our new environment
 env <- environment(rigged_file_ext)
 env
-#> <environment: 0x5628259bf720>
+#> <environment: 0x55aac8db2720>
 
 # its parent
 parent.env(env)
@@ -49,8 +57,10 @@ parent.env(env)
 
 # its content
 ls(env)
-#>  [1] "-"         "::"        ":::"       "("         "{"         "+"        
-#>  [7] "<-"        "="         ">"         "ifelse"    "regexpr"   "substring"
+#>  [1] "::"           ":::"          "!"            "("            "{"           
+#>  [6] "<-"           "="            "as.character" "basename"     "character"   
+#> [11] "grepl"        "if"           "ifelse"       "length"       "return"      
+#> [16] "sub"
 ```
 
 `rig_impl()` does this job and is the main function of the package. It
@@ -73,10 +83,11 @@ with {magrittr} (The hack is not needed for the base pipe)
 Here’s the diagram of dependencies of `rig_impl()`
 
 ``` r
+
 flow::flow_view_deps(boomer:::rig_impl, show_imports = "packages")
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
 #> Error in `knitr::include_graphics()`:
-#> ! Cannot find the file(s): "/tmp/RtmpWGkE9S/flow_30c96600c690.png"
+#> ! Cannot find the file(s): "/tmp/Rtmp1Pc7a1/flow_32536409a052.png"
 ```
 
 `rig_impl()` :

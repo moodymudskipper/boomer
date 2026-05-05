@@ -19,18 +19,21 @@ into its parts hence the name.
 Install CRAN version with:
 
 ``` r
+
 install.packages("boomer")
 ```
 
 Or development version with:
 
 ``` r
+
 remotes::install_github("moodymudskipper/boomer")
 ```
 
 ## `boom()`
 
 ``` r
+
 library(boomer)
 boom(1 + !1 * 2)
 ```
@@ -38,6 +41,7 @@ boom(1 + !1 * 2)
 ![](reference/figures/README-1.png)
 
 ``` r
+
 boom(subset(head(mtcars, 2), qsec > 17))
 ```
 
@@ -50,6 +54,7 @@ with *{magrittr}* pipes or base R pipes: just pipe to
 at the end of a pipe chain.
 
 ``` r
+
 library(magrittr)
 mtcars %>%
   head(2) %>%
@@ -63,6 +68,7 @@ If a call fails, *{boomer}* will print intermediate outputs up to the
 occurrence of the error, it can help with debugging:
 
 ``` r
+
 "tomato" %>%
   substr(1, 3) %>%
   toupper() %>%
@@ -89,6 +95,7 @@ features optional arguments :
 One use case is when the output is too long.
 
 ``` r
+
 boom(lapply(head(cars), sqrt), clock = TRUE, print = str)
 ```
 
@@ -98,6 +105,7 @@ boom(lapply(head(cars), sqrt), clock = TRUE, print = str)
 also works works on loops and multi-line expression.
 
 ``` r
+
  boom(for(i in 1:3) paste0(i, "!"))
 ```
 
@@ -111,6 +119,7 @@ function in order to
 its body, its arguments are printed by default when they’re evaluated.
 
 ``` r
+
 hello <- function(x) {
   if(!is.character(x) | length(x) != 1) {
     stop("`x` should be a string")
@@ -133,6 +142,7 @@ by other functions. For this we can use
 For instance you might have these functions in a package :
 
 ``` r
+
 cylinder_vol <- function(r, h) {
   h * disk_area(r)
 }
@@ -147,6 +157,7 @@ disk_area <- function(r) {
 on both and enjoy the detailed output:
 
 ``` r
+
 devtools::load_all()
 rig_in_namespace(cylinder_vol, disk_area)
 cylinder_vol(3,10)
@@ -174,6 +185,7 @@ for more information.
 For the following app, saved in a proper project/package:
 
 ``` r
+
 histogramUI <- function(id) {
   tagList(
     selectInput(NS(id, "var"), "Variable", choices = names(mtcars)),
