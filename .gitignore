@@ -7,3 +7,4 @@ inst/doc
 /Meta/
 .DS_Store
 man/.DS_Store
+.ccache/

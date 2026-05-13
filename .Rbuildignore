@@ -12,3 +12,4 @@
 ^Meta$
 ^CRAN-SUBMISSION$
 ^.claude$
+^\.ccache$
