@@ -257,12 +257,12 @@
       <  1 %>%... 
       . <  I(.) 
       . >  I(.) 
-      Error: simpleError/error/condition
+      Error: functionNotFoundError/objectNotFoundError/error/condition
       >  1 %>%
            identity() %>%
            missing_function() %>%
            I() 
-      Error: simpleError/error/condition
+      Error: functionNotFoundError/objectNotFoundError/error/condition
     Condition
       Error in `missing_function()`:
       ! could not find function "missing_function"
