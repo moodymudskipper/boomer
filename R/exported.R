@@ -173,23 +173,35 @@ rig_in_place <- function(
     nm <- nms[[i]]
     env <- environment(vals[[i]])
     ns <- topenv(env)
+    orig <- vals[[i]]
     vals[[i]] <- rig_impl(vals[[i]], clock = clock, print = print, rigged_nm = nms[[i]])
     val <- vals[[i]]
 
 
-    if (isNamespace(ns) && identical(get0(nm, ns, inherits = FALSE), val)) {  
-      # if the library is attached and the function is exported 
+    # compare against `orig` (the function before rigging), since `val` is the
+    # rigged copy and would never match the binding in the namespace
+    if (isNamespace(ns) && identical(get0(nm, ns, inherits = FALSE), orig)) {
+      # if the library is attached and the function is exported
       # we need to update the copy in the package env
       pkg <- paste0("package:", base::getNamespaceName(ns))
       if (pkg %in% search() && nm %in% getNamespaceExports(ns)) {
         ub(nm, as.environment(pkg))
         assign(nm, val, pkg)
       }
-  
-      # if the function is a s3 method we need to update the copy in the S3 table
-      if (nm %in% names(ns$.__S3MethodsTable__.)) {
-        ub(".__S3MethodsTable__.", ns)
-        assign(nm, val, ns$.__S3MethodsTable__.)
+
+      # if the function is an S3 method we need to update its registered copy,
+      # which is the one S3 dispatch actually calls. That copy lives in the S3
+      # methods table of the namespace that owns the *generic* (often base, e.g.
+      # for `print`), which is not necessarily `ns`. We locate it by identity
+      # wherever it is registered. The methods table environment is not locked,
+      # so no unlocking is needed.
+      for (loaded_ns in loadedNamespaces()) {
+        s3_table <- asNamespace(loaded_ns)[[".__S3MethodsTable__."]]
+        if (!is.null(s3_table) &&
+            !is.null(s3_table[[nm]]) &&
+            identical(s3_table[[nm]], orig)) {
+          assign(nm, val, s3_table)
+        }
       }
 
       # if the is imported by other packages priot to calling rig_in_place()
