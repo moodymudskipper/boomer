@@ -163,6 +163,40 @@ rig_in_place <- function(
   )
   
   nms <- as.character(expr)
+
+  # Rigging an S3 generic on its own has no visible effect: the generic just
+  # dispatches (`UseMethod()`) to a method, and it is the methods that we want
+  # to explode. So whenever a generic is passed we rig all of its registered S3
+  # methods instead. (#141)
+  is_generic <- vapply(
+    vals, function(v) isTRUE(unname(isS3stdGeneric(v))), logical(1)
+  )
+  if (any(is_generic)) {
+    expanded_vals <- list()
+    expanded_nms <- character()
+    for (i in seq_along(vals)) {
+      if (!is_generic[[i]]) {
+        expanded_vals <- c(expanded_vals, vals[i])
+        expanded_nms <- c(expanded_nms, nms[[i]])
+        next
+      }
+      methods <- s3_methods_of(nms[[i]], vals[[i]])
+      if (!length(methods)) {
+        message("`", nms[[i]], "()` is an S3 generic with no registered methods to rig.")
+        next
+      }
+      message(
+        "`", nms[[i]], "()` is an S3 generic, rigging its ", length(methods),
+        " registered method(s) instead: ",
+        paste0(names(methods), "()", collapse = ", ")
+      )
+      expanded_vals <- c(expanded_vals, unname(methods))
+      expanded_nms <- c(expanded_nms, names(methods))
+    }
+    vals <- expanded_vals
+    nms <- expanded_nms
+  }
+
   ub <- unlockBinding
 
   # rig all functions in their own namespace

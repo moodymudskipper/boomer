@@ -37,3 +37,29 @@ test_that("rig_in_place() updates the right S3 methods table (#141)", {
   # ... while still returning the correct result
   expect_identical(result, "ab")
 })
+
+test_that("rig_in_place() on an S3 generic rigs its registered methods (#141)", {
+  # rigging a generic is pointless on its own (it just dispatches), so it should
+  # rig the methods it dispatches to instead.
+  fake_package(
+    "boomerfakegen",
+    exported = list(boomerfakegen = function(x, ...) UseMethod("boomerfakegen")),
+    unexported = list(boomerfakegen.fakegencls = function(x, ...) {
+      total <- sum(1:3)
+      total * 10
+    }),
+    s3 = list(c("boomerfakegen", "fakegencls")),
+    attach = TRUE
+  )
+
+  expect_message(
+    rig_in_place(boomerfakegen::boomerfakegen),
+    "S3 generic"
+  )
+
+  obj <- structure(list(), class = "fakegencls")
+  out <- cli::ansi_strip(capture.output(result <- boomerfakegen(obj)))
+
+  expect_true(any(grepl("boomerfakegen.fakegencls", out, fixed = TRUE)))
+  expect_equal(result, 60)
+})
