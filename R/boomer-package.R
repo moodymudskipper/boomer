@@ -3,7 +3,7 @@
 #' @importFrom methods allNames formalArgs
 #' @aliases boomer boomer-package boomer.print boomer.clock boomer.print_args
 #'   boomer.visible_only boomer.ignore boomer.ignore_args boomer.safe_print
-#'   boomer.theme.args boomer.theme.rigged_fun boomer.theme.code
+#'   boomer.theme.args boomer.theme.rigged_fun boomer.theme.code boomer.log
 #' @details
 #'
 #' * [boom()] displays the intermediate results of a call or a code chunk.
@@ -50,5 +50,10 @@
 #'   "cli" to use the defaults of `cli::code_highlight()` or any theme listed by `cli::code_theme_list()`.
 #' - `boomer.rig_on_load`: A list of functions, or a list or vector of function names that will be rigged on load
 #' if `rig_on_load()` is used in `.onLoad()`.
+#' - `boomer.log`: Where to write the exploded output. A character vector that
+#'   may contain `"console"` (the default) and/or paths to files (typically
+#'   `".log"` or `".txt"`). Files receive the output with ANSI styling stripped.
+#'   For instance `boomer.log = c("console", "boom.log")` shows the output as
+#'   usual and also appends a plain-text copy to `boom.log`.
 #'
 "_PACKAGE"

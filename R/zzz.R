@@ -14,7 +14,8 @@ op.boom <- list(
   boomer.max_indent = 10L,
   boomer.theme.args = "green",
   boomer.theme.rigged_fun = "yellow",
-  boomer.theme.code = "cyan"
+  boomer.theme.code = "cyan",
+  boomer.log = "console"
 )
 
 .onLoad <- function(libname, pkgname) {

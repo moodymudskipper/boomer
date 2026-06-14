@@ -121,7 +121,7 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
 
     # display wrapped call at the top if relevant
     if(!is.null(deparsed_calls$open)) {
-      cat(deparsed_calls$open, "\n")
+      boom_cat(deparsed_calls$open, "\n")
     }
 
     # evaluate call with original wrapped function
@@ -141,12 +141,12 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     print_arguments(print_args, rigged_nm, mask, print_fun, ej, rigged_fun_exec_env)
 
     # display wrapped call at the bottom
-    cat(deparsed_calls$close, "\n")
+    boom_cat(deparsed_calls$close, "\n")
 
     # rethrow error on failure
     if (!success) {
       error <- attr(res, "condition")
-      writeLines(cli::col_magenta("Error: ", paste0(class(error), collapse = "/")))
+      boom_writelines(cli::col_magenta("Error: ", paste0(class(error), collapse = "/")))
       stop(error)
     }
 
@@ -159,13 +159,13 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     if(clock) {
       true_time_msg <- update_times_df_and_get_true_time(
         sc, total_time_start, res$evaluation_time_start, res$evaluation_time_end)
-      writeLines(cli::col_blue(true_time_msg))
+      boom_writelines(cli::col_blue(true_time_msg))
     }
 
     # print output with appropriate print fun and indentation
     res <- res$value
     print_fun <- fetch_print_fun(print_fun, res)
-    writeLines(c(paste0(ej$dots, capture.output(print_fun(res))), ej$dots))
+    boom_writelines(c(paste0(ej$dots, capture.output(print_fun(res))), ej$dots))
 
     res
   })))
@@ -237,7 +237,7 @@ signal_rigged_function_and_args <- function(rigged_nm, ej, print_args, rigged_fu
     # is this wrapped function call the first of the body?
     first_call <- !exists("..EVALED_ARGS..", rigged_fun_exec_env)
     if(first_call) {
-      cat(ej$dots, ej$rig_open, col_rigged_fun(rigged_nm),"\n", sep = "")
+      boom_cat(ej$dots, ej$rig_open, col_rigged_fun(rigged_nm),"\n", sep = "")
       fun_val <- rlang::eval_bare(quote(sys.function()), rigged_fun_exec_env)
       arg_nms <- setdiff(formalArgs(fun_val), "...")
       rigged_fun_exec_env$..EVALED_ARGS.. <- 
@@ -246,7 +246,7 @@ signal_rigged_function_and_args <- function(rigged_nm, ej, print_args, rigged_fu
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
         rm("..EVALED_ARGS..", envir =  rigged_fun_exec_env)
-        cat(ej$dots, ej$rig_close, col_rigged_fun(rigged_nm),"\n", sep = "")
+        boom_cat(ej$dots, ej$rig_close, col_rigged_fun(rigged_nm),"\n", sep = "")
       }, envir = rigged_fun_exec_env)
 
     }
@@ -340,7 +340,7 @@ print_arguments <- function(print_args, rigged_nm, mask, print_fun, ej, rigged_f
         arg_val <- get(arg, envir = rigged_fun_exec_env)
         print_fun <- fetch_print_fun(print_fun, arg_val)
         output <- capture.output(print_fun(arg_val))
-        writeLines(paste0(
+        boom_writelines(paste0(
           ej$dots, c(col_args(arg, " ", ":"), output)))
       }
     }
