@@ -228,6 +228,8 @@ update_globals_on_exit <- function(clock) {
   # update last_total_time_end on exit, we do it this way so our total
   # time doesn't leave out the updating of the times df with this value
   if(clock) globals$last_total_time_end <- Sys.time()
+  # close the file log entry if this was the outermost call (boom())
+  maybe_finalize_log_entry()
   invisible(NULL)
 }
 
@@ -238,15 +240,20 @@ signal_rigged_function_and_args <- function(rigged_nm, ej, print_args, rigged_fu
     first_call <- !exists("..EVALED_ARGS..", rigged_fun_exec_env)
     if(first_call) {
       boom_cat(ej$dots, ej$rig_open, col_rigged_fun(rigged_nm),"\n", sep = "")
+      globals$rigged_depth <- globals$rigged_depth + 1
       fun_val <- rlang::eval_bare(quote(sys.function()), rigged_fun_exec_env)
       arg_nms <- setdiff(formalArgs(fun_val), "...")
-      rigged_fun_exec_env$..EVALED_ARGS.. <- 
+      rigged_fun_exec_env$..EVALED_ARGS.. <-
         setNames(rep(FALSE, length(arg_nms)), arg_nms)
 
       # when exiting rigged function, inform and reset ..FIRST_CALL..
       withr::defer({
         rm("..EVALED_ARGS..", envir =  rigged_fun_exec_env)
         boom_cat(ej$dots, ej$rig_close, col_rigged_fun(rigged_nm),"\n", sep = "")
+        # the rigged `👆` close emits after `n_indent` has unwound, so close the
+        # file log entry here once the outermost rigged function has exited
+        globals$rigged_depth <- globals$rigged_depth - 1
+        maybe_finalize_log_entry()
       }, envir = rigged_fun_exec_env)
 
     }

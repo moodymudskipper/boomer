@@ -22,6 +22,25 @@ test_that("boomer.log = 'console' keeps the historical behaviour (#142)", {
   expect_true(any(grepl("2 * 3", console, fixed = TRUE)))
 })
 
+test_that("each file log entry is framed with a timestamp and a blank line (#142)", {
+  withr::local_options(boomer.safe_print = TRUE)
+  f <- withr::local_tempfile(fileext = ".log")
+  withr::local_options(boomer.log = f)
+
+  invisible(boom(1 + 2 * 3))
+  invisible(boom(sqrt(16)))
+  lines <- readLines(f)
+
+  # one commented timestamp header per top-level call
+  headers <- grep("^# ", lines)
+  expect_length(headers, 2)
+  # entries are separated by a single blank line, never two in a row
+  blanks <- which(lines == "")
+  expect_false(any(diff(blanks) == 1))
+  # the header sits immediately before the entry's first trace line
+  expect_match(lines[headers[2] - 1], "^$")
+})
+
 test_that("boomer.log can tee to the console and a file at once (#142)", {
   withr::local_options(boomer.safe_print = TRUE)
   f <- withr::local_tempfile(fileext = ".txt")

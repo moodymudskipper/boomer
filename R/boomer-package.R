@@ -52,8 +52,10 @@
 #' if `rig_on_load()` is used in `.onLoad()`.
 #' - `boomer.log`: Where to write the exploded output. A character vector that
 #'   may contain `"console"` (the default) and/or paths to files (typically
-#'   `".log"` or `".txt"`). Files receive the output with ANSI styling stripped.
-#'   For instance `boomer.log = c("console", "boom.log")` shows the output as
-#'   usual and also appends a plain-text copy to `boom.log`.
+#'   `".log"` or `".txt"`). Files receive the output with ANSI styling stripped,
+#'   and each top-level call is appended as its own entry: a commented line with
+#'   a timestamp, the exploded output, then a blank line. For instance
+#'   `boomer.log = c("console", "boom.log")` shows the output as usual and also
+#'   appends a plain-text copy to `boom.log`.
 #'
 "_PACKAGE"
