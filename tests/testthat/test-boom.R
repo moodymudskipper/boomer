@@ -88,9 +88,13 @@ test_that("can debug failing pipes (#17)", {
       I() %>%
       boomer::boom()
 
+    add_string <- function(x) {
+      x + "a"
+    }
+
     1 %>%
       identity() %>%
-      missing_function() %>%
+      add_string() %>%
       I() %>%
       boomer::boom()
 
