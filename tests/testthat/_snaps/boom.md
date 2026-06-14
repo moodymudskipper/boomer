@@ -252,20 +252,30 @@
       
       [1] 1
     Code
-      1 %>% identity() %>% missing_function() %>% I() %>% boomer::boom()
+      add_string <- (function(x) {
+        x + "a"
+      })
+      1 %>% identity() %>% add_string() %>% I() %>% boomer::boom()
     Output
       <  1 %>%... 
       . <  I(.) 
+      . . <  add_string(.) 
+      . . . <  identity(.) 
+      . . . >  identity(.) 
+      . . . [1] 1
+      . . . 
+      . . >  add_string(.) 
+      Error: simpleError/error/condition
       . >  I(.) 
       Error: simpleError/error/condition
       >  1 %>%
            identity() %>%
-           missing_function() %>%
+           add_string() %>%
            I() 
       Error: simpleError/error/condition
     Condition
-      Error in `missing_function()`:
-      ! could not find function "missing_function"
+      Error in `x + "a"`:
+      ! non-numeric argument to binary operator
     Code
       eagerly_failing_function <- (function(x) {
         stop("oops")
