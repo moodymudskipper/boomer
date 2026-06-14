@@ -9,6 +9,8 @@
   can be used on functions from any package.
 - A new option `boomer.max_indent` helps keeping the indentation under
   control, useful for long pipe sequences or deeply nested calls.
+- A new option `boomer.log` can send the exploded output to files in
+  addition to (or instead of) the console.
 
 ## boomer 0.2.0
 

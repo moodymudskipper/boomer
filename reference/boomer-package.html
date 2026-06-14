@@ -93,6 +93,13 @@ Defaults to <code>10L</code>.</p></li>
 "cli" to use the defaults of <code><a href="https://cli.r-lib.org/reference/code_highlight.html" class="external-link">cli::code_highlight()</a></code> or any theme listed by <code><a href="https://cli.r-lib.org/reference/code_theme_list.html" class="external-link">cli::code_theme_list()</a></code>.</p></li>
 <li><p><code>boomer.rig_on_load</code>: A list of functions, or a list or vector of function names that will be rigged on load
 if <code><a href="boom.html">rig_on_load()</a></code> is used in <code>.onLoad()</code>.</p></li>
+<li><p><code>boomer.log</code>: Where to write the exploded output. A character vector that
+may contain <code>"console"</code> (the default) and/or paths to files (typically
+<code>".log"</code> or <code>".txt"</code>). Files receive the output with ANSI styling stripped,
+and each top-level call is appended as its own entry: a commented line with
+a timestamp, the exploded output, then a blank line. For instance
+<code>boomer.log = c("console", "boom.log")</code> shows the output as usual and also
+appends a plain-text copy to <code>boom.log</code>.</p></li>
 </ul></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>

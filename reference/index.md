@@ -26,4 +26,5 @@
   [`boomer.theme.args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.theme.rigged_fun`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.theme.code`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.log`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   : boomer: Debugging Tools to Inspect the Intermediate Steps of a Call
