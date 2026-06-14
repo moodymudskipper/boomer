@@ -8,8 +8,9 @@
 #' verbose even when called by other existing functions. It works on functions from packages
 #' as well as on functions defined in a session.
 #' To undo, call `load_all()` for the development package or
-#' `pkgload::unload()` on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
-#' on S3 methods.
+#' `pkgload::unload()` on other packages, or restart the session if you rigged a base package.
+#' It works on S3 methods, and when given an S3 generic it rigs the generic's
+#' registered methods instead.
 #' - `rig_on_load()` can be used in `.onLoad()` to rig functions (values or names) stored in `getOption("boomer.rig_on_load")` 
 #' - `rigger()` provides a convenient way to rig an
 #' anonymous function by using the `rigger(...) + function(...) {...}` syntax.
@@ -47,7 +48,7 @@
 #'
 #' @export
 #' @return `boom()` returns the output of the call. `rig()` returns the modified
-#' input function. `rig_in_namespace()` returns `invisible(NULL)` and is called
+#' input function. `rig_in_place()` returns `invisible(NULL)` and is called
 #' for side effects. `rigger()` returns a list containing the arguments, with
 #' the class "rigger" to enable `+.rigger` and `print.rigger`
 #'

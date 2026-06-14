@@ -10,10 +10,11 @@
 #'
 #' Indentation is done through a global variable `globals$n_indent`.
 #'
-#' If `wrap()` is called from a function rigged using `rig` or `rig_in_namespace`,
+#' If `wrap()` is called from a function rigged using `rig` or `rig_in_place`,
 #' the `wrap()`per function will check if we entered the first call of the rigged
-#' function by checking in `mask` if `..FIRST_CALL..` is `TRUE`. If it is we
-#' signal that we entered the rigged function, and use `withr::defer` to
+#' function by checking whether `..EVALED_ARGS..` exists yet in the rigged
+#' function's execution environment (it is created on that first call). If we did
+#' we signal that we entered the rigged function, and use `withr::defer` to
 #' signal when the rigged function will be exited. This complex mechanism is
 #' used so that the rigged function's body stays unchanged and boomer's behavior
 #' can be more robust.
@@ -246,7 +247,7 @@ signal_rigged_function_and_args <- function(rigged_nm, ej, print_args, rigged_fu
       rigged_fun_exec_env$..EVALED_ARGS.. <-
         setNames(rep(FALSE, length(arg_nms)), arg_nms)
 
-      # when exiting rigged function, inform and reset ..FIRST_CALL..
+      # when exiting rigged function, inform and remove ..EVALED_ARGS..
       withr::defer({
         rm("..EVALED_ARGS..", envir =  rigged_fun_exec_env)
         boom_cat(ej$dots, ej$rig_close, col_rigged_fun(rigged_nm),"\n", sep = "")
