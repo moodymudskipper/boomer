@@ -1,4 +1,4 @@
-# boomer 0.3.0
+# boomer 1.0.0
 
 - `rig_in_namespace()` was renamed to `rig_in_place()`, and is kept as a
   deprecated alias.
