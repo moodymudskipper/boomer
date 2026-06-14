@@ -8,13 +8,32 @@
 #' @param exported named list of exported functions
 #' @param unexported named list of unexported functions
 #' @param attach whether to attach the fake package
+#' @param s3 list of `c(generic, class)` character pairs to register as S3
+#'   methods. The method function must be present in `exported` or `unexported`
+#'   under the name `paste(generic, class, sep = ".")`.
 #'
 #' @noRd
-fake_package <- function(name, exported = NULL, unexported = NULL, attach = TRUE) {
+fake_package <- function(name, exported = NULL, unexported = NULL, attach = TRUE, s3 = NULL) {
   # for CRAN notes
   makeNamespace <- NULL
-  # fetch and eval call to create `makeNamespace`
-  eval(body(loadNamespace)[[c(8, 4, 4)]])
+  # `makeNamespace()` is defined as a local function inside `loadNamespace()`,
+  # but its exact location in the body varies across R versions, so we find the
+  # defining call by walking the whole parse tree rather than indexing into it.
+  find_makeNamespace_def <- function(node) {
+    if (is.call(node)) {
+      if ((identical(node[[1]], as.symbol("<-")) || identical(node[[1]], as.symbol("="))) &&
+          identical(node[[2]], as.symbol("makeNamespace"))) {
+        return(node)
+      }
+      for (part in as.list(node)) {
+        found <- find_makeNamespace_def(part)
+        if (!is.null(found)) return(found)
+      }
+    }
+    NULL
+  }
+  makeNamespace_call <- find_makeNamespace_def(body(loadNamespace))
+  eval(makeNamespace_call)
   # create an empty namespace
   ns <- makeNamespace(name)
   # makethis namespace the closure env of our input functions
@@ -25,6 +44,12 @@ fake_package <- function(name, exported = NULL, unexported = NULL, attach = TRUE
   list2env(unexported, ns)
   # export relevant functions
   namespaceExport(ns, names(exported))
+  # register S3 methods so they end up in the relevant S3 methods table, as a
+  # real package would
+  for (m in s3) {
+    method_nm <- paste(m[[1]], m[[2]], sep = ".")
+    registerS3method(m[[1]], m[[2]], get(method_nm, ns), envir = ns)
+  }
   if(attach) {
     # copy exported funs to "package:pkg" envir of the search path
     match.fun("attach")(exported, name = paste0("package:", name))

@@ -90,6 +90,22 @@ fetch_functions <- function(expr, ignore) {
 }
 
 
+# Registered S3 methods of a generic, as a named list of method functions keyed
+# by method name. They live in the S3 methods table of the namespace that
+# defines the generic (base for primitives and group generics). Methods are
+# keyed "<generic>.<class>", so we match by that prefix.
+s3_methods_of <- function(generic_nm, generic_fun) {
+  gen_env <- environment(generic_fun)
+  if (is.null(gen_env)) gen_env <- baseenv()
+  s3_table <- gen_env[[".__S3MethodsTable__."]]
+  if (is.null(s3_table)) return(list())
+  keys <- ls(s3_table, all.names = TRUE)
+  keys <- keys[startsWith(keys, paste0(generic_nm, "."))]
+  methods <- mget(keys, s3_table)
+  methods[vapply(methods, is.function, logical(1))]
+}
+
+
 build_shimmed_assign <- function(symbol, clock, print_fun, rigged_nm, mask) {
   assign_op <- eval(bquote(function(e1, e2) {
     E2 <- if (is.language(e2)) {

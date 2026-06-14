@@ -1,5 +1,5 @@
 #' @importFrom stats setNames
-#' @importFrom utils getParseData head capture.output getFromNamespace
+#' @importFrom utils getParseData head capture.output getFromNamespace isS3stdGeneric
 #' @importFrom methods allNames formalArgs
 #' @aliases boomer boomer-package boomer.print boomer.clock boomer.print_args
 #'   boomer.visible_only boomer.ignore boomer.ignore_args boomer.safe_print
