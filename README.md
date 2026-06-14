@@ -13,7 +13,7 @@ into its parts hence the name.
 - `boom()` prints the intermediate results of a call or a code chunk.
 - `rig()` creates a copy of a function which will display the
   intermediate results of all the calls of it body.
-- `rig_in_namespace()` rigs a namespaced function in place, so its
+- `rig_in_place()` rigs a namespaced function in place, so its
   always verbose even when called by other existing functions. It is
   especially handy for package development.
 
@@ -115,11 +115,11 @@ rig(hello)("world")
 
 ![](man/figures/README-7.png)
 
-## `rig_in_namespace()`
+## `rig_in_place()`
 
 `rig()` creates a copy of a function, but when developing a package we
 might want to rig a function in place so it has a verbose output when
-called by other functions. For this we can use `rig_in_namespace()`.
+called by other functions. For this we can use `rig_in_place()`.
 
 For instance you might have these functions in a package :
 
@@ -134,11 +134,11 @@ disk_area <- function(r) {
 ```
 
 `cylinder_vol` depends on `disk_area`, call `devtools::load_all()` then
-`rig_in_namespace()` on both and enjoy the detailed output:
+`rig_in_place()` on both and enjoy the detailed output:
 
 ``` r
 devtools::load_all()
-rig_in_namespace(cylinder_vol, disk_area)
+rig_in_place(cylinder_vol, disk_area)
 cylinder_vol(3,10)
 ```
 
