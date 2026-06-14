@@ -3,7 +3,7 @@ output: github_document
 ---
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/moodymudskipper/boomer/workflows/R-CMD-check/badge.svg)](https://github.com/moodymudskipper/boomer/actions)
+[![R-CMD-check](https://github.com/moodymudskipper/boomer/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/moodymudskipper/boomer/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ```{r, include = FALSE}
@@ -206,13 +206,13 @@ call you'd like to explode and fire away!
 
 ## Options
 
-Several options are proposed to weak he printed output of {boomer}'s functions
+Several options are proposed to tweak the printed output of {boomer}'s functions
 and addin, see `?boomer` to learn about them.
 
 In particular on some operating systems *{boomer}*'s functions' output might 
-not always look good in markdown report or reprexes. 
-It's due to how he system handles UTF-8 characters. In this case
-one can use `options(boomer.safe_print = TRUE)` for a more satisfactory input. 
+not always look good in markdown reports or reprexes. 
+It's due to how the system handles UTF-8 characters. In this case
+one can use `options(boomer.safe_print = TRUE)` for a more satisfactory output. 
 
 ## Notes
 
