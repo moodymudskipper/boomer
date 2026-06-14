@@ -16,13 +16,23 @@
 fake_package <- function(name, exported = NULL, unexported = NULL, attach = TRUE, s3 = NULL) {
   # for CRAN notes
   makeNamespace <- NULL
-  # fetch and eval the call that defines `makeNamespace` inside `loadNamespace()`
-  makeNamespace_call <- Find(
-    function(e) is.call(e) &&
-      identical(e[[1]], as.symbol("<-")) &&
-      identical(e[[2]], as.symbol("makeNamespace")),
-    as.list(body(loadNamespace)[[c(8, 4)]])
-  )
+  # `makeNamespace()` is defined as a local function inside `loadNamespace()`,
+  # but its exact location in the body varies across R versions, so we find the
+  # defining call by walking the whole parse tree rather than indexing into it.
+  find_makeNamespace_def <- function(node) {
+    if (is.call(node)) {
+      if ((identical(node[[1]], as.symbol("<-")) || identical(node[[1]], as.symbol("="))) &&
+          identical(node[[2]], as.symbol("makeNamespace"))) {
+        return(node)
+      }
+      for (part in as.list(node)) {
+        found <- find_makeNamespace_def(part)
+        if (!is.null(found)) return(found)
+      }
+    }
+    NULL
+  }
+  makeNamespace_call <- find_makeNamespace_def(body(loadNamespace))
   eval(makeNamespace_call)
   # create an empty namespace
   ns <- makeNamespace(name)
