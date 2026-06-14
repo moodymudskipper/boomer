@@ -1,5 +1,7 @@
 # boomer 1.0.0
 
+Boomer is back on CRAN!
+
 - `rig_in_namespace()` was renamed to `rig_in_place()`, and is kept as a
   deprecated alias.
 - `rig_in_place()` works on functions from any package and on several functions
