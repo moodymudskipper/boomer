@@ -14,6 +14,7 @@
 \alias{boomer.theme.args}
 \alias{boomer.theme.rigged_fun}
 \alias{boomer.theme.code}
+\alias{boomer.log}
 \title{boomer: Debugging Tools to Inspect the Intermediate Steps of a Call}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
@@ -68,6 +69,13 @@ Defaults to \code{10L}.
 "cli" to use the defaults of \code{cli::code_highlight()} or any theme listed by \code{cli::code_theme_list()}.
 \item \code{boomer.rig_on_load}: A list of functions, or a list or vector of function names that will be rigged on load
 if \code{rig_on_load()} is used in \code{.onLoad()}.
+\item \code{boomer.log}: Where to write the exploded output. A character vector that
+may contain \code{"console"} (the default) and/or paths to files (typically
+\code{".log"} or \code{".txt"}). Files receive the output with ANSI styling stripped,
+and each top-level call is appended as its own entry: a commented line with
+a timestamp, the exploded output, then a blank line. For instance
+\code{boomer.log = c("console", "boom.log")} shows the output as usual and also
+appends a plain-text copy to \code{boom.log}.
 }
 }
 
