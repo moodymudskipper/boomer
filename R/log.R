@@ -40,16 +40,35 @@ boom_emit <- function(text) {
   invisible(NULL)
 }
 
+# Header written once at the top of a freshly created log file, so that a reader
+# (human or AI) encountering the file can tell what it is and how to read it.
+boom_log_header <- paste0(
+  "# Built by the boomer R package (https://github.com/moodymudskipper/boomer)\n",
+  "# This is a boomer execution log, it displays the intermediate values computed inside a function.\n",
+  "# Each expression is shown entering, then its successful return value.\n",
+  "#   \U0001f4a3 <expr>   = expression about to be evaluated\n",
+  "#   \U0001f4a5 <expr>   = same expression, followed by the value it returned\n",
+  "#   ·····       = call-nesting depth (more dots = deeper in the stack)\n",
+  "#   time: ...   = wall-clock time for the evaluation it precedes\n",
+  "#   value blocks describe the values\n",
+  "# Logged errors are errors in the inspected code, not boomer\n",
+  "# The final depth-0 \U0001f4a5 is the overall return value.\n\n"
+)
+
 # Flush the buffered file log entry once the whole top-level call has unwound:
 # all wrapped calls have exited (`n_indent < 0`) and all rigged functions have
 # signalled their exit (`rigged_depth <= 0`). Called from both unwind points
 # since either may happen last. The entry is written as a timestamp header, the
-# trace (trailing whitespace trimmed), and a blank separator line.
+# trace (trailing whitespace trimmed), and a blank separator line. Files created
+# by this write get the descriptive `boom_log_header` prepended first.
 maybe_finalize_log_entry <- function() {
   if (isTRUE(globals$log_open) && globals$n_indent < 0 && globals$rigged_depth <= 0) {
     body <- trimws(paste0(globals$log_buffer, collapse = ""), which = "right")
     entry <- paste0("# ", globals$log_timestamp, "\n", body, "\n\n")
     for (path in boom_log_files()) {
+      if (!file.exists(path)) {
+        cat(boom_log_header, file = path)
+      }
       cat(entry, file = path, append = TRUE)
     }
     globals$log_buffer <- character()
