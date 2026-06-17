@@ -13,9 +13,9 @@ into its parts hence the name.
 - `boom()` prints the intermediate results of a call or a code chunk.
 - `rig()` creates a copy of a function which will display the
   intermediate results of all the calls of it body.
-- `rig_in_place()` rigs a namespaced function in place, so its
-  always verbose even when called by other existing functions. It is
-  especially handy for package development.
+- `rig_in_place()` rigs a namespaced function in place, so its always
+  verbose even when called by other existing functions. It is especially
+  handy for package development.
 
 ## Installation
 
@@ -79,8 +79,9 @@ occurrence of the error, it can help with debugging:
 
 - `print`: set to a function such as `str` to change what is printed
   (see `?boom` to see how to print differently depending on class).
-  Useful alternatives would be `dplyr::glimpse` of `invisible` (to print
-  nothing).
+  Useful alternatives would be `constructive::construct`, to print code
+  that accurately reproduces the objects and avoid the caveats of
+  `print()`, of `invisible` (to print nothing).
 
 One use case is when the output is too long.
 
@@ -150,6 +151,38 @@ While debugging a function, call `boom_on()` and all subsequent calls
 will be boomed, call `boom_off()` to return to standard debugging.
 
 ![](man/figures/README-10.gif)
+
+## boomer and AI
+
+Just like us, AI first tries to debug from looking at the code alone and
+might fail. Give it some logs of what every intermediate output was at
+any time and it will be much more performant, here’s a suggested
+workflow when working on a package.
+
+``` r
+# Set these options, in the console, in your R Profile, or in .onLoad itself
+options(
+  # log to a file rather than the console,
+  boomer.log = "boomer_execution_log.log",
+  # log the accurate objects rather than just print() them,
+  boomer.print = constructive::construct,
+  # log the times as well to spot performance bottlenecks
+  boomer.clock = TRUE,
+  # show more context, usually too verbose for humans but perfect for AI
+  boomer.ignore = character(),
+  # vector of functions to rig from your package
+  boomer.rig_on_load = c("fun1", "fun2")
+)
+
+.onLoad <- function(libname, pkgname) {
+  # rig relevant functions any time the package is reloaded
+  boomer::rig_on_load()
+}
+```
+
+The execution created contains a header explaining what it is, and
+timestamps for context, so AI will have no problem understanding them
+and interpreting them.
 
 ## `boom_shinyApp()`
 
