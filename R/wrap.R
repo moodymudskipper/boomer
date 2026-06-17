@@ -48,9 +48,21 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     # only at the top level
     rigged_fun_exec_env <- wrapped_fun_caller_env
     mask <- .(mask)
-    while (!identical(parent <- parent.env(rigged_fun_exec_env), mask)) {
+    # Walk up the lexical chain until we reach the rigged function's execution
+    # env (its parent is the mask). Some callers evaluate a wrapped function
+    # directly in the mask itself, e.g. `rlang::arg_match()` evaluates a formal's
+    # default with `eval_bare(default, get_env(fn))` and `get_env(fn)` is the
+    # mask. In that case there is no execution env to find, so we stop at the
+    # mask rather than walking past the namespace chain into the empty env.
+    while (!identical(rigged_fun_exec_env, mask) &&
+           !identical(parent <- parent.env(rigged_fun_exec_env), mask)) {
       rigged_fun_exec_env <- parent
     }
+    # TRUE when we found a genuine rigged-function execution env (a child of the
+    # mask). FALSE when the wrapped function was evaluated directly in the mask
+    # (e.g. via `rlang::arg_match()`'s default lookup): there is no rigged frame
+    # being entered, so we must not signal one.
+    in_rigged_frame <- !identical(rigged_fun_exec_env, mask)
 
     ignore <- getOption("boomer.ignore")
     if (is.character(ignore)) {
@@ -94,7 +106,9 @@ wrap <- function(fun_val, clock, print_fun, rigged_nm = NULL, wrapped_nm = NA, m
     on.exit(update_globals_on_exit(clock))
 
     # !!! this adds calls on.exit of caller (rigged) function !!!
-    signal_rigged_function_and_args(rigged_nm, ej, print_args, rigged_fun_exec_env)
+    if (in_rigged_frame) {
+      signal_rigged_function_and_args(rigged_nm, ej, print_args, rigged_fun_exec_env)
+    }
 
     # build calls to be displayed on top and bottom of wrapped call
    ignore_args <- getOption("boomer.ignore_args")

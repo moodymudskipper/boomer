@@ -21,6 +21,10 @@ Boomer is back on CRAN!
 - A new option `boomer.log` can send the exploded output to files in addition to
   (or instead of) the console.
 - boomer doesn't use the 'pryr' package anymore.
+- Rigging a function that evaluates a wrapped call directly in its own
+  environment no longer fails with "the empty environment has no parent". This
+  affected e.g. `constructive::construct()`, which uses `rlang::arg_match()` to
+  resolve a formal's choices.
 
 # boomer 0.2.0
 
