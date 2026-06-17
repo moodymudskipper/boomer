@@ -133,6 +133,12 @@ double_colon <- function(clock, print_fun, rigged_nm, mask) {
     if (!is.function(fun_val)) {
       return(fun_val)
     }
+    # don't trace Positron/Ark runtime plumbing, reached via `base::.ark_*`
+    # (e.g. `base::.ark_capture_current_environment()`), which would otherwise
+    # be wrapped and boomed on every prompt during `boom_on()` sessions
+    if (pkg == "base" && startsWith(name, ".ark_")) {
+      return(fun_val)
+    }
     wrap(fun_val, clock, print_fun, rigged_nm, "::", mask)
   }
 }
