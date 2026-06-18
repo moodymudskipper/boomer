@@ -48,7 +48,7 @@ boom_log_header <- paste0(
   "# Each expression is shown entering, then its successful return value.\n",
   "#   \U0001f4a3 <expr>   = expression about to be evaluated\n",
   "#   \U0001f4a5 <expr>   = same expression, followed by the value it returned\n",
-  "#   ·····       = call-nesting depth (more dots = deeper in the stack)\n",
+  "#   \u00b7\u00b7\u00b7\u00b7\u00b7       = call-nesting depth (more dots = deeper in the stack)\n",
   "#   time: ...   = wall-clock time for the evaluation it precedes\n",
   "#   value blocks describe the values\n",
   "# Logged errors are errors in the inspected code, not boomer\n",
