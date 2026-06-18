@@ -294,5 +294,5 @@ rig_in_namespace <- rig_in_place
 #' @rdname boom
 #' @export
 rig_on_load <- function() {
-  rig_in_place(!!!getOption("boomer.rig_on_load"))
+  do.call(rig_in_place, as.list(getOption("boomer.rig_on_load")), envir = parent.frame())
 }
