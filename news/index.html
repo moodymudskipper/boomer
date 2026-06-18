@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">boomer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,14 +37,24 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.3.0" id="boomer-030">boomer 0.3.0<a class="anchor" aria-label="anchor" href="#boomer-030"></a></h2>
-<ul><li>boomer doesn’t use the ‘pryr’ package anymore.</li>
+<h2 class="pkg-version" data-toc-text="1.0.0" id="boomer-100">boomer 1.0.0<a class="anchor" aria-label="anchor" href="#boomer-100"></a></h2>
+<p>Boomer is back on CRAN!</p>
+<ul><li>
+<code><a href="../reference/rig_in_namespace.html">rig_in_namespace()</a></code> was renamed to <code><a href="../reference/boom.html">rig_in_place()</a></code>, and is kept as a deprecated alias.</li>
 <li>
-<code><a href="../reference/rig_in_namespace.html">rig_in_namespace()</a></code> works better when provided several functions.</li>
+<code><a href="../reference/boom.html">rig_in_place()</a></code> works on functions from any package and on several functions at once. It rigs them wherever a copy is used (the namespace, the attached package environment, the S3 methods table, and the import environments of other loaded packages) so they stay verbose even when called by other functions.</li>
+<li>Rigging an S3 method now updates the copy that S3 dispatch actually calls, and rigging an S3 generic rigs all of its registered methods.</li>
 <li>
-<code><a href="../reference/rig_in_namespace.html">rig_in_namespace()</a></code> can be used on functions from any package.</li>
+<code><a href="../reference/boom.html">rig()</a></code> and <code><a href="../reference/boom.html">rig_in_place()</a></code> accept character input, e.g. <code>rig("pkg::fun")</code>.</li>
+<li>
+<code><a href="../reference/boom.html">rig()</a></code> and <code><a href="../reference/boom.html">rig_in_place()</a></code> support recursive functions.</li>
+<li>
+<code><a href="../reference/boom.html">rig_on_load()</a></code>, called from a package’s <code>.onLoad()</code>, rigs the functions listed in the <code>boomer.rig_on_load</code> option.</li>
+<li>New options <code>boomer.theme.args</code>, <code>boomer.theme.rigged_fun</code> and <code>boomer.theme.code</code> customize the colors used in the output.</li>
 <li>A new option <code>boomer.max_indent</code> helps keeping the indentation under control, useful for long pipe sequences or deeply nested calls.</li>
 <li>A new option <code>boomer.log</code> can send the exploded output to files in addition to (or instead of) the console.</li>
+<li>boomer doesn’t use the ‘pryr’ package anymore.</li>
+<li>Rigging a function that evaluates a wrapped call directly in its own environment no longer fails with “the empty environment has no parent”. This affected e.g. <code>constructive::construct()</code>, which uses <code><a href="https://rlang.r-lib.org/reference/arg_match.html" class="external-link">rlang::arg_match()</a></code> to resolve a formal’s choices.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.2.0" id="boomer-020">boomer 0.2.0<a class="anchor" aria-label="anchor" href="#boomer-020"></a></h2><p class="text-muted">CRAN release: 2024-07-09</p>

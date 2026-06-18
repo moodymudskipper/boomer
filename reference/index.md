@@ -23,8 +23,11 @@
   [`boomer.ignore`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.ignore_args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.safe_print`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.abbreviate`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.theme.args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.theme.rigged_fun`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.theme.code`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.max_indent`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.log`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.rig_on_load`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   : boomer: Debugging Tools to Inspect the Intermediate Steps of a Call

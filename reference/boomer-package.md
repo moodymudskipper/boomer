@@ -13,7 +13,7 @@ the package name.
   creates a copy of a function which will display the intermediate
   results of all the calls of it body.
 
-- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
+- [`rig_in_place()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   rigs a namespaced function in place, so its always verbose even when
   called by other existing functions. It is especially handy for package
   development.
@@ -33,7 +33,7 @@ Several options impact the display of exploded calls :
 - `boomer.print`: If the `print` argument is not provided, this option
   will replace it at run time. Defaults to the
   [`base::print`](https://rdrr.io/r/base/print.html) function.
-  `boomer.print = constructive::construct` is a useful alternative.ß
+  `boomer.print = constructive::construct` is a useful alternative.
 
 - `boomer.clock`: If the `clock` argument is not provided, this option
   will replace it at run time. Defaults to `FALSE`.

@@ -9,7 +9,7 @@ into its parts hence the name.
 - [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   creates a copy of a function which will display the intermediate
   results of all the calls of it body.
-- [`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
+- [`rig_in_place()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   rigs a namespaced function in place, so its always verbose even when
   called by other existing functions. It is especially handy for package
   development.
@@ -88,9 +88,10 @@ features optional arguments :
   (see
   [`?boom`](https://moodymudskipper.github.io/boomer/reference/boom.md)
   to see how to print differently depending on class). Useful
-  alternatives would be
-  [`dplyr::glimpse`](https://pillar.r-lib.org/reference/glimpse.html) of
-  `invisible` (to print nothing).
+  alternatives would be `constructive::construct`, to print code that
+  accurately reproduces the objects and avoid the caveats of
+  [`print()`](https://rdrr.io/r/base/print.html), of `invisible` (to
+  print nothing).
 
 One use case is when the output is too long.
 
@@ -131,13 +132,13 @@ rig(hello)("world")
 
 ![](reference/figures/README-7.png)
 
-## `rig_in_namespace()`
+## `rig_in_place()`
 
 [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
 creates a copy of a function, but when developing a package we might
 want to rig a function in place so it has a verbose output when called
 by other functions. For this we can use
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md).
+[`rig_in_place()`](https://moodymudskipper.github.io/boomer/reference/boom.md).
 
 For instance you might have these functions in a package :
 
@@ -153,13 +154,13 @@ disk_area <- function(r) {
 ```
 
 `cylinder_vol` depends on `disk_area`, call `devtools::load_all()` then
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
+[`rig_in_place()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
 on both and enjoy the detailed output:
 
 ``` r
 
 devtools::load_all()
-rig_in_namespace(cylinder_vol, disk_area)
+rig_in_place(cylinder_vol, disk_area)
 cylinder_vol(3,10)
 ```
 
@@ -174,6 +175,39 @@ and all subsequent calls will be boomed, call
 to return to standard debugging.
 
 ![](reference/figures/README-10.gif)
+
+## boomer and AI
+
+Just like us, AI first tries to debug from looking at the code alone and
+might fail. Give it some logs of what every intermediate output was at
+any time and it will be much more performant, here’s a suggested
+workflow when working on a package.
+
+``` r
+
+# Set these options, in the console, in your R Profile, or in .onLoad itself
+options(
+  # log to a file rather than the console,
+  boomer.log = "boomer_execution_log.log",
+  # log the accurate objects rather than just print() them,
+  boomer.print = constructive::construct,
+  # log the times as well to spot performance bottlenecks
+  boomer.clock = TRUE,
+  # show more context, usually too verbose for humans but perfect for AI
+  boomer.ignore = character(),
+  # vector of functions to rig from your package
+  boomer.rig_on_load = c("fun1", "fun2")
+)
+
+.onLoad <- function(libname, pkgname) {
+  # rig relevant functions any time the package is reloaded
+  boomer::rig_on_load()
+}
+```
+
+The execution created contains a header explaining what it is, and
+timestamps for context, so AI will have no problem understanding them
+and interpreting them.
 
 ## `boom_shinyApp()`
 
@@ -228,15 +262,15 @@ windows), select the call you’d like to explode and fire away!
 
 ## Options
 
-Several options are proposed to weak he printed output of {boomer}’s
+Several options are proposed to tweak the printed output of {boomer}’s
 functions and addin, see
 [`?boomer`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
 to learn about them.
 
 In particular on some operating systems *{boomer}*’s functions’ output
-might not always look good in markdown report or reprexes. It’s due to
-how he system handles UTF-8 characters. In this case one can use
-`options(boomer.safe_print = TRUE)` for a more satisfactory input.
+might not always look good in markdown reports or reprexes. It’s due to
+how the system handles UTF-8 characters. In this case one can use
+`options(boomer.safe_print = TRUE)` for a more satisfactory output.
 
 ## Notes
 
@@ -274,10 +308,13 @@ Thanks to @data_question for suggesting the name *{boomer}* on
   [`boomer.ignore`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.ignore_args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.safe_print`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.abbreviate`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.theme.args`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.theme.rigged_fun`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.theme.code`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.max_indent`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   [`boomer.log`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
+  [`boomer.rig_on_load`](https://moodymudskipper.github.io/boomer/reference/boomer-package.md)
   : boomer: Debugging Tools to Inspect the Intermediate Steps of a Call
 
 # Articles

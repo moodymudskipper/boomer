@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">boomer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,7 @@
 <li>
 <code><a href="reference/boom.html">rig()</a></code> creates a copy of a function which will display the intermediate results of all the calls of it body.</li>
 <li>
-<code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code> rigs a namespaced function in place, so its always verbose even when called by other existing functions. It is especially handy for package development.</li>
+<code><a href="reference/boom.html">rig_in_place()</a></code> rigs a namespaced function in place, so its always verbose even when called by other existing functions. It is especially handy for package development.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -114,7 +114,7 @@
 <p><code><a href="reference/boom.html">boom()</a></code> features optional arguments :</p>
 <ul>
 <li><p><code>clock</code>: set to <code>TRUE</code> to see how long each step (in isolation!) took to run.</p></li>
-<li><p><code>print</code>: set to a function such as <code>str</code> to change what is printed (see <code><a href="reference/boom.html">?boom</a></code> to see how to print differently depending on class). Useful alternatives would be <code><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">dplyr::glimpse</a></code> of <code>invisible</code> (to print nothing).</p></li>
+<li><p><code>print</code>: set to a function such as <code>str</code> to change what is printed (see <code><a href="reference/boom.html">?boom</a></code> to see how to print differently depending on class). Useful alternatives would be <code>constructive::construct</code>, to print code that accurately reproduces the objects and avoid the caveats of <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, of <code>invisible</code> (to print nothing).</p></li>
 </ul>
 <p>One use case is when the output is too long.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -141,10 +141,10 @@
 <p><img src="reference/figures/README-7.png"></p>
 </div>
 <div class="section level2">
-<h2 id="rig_in_namespace">
-<code>rig_in_namespace()</code><a class="anchor" aria-label="anchor" href="#rig_in_namespace"></a>
+<h2 id="rig_in_place">
+<code>rig_in_place()</code><a class="anchor" aria-label="anchor" href="#rig_in_place"></a>
 </h2>
-<p><code><a href="reference/boom.html">rig()</a></code> creates a copy of a function, but when developing a package we might want to rig a function in place so it has a verbose output when called by other functions. For this we can use <code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code>.</p>
+<p><code><a href="reference/boom.html">rig()</a></code> creates a copy of a function, but when developing a package we might want to rig a function in place so it has a verbose output when called by other functions. For this we can use <code><a href="reference/boom.html">rig_in_place()</a></code>.</p>
 <p>For instance you might have these functions in a package :</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cylinder_vol</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">r</span>, <span class="va">h</span><span class="op">)</span> <span class="op">{</span></span>
@@ -154,10 +154,10 @@
 <span><span class="va">disk_area</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">r</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">pi</span> <span class="op">*</span> <span class="va">r</span><span class="op">^</span><span class="fl">2</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><code>cylinder_vol</code> depends on <code>disk_area</code>, call <code>devtools::load_all()</code> then <code><a href="reference/rig_in_namespace.html">rig_in_namespace()</a></code> on both and enjoy the detailed output:</p>
+<p><code>cylinder_vol</code> depends on <code>disk_area</code>, call <code>devtools::load_all()</code> then <code><a href="reference/boom.html">rig_in_place()</a></code> on both and enjoy the detailed output:</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">load_all</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/rig_in_namespace.html">rig_in_namespace</a></span><span class="op">(</span><span class="va">cylinder_vol</span>, <span class="va">disk_area</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/boom.html">rig_in_place</a></span><span class="op">(</span><span class="va">cylinder_vol</span>, <span class="va">disk_area</span><span class="op">)</span></span>
 <span><span class="fu">cylinder_vol</span><span class="op">(</span><span class="fl">3</span>,<span class="fl">10</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-9.png"></p>
 </div>
@@ -170,12 +170,37 @@
 <p><img src="reference/figures/README-10.gif"></p>
 </div>
 <div class="section level2">
+<h2 id="boomer-and-ai">boomer and AI<a class="anchor" aria-label="anchor" href="#boomer-and-ai"></a>
+</h2>
+<p>Just like us, AI first tries to debug from looking at the code alone and might fail. Give it some logs of what every intermediate output was at any time and it will be much more performant, here’s a suggested workflow when working on a package.</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Set these options, in the console, in your R Profile, or in .onLoad itself</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span></span>
+<span>  <span class="co"># log to a file rather than the console,</span></span>
+<span>  boomer.log <span class="op">=</span> <span class="st">"boomer_execution_log.log"</span>,</span>
+<span>  <span class="co"># log the accurate objects rather than just print() them,</span></span>
+<span>  boomer.print <span class="op">=</span> <span class="fu">constructive</span><span class="fu">::</span><span class="va">construct</span>,</span>
+<span>  <span class="co"># log the times as well to spot performance bottlenecks</span></span>
+<span>  boomer.clock <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  <span class="co"># show more context, usually too verbose for humans but perfect for AI</span></span>
+<span>  boomer.ignore <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  <span class="co"># vector of functions to rig from your package</span></span>
+<span>  boomer.rig_on_load <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fun1"</span>, <span class="st">"fun2"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">.onLoad</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">libname</span>, <span class="va">pkgname</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># rig relevant functions any time the package is reloaded</span></span>
+<span>  <span class="fu">boomer</span><span class="fu">::</span><span class="fu"><a href="reference/boom.html">rig_on_load</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The execution created contains a header explaining what it is, and timestamps for context, so AI will have no problem understanding them and interpreting them.</p>
+</div>
+<div class="section level2">
 <h2 id="boom_shinyapp">
 <code>boom_shinyApp()</code><a class="anchor" aria-label="anchor" href="#boom_shinyapp"></a>
 </h2>
 <p>A very experimental feature that allows you to rig the reactives of a shiny app. See <code><a href="articles/shiny.html">vignette("shiny", "boomer")</a></code> for more information.</p>
 <p>For the following app, saved in a proper project/package:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">histogramUI</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">id</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu">tagList</span><span class="op">(</span></span>
 <span>    <span class="fu">selectInput</span><span class="op">(</span><span class="fu">NS</span><span class="op">(</span><span class="va">id</span>, <span class="st">"var"</span><span class="op">)</span>, <span class="st">"Variable"</span>, choices <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -211,8 +236,8 @@
 <div class="section level2">
 <h2 id="options">Options<a class="anchor" aria-label="anchor" href="#options"></a>
 </h2>
-<p>Several options are proposed to weak he printed output of {boomer}’s functions and addin, see <code><a href="reference/boomer-package.html">?boomer</a></code> to learn about them.</p>
-<p>In particular on some operating systems <em>{boomer}</em>’s functions’ output might not always look good in markdown report or reprexes. It’s due to how he system handles UTF-8 characters. In this case one can use <code>options(boomer.safe_print = TRUE)</code> for a more satisfactory input.</p>
+<p>Several options are proposed to tweak the printed output of {boomer}’s functions and addin, see <code><a href="reference/boomer-package.html">?boomer</a></code> to learn about them.</p>
+<p>In particular on some operating systems <em>{boomer}</em>’s functions’ output might not always look good in markdown reports or reprexes. It’s due to how the system handles UTF-8 characters. In this case one can use <code>options(boomer.safe_print = TRUE)</code> for a more satisfactory output.</p>
 </div>
 <div class="section level2">
 <h2 id="notes">Notes<a class="anchor" aria-label="anchor" href="#notes"></a>
@@ -256,7 +281,7 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/moodymudskipper/boomer/actions" class="external-link"><img src="https://github.com/moodymudskipper/boomer/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/moodymudskipper/boomer/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/moodymudskipper/boomer/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 

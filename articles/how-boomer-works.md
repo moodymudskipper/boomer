@@ -19,7 +19,7 @@ tools::file_ext
 #>     ifelse(grepl("^(.*[^.]+.*)[.]([[:alnum:]]+)$", basename(x)), 
 #>         sub(".*[.]([[:alnum:]]+)$", "\\1", x), "")
 #> }
-#> <bytecode: 0x55e0010c3118>
+#> <bytecode: 0x5601420f8ee8>
 #> <environment: namespace:tools>
 rigged_file_ext
 #> function (x) 
@@ -30,7 +30,7 @@ rigged_file_ext
 #>     ifelse(grepl("^(.*[^.]+.*)[.]([[:alnum:]]+)$", basename(x)), 
 #>         sub(".*[.]([[:alnum:]]+)$", "\\1", x), "")
 #> }
-#> <environment: 0x55e001af7a50>
+#> <environment: 0x560142b2b7b0>
 #> attr(,"boomer.rigged")
 #> [1] TRUE
 ```
@@ -49,7 +49,7 @@ environment(tools::file_ext)
 # our new environment
 env <- environment(rigged_file_ext)
 env
-#> <environment: 0x55e001af7a50>
+#> <environment: 0x560142b2b7b0>
 
 # its parent
 parent.env(env)
@@ -87,7 +87,7 @@ Here’s the diagram of dependencies of `rig_impl()`
 flow::flow_view_deps(boomer:::rig_impl, show_imports = "packages")
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
 #> Error in `knitr::include_graphics()`:
-#> ! Cannot find the file(s): "/tmp/RtmpL3fnza/flow_31477e1dfb89.png"
+#> ! Cannot find the file(s): "/tmp/RtmpmkgptL/flow_30c1337fa52a.png"
 ```
 
 `rig_impl()` :
@@ -101,11 +101,6 @@ flow::flow_view_deps(boomer:::rig_impl, show_imports = "packages")
   original function, and thus impossible to shim at “rig time”, can be
   made verbose too.
 - Populates it with shims of all other called functions, using `wrap()`
-- Creates special variables `..FIRST_CALL..` and `..EVALED_ARGS..` in
-  this environment, `..FIRST_CALL..` is a boolean initiated to `TRUE`
-  and set to `FALSE` once the first wrapper call is triggered,
-  `..EVALED_ARGS..` is a named logical vector that keeps track of which
-  arguments have been evaled.
 
 ### `wrap()`
 
@@ -116,28 +111,34 @@ function (e.g. argument values and execution time).
 
 However it does a couple more things:
 
-- If a wrapper function is the first called it prints information
-  signaling that we are entering the rig function, and it sets up our
-  rigged function so on exit it will print information that we are
-  exiting it. This uses the `..FIRST_CALL..` special variable introduced
-  in above section.
+- If a wrapper function is the first to be called within a rigged
+  function’s execution, it prints information signaling that we are
+  entering the rigged function, and sets up an exit hook so we print
+  information that we are exiting it. It detects this “first call” by
+  the absence of a `..EVALED_ARGS..` variable in the rigged function’s
+  execution environment, which it creates on that occasion.
 - It checks if the rigged function’s arguments have been evaluated
   (remember in R arguments are not evaluated unless their values are
-  requested down the line) and prints them when they are. This uses the
-  \`..EVALED_ARGS..\`\` special variable introduced in above section.
+  requested down the line) and prints them when they are. This uses that
+  same `..EVALED_ARGS..` variable, a named logical vector that keeps
+  track of which arguments have been evaled.
 
-### `rig_in_namespace()`
+### `rig_in_place()`
 
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
+[`rig_in_place()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
 calls `rig_impl()` on its inputs but unlike
 [`rig()`](https://moodymudskipper.github.io/boomer/reference/boom.md) we
 want the rigged functions to be bound in the namespace instead of the
 original functions.
 
-To do this we unlock the namespace and assigned rigged functions there.
+To do this we unlock the namespace and assign the rigged functions
+there. We also replace the other copies a caller might reach: the one in
+the attached package environment, the one in the S3 methods table (so S3
+dispatch is verbose too), and the ones imported by other already loaded
+packages.
 
 Since
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
+[`rig_in_place()`](https://moodymudskipper.github.io/boomer/reference/boom.md)
 accepts several functions as arguments, and that they might call each
 other, we also make sure we include wrapped versions of our rigged
 functions in all the masks.

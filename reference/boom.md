@@ -10,8 +10,9 @@
   packages as well as on functions defined in a session. To undo, call
   `load_all()` for the development package or
   [`pkgload::unload()`](https://pkgload.r-lib.org/reference/unload.html)
-  on other packages, or restart the session if your rigged a base
-  package. Shouldn't be used on S3 generics, but works on S3 methods.
+  on other packages, or restart the session if you rigged a base
+  package. It works on S3 methods, and when given an S3 generic it rigs
+  the generic's registered methods instead.
 
 - `rig_on_load()` can be used in `.onLoad()` to rig functions (values or
   names) stored in `getOption("boomer.rig_on_load")`
@@ -80,11 +81,9 @@ rig_on_load()
 ## Value
 
 `boom()` returns the output of the call. `rig()` returns the modified
-input function.
-[`rig_in_namespace()`](https://moodymudskipper.github.io/boomer/reference/rig_in_namespace.md)
-returns `invisible(NULL)` and is called for side effects. `rigger()`
-returns a list containing the arguments, with the class "rigger" to
-enable `+.rigger` and `print.rigger`
+input function. `rig_in_place()` returns `invisible(NULL)` and is called
+for side effects. `rigger()` returns a list containing the arguments,
+with the class "rigger" to enable `+.rigger` and `print.rigger`
 
 ## Side effects of `rig_in_place()`
 
@@ -128,7 +127,7 @@ boom(subset(head(mtcars, 2), qsec > 17))
 boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE, print = str)
 #> 💣 subset(head(mtcars, 2), qsec > 17) 
 #> · 💣 💥 head(mtcars, 2) 
-#> time: 0.188 ms
+#> time: 0.2 ms
 #> · 'data.frame': 2 obs. of  11 variables:
 #> ·  $ mpg : num  21 21
 #> ·  $ cyl : num  6 6
@@ -143,11 +142,11 @@ boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE, print = str)
 #> ·  $ carb: num  4 4
 #> · 
 #> · 💣 💥 qsec > 17 
-#> time: 0.009 ms
+#> time: 0.011 ms
 #> ·  logi [1:2] FALSE TRUE
 #> · 
 #> 💥 subset(head(mtcars, 2), qsec > 17) 
-#> time: 0.311 ms
+#> time: 0.316 ms
 #> 'data.frame':    1 obs. of  11 variables:
 #>  $ mpg : num 21
 #>  $ cyl : num 6
@@ -281,11 +280,11 @@ fun2(1)
 #> · x :
 #> · [1] "double"
 #> · 💣 💥 x + 1 
-#> time: 0.011 ms
+#> time: 0.01 ms
 #> · [1] "double"
 #> · 
 #> 💥 x + 1 + 2 
-#> time: 0.035 s
+#> time: 0.034 s
 #> [1] "double"
 #> 
 #> 👆 e2

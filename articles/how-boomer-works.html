@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">boomer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,7 +87,7 @@ of the function we rig.</p>
 <span><span class="co">#&gt;     ifelse(grepl("^(.*[^.]+.*)[.]([[:alnum:]]+)$", basename(x)), </span></span>
 <span><span class="co">#&gt;         sub(".*[.]([[:alnum:]]+)$", "\\1", x), "")</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;bytecode: 0x55e0010c3118&gt;</span></span>
+<span><span class="co">#&gt; &lt;bytecode: 0x5601420f8ee8&gt;</span></span>
 <span><span class="co">#&gt; &lt;environment: namespace:tools&gt;</span></span>
 <span><span class="va">rigged_file_ext</span></span>
 <span><span class="co">#&gt; function (x) </span></span>
@@ -98,7 +98,7 @@ of the function we rig.</p>
 <span><span class="co">#&gt;     ifelse(grepl("^(.*[^.]+.*)[.]([[:alnum:]]+)$", basename(x)), </span></span>
 <span><span class="co">#&gt;         sub(".*[.]([[:alnum:]]+)$", "\\1", x), "")</span></span>
 <span><span class="co">#&gt; }</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55e001af7a50&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x560142b2b7b0&gt;</span></span>
 <span><span class="co">#&gt; attr(,"boomer.rigged")</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>Instead we copy the original function but give it a new environment.
@@ -113,7 +113,7 @@ We call this environment the mask.</p>
 <span><span class="co"># our new environment</span></span>
 <span><span class="va">env</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">environment</a></span><span class="op">(</span><span class="va">rigged_file_ext</span><span class="op">)</span></span>
 <span><span class="va">env</span></span>
-<span><span class="co">#&gt; &lt;environment: 0x55e001af7a50&gt;</span></span>
+<span><span class="co">#&gt; &lt;environment: 0x560142b2b7b0&gt;</span></span>
 <span></span>
 <span><span class="co"># its parent</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/environment.html" class="external-link">parent.env</a></span><span class="op">(</span><span class="va">env</span><span class="op">)</span></span>
@@ -151,7 +151,7 @@ needed for the base pipe)</p>
 <code class="sourceCode R"><span><span class="fu">flow</span><span class="fu">::</span><span class="fu"><a href="https://moodymudskipper.github.io/flow/reference/flow_view_deps.html" class="external-link">flow_view_deps</a></span><span class="op">(</span><span class="fu">boomer</span><span class="fu">:::</span><span class="va">rig_impl</span>, show_imports <span class="op">=</span> <span class="st">"packages"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `knitr::include_graphics()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Cannot find the file(s): "/tmp/RtmpL3fnza/flow_31477e1dfb89.png"</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Cannot find the file(s): "/tmp/RtmpmkgptL/flow_30c1337fa52a.png"</span></span></code></pre></div>
 <p><code>rig_impl()</code> :</p>
 <ul>
 <li>Creates a new environment (the mask) as a child of the original
@@ -166,12 +166,6 @@ at “rig time”, can be made verbose too.</li>
 <li>Populates it with shims of all other called functions, using
 <code>wrap()</code>
 </li>
-<li>Creates special variables <code>..FIRST_CALL..</code> and
-<code>..EVALED_ARGS..</code> in this environment,
-<code>..FIRST_CALL..</code> is a boolean initiated to <code>TRUE</code>
-and set to <code>FALSE</code> once the first wrapper call is triggered,
-<code>..EVALED_ARGS..</code> is a named logical vector that keeps track
-of which arguments have been evaled.</li>
 </ul>
 </div>
 <div class="section level3">
@@ -183,27 +177,33 @@ of which arguments have been evaled.</li>
 function (e.g. argument values and execution time).</p>
 <p>However it does a couple more things:</p>
 <ul>
-<li>If a wrapper function is the first called it prints information
-signaling that we are entering the rig function, and it sets up our
-rigged function so on exit it will print information that we are exiting
-it. This uses the <code>..FIRST_CALL..</code> special variable
-introduced in above section.</li>
+<li>If a wrapper function is the first to be called within a rigged
+function’s execution, it prints information signaling that we are
+entering the rigged function, and sets up an exit hook so we print
+information that we are exiting it. It detects this “first call” by the
+absence of a <code>..EVALED_ARGS..</code> variable in the rigged
+function’s execution environment, which it creates on that
+occasion.</li>
 <li>It checks if the rigged function’s arguments have been evaluated
 (remember in R arguments are not evaluated unless their values are
-requested down the line) and prints them when they are. This uses the
-`..EVALED_ARGS..`` special variable introduced in above section.</li>
+requested down the line) and prints them when they are. This uses that
+same <code>..EVALED_ARGS..</code> variable, a named logical vector that
+keeps track of which arguments have been evaled.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="rig_in_namespace">
-<code>rig_in_namespace()</code><a class="anchor" aria-label="anchor" href="#rig_in_namespace"></a>
+<h3 id="rig_in_place">
+<code>rig_in_place()</code><a class="anchor" aria-label="anchor" href="#rig_in_place"></a>
 </h3>
-<p><code><a href="../reference/rig_in_namespace.html">rig_in_namespace()</a></code> calls <code>rig_impl()</code> on its
+<p><code><a href="../reference/boom.html">rig_in_place()</a></code> calls <code>rig_impl()</code> on its
 inputs but unlike <code><a href="../reference/boom.html">rig()</a></code> we want the rigged functions to be
 bound in the namespace instead of the original functions.</p>
-<p>To do this we unlock the namespace and assigned rigged functions
-there.</p>
-<p>Since <code><a href="../reference/rig_in_namespace.html">rig_in_namespace()</a></code> accepts several functions as
+<p>To do this we unlock the namespace and assign the rigged functions
+there. We also replace the other copies a caller might reach: the one in
+the attached package environment, the one in the S3 methods table (so S3
+dispatch is verbose too), and the ones imported by other already loaded
+packages.</p>
+<p>Since <code><a href="../reference/boom.html">rig_in_place()</a></code> accepts several functions as
 arguments, and that they might call each other, we also make sure we
 include wrapped versions of our rigged functions in all the masks.</p>
 </div>

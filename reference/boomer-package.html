@@ -9,7 +9,7 @@ Provides debugging tools that let you inspect the intermediate results of a call
 
     <a class="navbar-brand me-2" href="../index.html">boomer</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@ Provides debugging tools that let you inspect the intermediate results of a call
 <ul><li><p><code><a href="boom.html">boom()</a></code> displays the intermediate results of a call or a code chunk.</p></li>
 <li><p><code><a href="boom.html">rig()</a></code> creates a copy of a function which will display the intermediate
 results of all the calls of it body.</p></li>
-<li><p><code><a href="rig_in_namespace.html">rig_in_namespace()</a></code> rigs a namespaced function in place, so its always
+<li><p><code><a href="boom.html">rig_in_place()</a></code> rigs a namespaced function in place, so its always
 verbose even when called by other existing functions. It is especially handy
 for package development.</p></li>
 <li><p><code><a href="boom.html">rigger()</a></code> provides a convenient way to rig an
@@ -66,7 +66,7 @@ with a keyboard shortcut.</p></li>
 
 <p>Several options impact the display of exploded calls :</p><ul><li><p><code>boomer.print</code>: If the <code>print</code> argument is not provided, this option will
 replace it at run time. Defaults to the <code><a href="https://rdrr.io/r/base/print.html" class="external-link">base::print</a></code> function.
-<code>boomer.print = constructive::construct</code> is a useful alternative.ß</p></li>
+<code>boomer.print = constructive::construct</code> is a useful alternative.</p></li>
 <li><p><code>boomer.clock</code>: If the <code>clock</code> argument is not provided, this option will
 replace it at run time. Defaults to <code>FALSE</code>.</p></li>
 <li><p><code>boomer.print_args</code>: Whether to print the arguments of rigged functions
