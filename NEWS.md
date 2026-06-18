@@ -1,12 +1,30 @@
-# boomer 0.3.0
+# boomer 1.0.0
 
-- boomer doesn't use the 'pryr' package anymore.
-- `rig_in_namespace()` works better when provided several functions.
-- `rig_in_namespace()` can be used on functions from any package.
+Boomer is back on CRAN!
+
+- `rig_in_namespace()` was renamed to `rig_in_place()`, and is kept as a
+  deprecated alias.
+- `rig_in_place()` works on functions from any package and on several functions
+  at once. It rigs them wherever a copy is used (the namespace, the attached
+  package environment, the S3 methods table, and the import environments of other
+  loaded packages) so they stay verbose even when called by other functions.
+- Rigging an S3 method now updates the copy that S3 dispatch actually calls, and
+  rigging an S3 generic rigs all of its registered methods.
+- `rig()` and `rig_in_place()` accept character input, e.g. `rig("pkg::fun")`.
+- `rig()` and `rig_in_place()` support recursive functions.
+- `rig_on_load()`, called from a package's `.onLoad()`, rigs the functions listed
+  in the `boomer.rig_on_load` option.
+- New options `boomer.theme.args`, `boomer.theme.rigged_fun` and
+  `boomer.theme.code` customize the colors used in the output.
 - A new option `boomer.max_indent` helps keeping the indentation under control, 
   useful for long pipe sequences or deeply nested calls.
 - A new option `boomer.log` can send the exploded output to files in addition to
   (or instead of) the console.
+- boomer doesn't use the 'pryr' package anymore.
+- Rigging a function that evaluates a wrapped call directly in its own
+  environment no longer fails with "the empty environment has no parent". This
+  affected e.g. `constructive::construct()`, which uses `rlang::arg_match()` to
+  resolve a formal's choices.
 
 # boomer 0.2.0
 

@@ -1,15 +1,17 @@
 #' @importFrom stats setNames
 #' @importFrom utils getParseData head capture.output getFromNamespace isS3stdGeneric
 #' @importFrom methods allNames formalArgs
-#' @aliases boomer boomer-package boomer.print boomer.clock boomer.print_args
-#'   boomer.visible_only boomer.ignore boomer.ignore_args boomer.safe_print
-#'   boomer.theme.args boomer.theme.rigged_fun boomer.theme.code boomer.log
+#' @aliases boomer boomer-package
+#' @aliases boomer.print boomer.clock boomer.print_args boomer.visible_only
+#' @aliases boomer.ignore boomer.ignore_args boomer.safe_print boomer.abbreviate
+#' @aliases boomer.theme.args boomer.theme.rigged_fun boomer.theme.code
+#' @aliases boomer.max_indent boomer.log boomer.rig_on_load
 #' @details
 #'
 #' * [boom()] displays the intermediate results of a call or a code chunk.
 #' * [rig()] creates a copy of a function which will display the intermediate
 #' results of all the calls of it body.
-#' * [rig_in_namespace()] rigs a namespaced function in place, so its always
+#' * [rig_in_place()] rigs a namespaced function in place, so its always
 #' verbose even when called by other existing functions. It is especially handy
 #' for package development.
 #' * [rigger()] provides a convenient way to rig an
@@ -23,7 +25,7 @@
 #'
 #' - `boomer.print`: If the `print` argument is not provided, this option will
 #'   replace it at run time. Defaults to the `base::print` function.
-#'   `boomer.print = constructive::construct` is a useful alternative.ß
+#'   `boomer.print = constructive::construct` is a useful alternative.
 #' - `boomer.clock`: If the `clock` argument is not provided, this option will
 #'   replace it at run time. Defaults to `FALSE`.
 #' - `boomer.print_args`: Whether to print the arguments of rigged functions

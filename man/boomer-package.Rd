@@ -11,10 +11,13 @@
 \alias{boomer.ignore}
 \alias{boomer.ignore_args}
 \alias{boomer.safe_print}
+\alias{boomer.abbreviate}
 \alias{boomer.theme.args}
 \alias{boomer.theme.rigged_fun}
 \alias{boomer.theme.code}
+\alias{boomer.max_indent}
 \alias{boomer.log}
+\alias{boomer.rig_on_load}
 \title{boomer: Debugging Tools to Inspect the Intermediate Steps of a Call}
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
@@ -26,7 +29,7 @@ Provides debugging tools that let you inspect the intermediate results of a call
 \item \code{\link[=boom]{boom()}} displays the intermediate results of a call or a code chunk.
 \item \code{\link[=rig]{rig()}} creates a copy of a function which will display the intermediate
 results of all the calls of it body.
-\item \code{\link[=rig_in_namespace]{rig_in_namespace()}} rigs a namespaced function in place, so its always
+\item \code{\link[=rig_in_place]{rig_in_place()}} rigs a namespaced function in place, so its always
 verbose even when called by other existing functions. It is especially handy
 for package development.
 \item \code{\link[=rigger]{rigger()}} provides a convenient way to rig an
@@ -42,7 +45,7 @@ Several options impact the display of exploded calls :
 \itemize{
 \item \code{boomer.print}: If the \code{print} argument is not provided, this option will
 replace it at run time. Defaults to the \code{base::print} function.
-\code{boomer.print = constructive::construct} is a useful alternative.ß
+\code{boomer.print = constructive::construct} is a useful alternative.
 \item \code{boomer.clock}: If the \code{clock} argument is not provided, this option will
 replace it at run time. Defaults to \code{FALSE}.
 \item \code{boomer.print_args}: Whether to print the arguments of rigged functions

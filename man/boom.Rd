@@ -47,7 +47,7 @@ of the given S3 class are printed. For instance \code{print = list(str, data.fra
 }
 \value{
 \code{boom()} returns the output of the call. \code{rig()} returns the modified
-input function. \code{rig_in_namespace()} returns \code{invisible(NULL)} and is called
+input function. \code{rig_in_place()} returns \code{invisible(NULL)} and is called
 for side effects. \code{rigger()} returns a list containing the arguments, with
 the class "rigger" to enable \code{+.rigger} and \code{print.rigger}
 }
@@ -60,8 +60,9 @@ results of all the calls of it body.
 verbose even when called by other existing functions. It works on functions from packages
 as well as on functions defined in a session.
 To undo, call \code{load_all()} for the development package or
-\code{pkgload::unload()} on other packages, or restart the session if your rigged a base package. Shouldn't be used on S3 generics, but works
-on S3 methods.
+\code{pkgload::unload()} on other packages, or restart the session if you rigged a base package.
+It works on S3 methods, and when given an S3 generic it rigs the generic's
+registered methods instead.
 \item \code{rig_on_load()} can be used in \code{.onLoad()} to rig functions (values or names) stored in \code{getOption("boomer.rig_on_load")}
 \item \code{rigger()} provides a convenient way to rig an
 anonymous function by using the \code{rigger(...) + function(...) {...}} syntax.

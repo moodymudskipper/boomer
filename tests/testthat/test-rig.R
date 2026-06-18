@@ -40,6 +40,19 @@ test_that("missing arguments don't break rig()", {
   fun <- function(a, b, c) {
     a + b
     missing(c)
-  } 
+  }
   expect_snapshot(rig(fun) (1, 2))
+})
+
+test_that("wrapped functions evaluated in the mask itself don't error (#140)", {
+  # Some callers evaluate a wrapped function directly in the mask, e.g.
+  # `rlang::arg_match()` resolves a formal's choices with
+  # `eval_bare(formals(fn)[[arg]], get_env(fn))` and for a rigged function
+  # `get_env(fn)` is the mask. The wrapper must then stop at the mask instead of
+  # walking past the namespace chain into the empty environment, which used to
+  # raise "the empty environment has no parent".
+  foo <- function(x = c("a", "b")) c(x)
+  rigged <- rig(foo)
+  mask <- environment(rigged)
+  expect_no_error(capture.output(eval(quote(c("a", "b")), mask)))
 })

@@ -1,8 +1,8 @@
 #' simulate a package
 #'
 #' simulate loading a namespace or attaching a package. designed to make reprexes
-#' for `rig_in_namespace()` easy. The input function's closer env is set to
-#' the namespace and no fancy feature such as registering S3 methods is supported
+#' for `rig_in_place()` easy. The input function's closer env is set to
+#' the namespace, and S3 methods can be registered through the `s3` argument.
 #'
 #' @param name string, name of fake package
 #' @param exported named list of exported functions

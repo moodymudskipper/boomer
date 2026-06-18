@@ -13,3 +13,4 @@
 ^CRAN-SUBMISSION$
 ^.claude$
 ^\.ccache$
+^talks$
