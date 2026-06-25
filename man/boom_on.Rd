@@ -5,11 +5,14 @@
 \alias{boom_off}
 \title{Switch "boom" debugging on and off}
 \usage{
-boom_on(clock = NULL, print = NULL)
+boom_on(..., clock = NULL, print = NULL)
 
-boom_off()
+boom_off(...)
 }
 \arguments{
+\item{...}{Not used by the code, but passing \code{browser()} makes sure the caller function is not compiled
+into bytecode.}
+
 \item{clock}{whether to time intermediate steps. Defaults to \code{getOption("boomer.clock")}
 evaluated at run time (\code{FALSE} unless you change it). The execution time of
 a step doesn't include the execution time of its previously printed sub-steps.}
@@ -22,6 +25,38 @@ evaluated at run time (\code{base::print} unless you change it)'.}
 Returns \code{NULL} invisibly, called for side effects.
 }
 \description{
+To scope the verbosity brought by 'boomer' to specific sections of the code we can call
+\code{boom_on()} and \code{boom_off()}. These can be called interactively when using
+\code{browser()}, \code{debug()}, \code{debugonce()} for instance, or non-interactively, with the caveat explained
+in the dedicated section below (in short, you need to call \code{boom_on(browser())} )
+}
+\section{Calling \code{boom_on()} and \code{boom_off()} interactively}{
+
+
 While debugging a function, call \code{boom_on()} and all subsequent calls will be boomed,
 call \code{boom_off()} to return to standard debugging.
 }
+
+\section{Calling \code{boom_on()} and \code{boom_off()} non-interactively}{
+
+
+This use case has a quirky singularity.
+The first time any R function is called a flag is set on the object, invisible from R itself.
+Then when it's called a second time the function is compiled to bytecode before execution.
+A consequence is that the tricks boomer uses to make functions chatty don't work on operators
+like \code{+} or control flow constructs like \code{if}.
+
+There are 3 ways to make sure a function is not compiled:
+\itemize{
+\item Run it in interactive mode (see section above)
+\item Fake the interactive mode by having an unevaled call to \code{browser()} in the function's body,
+like a line of code \code{~ browser()}, or easier just \code{boom_on(browser())} where the function ignores the first arg.
+\item Disable \code{compiler::enableJIT(0)} before the function is compiled or set the env variable \code{R_ENABLE_JIT=0} in your .REnviron (setting it mid session won't work).
+}
+
+Pro tip: Have in your .RProfile \code{setHook(packageEvent("boomer", "onLoad"), function(...) compiler::enableJIT(0))},
+it will disable compilation only when boomer's namespace is loaded, at a performance cost that is most likely not
+impactful in a debugging context. This way you can call \code{boom_on()} normally without bothering with these odd
+looking \code{browser()} calls.
+}
+
