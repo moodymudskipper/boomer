@@ -29,6 +29,9 @@ rig_impl <- function(
 
     # fetch the env, primitives don't have one, but they're in the base package
     fun_val <- get(wrapped_nm, envir = rigged_fun_env)
+    # never wrap boomer's own switch: `boom_off()` would otherwise boom itself
+    # when turning tracing off
+    if (identical(fun_val, boom_off)) next
     fun_env <- environment(fun_val)
     if(is.null(fun_env)) {
       fun_env <- asNamespace("base")
@@ -137,6 +140,10 @@ double_colon <- function(clock, print_fun, rigged_nm, mask) {
     # (e.g. `base::.ark_capture_current_environment()`), which would otherwise
     # be wrapped and boomed on every prompt during `boom_on()` sessions
     if (pkg == "base" && startsWith(name, ".ark_")) {
+      return(fun_val)
+    }
+    # `boomer::boom_off()` shouldn't boom itself when turning tracing off
+    if (identical(fun_val, boom_off)) {
       return(fun_val)
     }
     wrap(fun_val, clock, print_fun, rigged_nm, "::", mask)
