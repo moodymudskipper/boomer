@@ -13,11 +13,15 @@ export(rig_in_namespace)
 export(rig_in_place)
 export(rig_on_load)
 export(rigger)
-importFrom(methods,allNames)
-importFrom(methods,formalArgs)
+importFrom(methods,
+  allNames,
+  formalArgs
+)
 importFrom(stats,setNames)
-importFrom(utils,capture.output)
-importFrom(utils,getFromNamespace)
-importFrom(utils,getParseData)
-importFrom(utils,head)
-importFrom(utils,isS3stdGeneric)
+importFrom(utils,
+  capture.output,
+  getFromNamespace,
+  getParseData,
+  head,
+  isS3stdGeneric
+)
