@@ -31,4 +31,4 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Language: en
 Roxygen: list(markdown = TRUE)
-Config/roxygen2/version: 8.0.0.9000
+Config/roxygen2/version: 8.1.0.9000
