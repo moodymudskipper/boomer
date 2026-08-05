@@ -142,11 +142,11 @@ boom(subset(head(mtcars, 2), qsec > 17), clock = TRUE, print = str)
 #> ·  $ carb: num  4 4
 #> · 
 #> · 💣 💥 qsec > 17 
-#> time: 0.01 ms
+#> time: 0.012 ms
 #> ·  logi [1:2] FALSE TRUE
 #> · 
 #> 💥 subset(head(mtcars, 2), qsec > 17) 
-#> time: 0.308 ms
+#> time: 0.321 ms
 #> 'data.frame':    1 obs. of  11 variables:
 #>  $ mpg : num 21
 #>  $ cyl : num 6
@@ -280,7 +280,7 @@ fun2(1)
 #> · x :
 #> · [1] "double"
 #> · 💣 💥 x + 1 
-#> time: 0.011 ms
+#> time: 0.01 ms
 #> · [1] "double"
 #> · 
 #> 💥 x + 1 + 2 
