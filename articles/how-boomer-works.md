@@ -19,7 +19,7 @@ tools::file_ext
 #>     ifelse(grepl("^(.*[^.]+.*)[.]([[:alnum:]]+)$", basename(x)), 
 #>         sub(".*[.]([[:alnum:]]+)$", "\\1", x), "")
 #> }
-#> <bytecode: 0x56494248f8b0>
+#> <bytecode: 0x5b6b9f894920>
 #> <environment: namespace:tools>
 rigged_file_ext
 #> function (x) 
@@ -30,7 +30,7 @@ rigged_file_ext
 #>     ifelse(grepl("^(.*[^.]+.*)[.]([[:alnum:]]+)$", basename(x)), 
 #>         sub(".*[.]([[:alnum:]]+)$", "\\1", x), "")
 #> }
-#> <environment: 0x564942d5a208>
+#> <environment: 0x5b6ba015f2e8>
 #> attr(,"boomer.rigged")
 #> [1] TRUE
 ```
@@ -49,7 +49,7 @@ environment(tools::file_ext)
 # our new environment
 env <- environment(rigged_file_ext)
 env
-#> <environment: 0x564942d5a208>
+#> <environment: 0x5b6ba015f2e8>
 
 # its parent
 parent.env(env)
@@ -87,7 +87,7 @@ Here’s the diagram of dependencies of `rig_impl()`
 flow::flow_view_deps(boomer:::rig_impl, show_imports = "packages")
 #> PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
 #> Error in `knitr::include_graphics()`:
-#> ! Cannot find the file(s): "/tmp/RtmpjFqkeW/flow_29885bc154ee.png"
+#> ! Cannot find the file(s): "/tmp/RtmpM4bxN9/flow_29602a8b3ccd.png"
 ```
 
 `rig_impl()` :
