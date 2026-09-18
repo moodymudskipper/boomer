@@ -7,7 +7,7 @@
 \usage{
 boom_on(..., clock = NULL, print = NULL)
 
-boom_off(...)
+boom_off()
 }
 \arguments{
 \item{...}{Not used by the code, but passing \code{browser()} makes sure the caller function is not compiled
@@ -51,12 +51,15 @@ There are 3 ways to make sure a function is not compiled:
 \item Run it in interactive mode (see section above)
 \item Fake the interactive mode by having an unevaled call to \code{browser()} in the function's body,
 like a line of code \code{~ browser()}, or easier just \code{boom_on(browser())} where the function ignores the first arg.
-\item Disable \code{compiler::enableJIT(0)} before the function is compiled or set the env variable \code{R_ENABLE_JIT=0} in your .REnviron (setting it mid session won't work).
+\item Call \code{compiler::enableJIT(0)} before the function is compiled or set the env variable \code{R_ENABLE_JIT=0} in your .REnviron (setting it mid session won't work).
 }
 
 Pro tip: Have in your .RProfile \code{setHook(packageEvent("boomer", "onLoad"), function(...) compiler::enableJIT(0))},
 it will disable compilation only when boomer's namespace is loaded, at a performance cost that is most likely not
 impactful in a debugging context. This way you can call \code{boom_on()} normally without bothering with these odd
 looking \code{browser()} calls.
+
+\code{boom_on()} warns when it detects that the calling function was compiled, unless it was
+given an argument through \code{...} or called from a \code{browser()} prompt.
 }
 

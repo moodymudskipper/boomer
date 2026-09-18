@@ -23,12 +23,15 @@
 #' * Run it in interactive mode (see section above)
 #' * Fake the interactive mode by having an unevaled call to `browser()` in the function's body, 
 #'   like a line of code `~ browser()`, or easier just `boom_on(browser())` where the function ignores the first arg.
-#' * Disable `compiler::enableJIT(0)` before the function is compiled or set the env variable `R_ENABLE_JIT=0` in your .REnviron (setting it mid session won't work).
+#' * Call `compiler::enableJIT(0)` before the function is compiled or set the env variable `R_ENABLE_JIT=0` in your .REnviron (setting it mid session won't work).
 #' 
 #' Pro tip: Have in your .RProfile `setHook(packageEvent("boomer", "onLoad"), function(...) compiler::enableJIT(0))`, 
 #' it will disable compilation only when boomer's namespace is loaded, at a performance cost that is most likely not
 #' impactful in a debugging context. This way you can call `boom_on()` normally without bothering with these odd
 #' looking `browser()` calls.
+#' 
+#' `boom_on()` warns when it detects that the calling function was compiled, unless it was
+#' given an argument through `...` or called from a `browser()` prompt.
 #' 
 #' @inheritParams boom
 #' @param ... Not used by the code, but passing `browser()` makes sure the caller function is not compiled
@@ -38,6 +41,7 @@
 #' @return Returns `NULL` invisibly, called for side effects.
 boom_on <- function(..., clock = NULL, print = NULL) {
   fun <- sys.function(-1)
+  warn_if_compiled(fun, has_dots = ...length() > 0)
   rigged_fun <- rig_impl(fun, clock, print, rigged_nm = NULL)
   e <- parent.frame()
   parent.env(e) <- environment(rigged_fun)
@@ -50,4 +54,31 @@ boom_off <- function() {
   e <- parent.frame()
   parent.env(e) <- parent.env(parent.env(e))
   invisible(NULL)
+}
+
+# A byte-compiled caller won't have its operators and control flow constructs
+# boomed, so we tell the user how to avoid the compilation. Calls typed at a
+# browser prompt are fine, and so are calls that were given an unevaled
+# `browser()` through `...`, which is what prevented the compilation.
+warn_if_compiled <- function(fun, has_dots) {
+  if (has_dots || !is_compiled(fun) || is_browsing()) return(invisible(NULL))
+  warning(
+    "`boom_on()` was called from a byte-compiled function, so operators like ",
+    "`+` and control flow constructs like `if` won't be boomed.\n",
+    "Call `boom_on(browser())` instead, or disable the compilation for the ",
+    "session with `compiler::enableJIT(0)`.\n",
+    "See `?boom_on` for details.",
+    call. = FALSE
+  )
+}
+
+is_compiled <- function(fun) {
+  # R gives us no direct way to ask whether a closure carries bytecode, but
+  # printing it shows a `<bytecode: ...>` line when it does
+  any(startsWith(capture.output(print(fun)), "<bytecode:"))
+}
+
+is_browsing <- function() {
+  # `browserText()` fails when no browser context is on the stack
+  tryCatch({browserText(); TRUE}, error = function(e) FALSE)
 }
