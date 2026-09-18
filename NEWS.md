@@ -25,6 +25,13 @@ Boomer is back on CRAN!
   environment no longer fails with "the empty environment has no parent". This
   affected e.g. `constructive::construct()`, which uses `rlang::arg_match()` to
   resolve a formal's choices.
+- `boom_on()` and `boom_off()` can be used in the body of a function and not only
+  at a `browser()` prompt. Since a byte-compiled function doesn't show its
+  operators and control flow constructs, pass an unevaled `browser()` to
+  `boom_on()`, as in `boom_on(browser())`, to keep the caller from being
+  compiled. `boom_on()` warns when it detects a compiled caller, and `?boom_on`
+  documents the other ways around it.
+- `boom_off()` doesn't boom itself anymore when it turns booming off.
 
 # boomer 0.2.0
 
