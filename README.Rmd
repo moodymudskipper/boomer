@@ -30,17 +30,17 @@ into its parts hence the name.
 
 ## Installation
 
-Install CRAN version with:
+Install boomer from cynkra's R-universe:
 
 ``` r
-install.packages("boomer")
+install.packages('boomer', repos = c('https://cynkra.r-universe.dev', 'https://cloud.r-project.org'))
 ```
 
 
-Or development version with:
+Or from GitHub:
 
 ``` r
-remotes::install_github("moodymudskipper/boomer")
+pak::pak("moodymudskipper/boomer")
 ```
 
 ## `boom()`
